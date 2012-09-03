@@ -695,6 +695,146 @@ class npc_venture_co_straggler : public CreatureScript
         }
 };
 
+/*######
+## Quest A Blade Fit For A Champion Daily Argent Tournament.
+## http://www.wowhead.com/search?q=A+Blade+Fit+For+A+Champion
+## 13603, 13666, 13673, 13741, 13746, 13752, 13757, 13762, 13768, 13773, 13778, 13783
+######*/
+
+enum eLakeFrog
+{
+    SPELL_WARTSBGONE_LIP_BALM       = 62574,
+    SPELL_FROG_LOVE                 = 62537,
+    SPELL_WARTS                     = 62581,
+    NPC_MAIDEN_OF_ASHWOOD_LAKE      = 33220,
+    SUMMON_ASHOOD_BRAND_SPELL       = 62554,
+    SAY_MAIDEM                      = -1850015 // Can it really be? Free after all these years?
+};
+
+struct QUEST_A_BLADE_FIT_FOR_A_CHAMPION
+{ 
+    uint32 quest_id; 
+};
+
+QUEST_A_BLADE_FIT_FOR_A_CHAMPION new_quest[] = 
+{
+    13603,13666,13673,13741,13746,13752,13757,13762,13768,13773,13778,13783,
+};
+
+class npc_lake_frog : public CreatureScript
+{
+public:
+    npc_lake_frog() : CreatureScript("npc_lake_frog") { }
+
+    struct npc_lake_frogAI : public FollowerAI 
+    {
+        npc_lake_frogAI(Creature *c) : FollowerAI(c) {}
+       
+        uint32 uiFollowTimer; 
+        bool following;	
+    
+        void Reset () 
+        {
+            following = false;
+            uiFollowTimer = 15000; // 15 seg te siguie la ranita
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (following)
+            {
+                if (uiFollowTimer <= diff)
+                {
+                    SetFollowComplete();
+                    me->DisappearAndDie();
+                    me->Respawn(true);
+                    Reset();
+                }
+                else uiFollowTimer-=diff;
+            }
+        }
+
+        void ReceiveEmote(Player* player, uint32 emote)
+        {
+            if (following) 
+                return;
+			
+            if (emote==TEXT_EMOTE_KISS)
+                for (int i = 0; i < 12; i++)
+                {
+
+
+                             if(roll_chance_i(10) && player->GetQuestStatus(new_quest[i].quest_id) == QUEST_STATUS_INCOMPLETE)
+                             {
+                                 if (Unit* pMaidem = me->SummonCreature(NPC_MAIDEN_OF_ASHWOOD_LAKE,me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),0,TEMPSUMMON_TIMED_DESPAWN,30000))
+                                 {
+                                 player->SummonCreature(NPC_MAIDEN_OF_ASHWOOD_LAKE,me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),0,TEMPSUMMON_TIMED_DESPAWN,30000);
+                                 DoScriptText(SAY_MAIDEM, pMaidem);
+                                 me->DisappearAndDie();		
+                                 me->Respawn(true); 
+                                 }
+                              }
+                            else
+                            {
+                            player->RemoveAura(SPELL_WARTSBGONE_LIP_BALM);	
+                            me->AddAura(SPELL_FROG_LOVE,me);
+                            StartFollow(player, 35, NULL); 
+                            following=true;
+                            }
+                    
+                }
+        }
+    };
+
+    CreatureAI *GetAI(Creature *pCreature) const
+    {
+        return new npc_lake_frogAI(pCreature);
+    }
+};
+
+enum MaidenOFAshwoodLake
+{
+    MAIDEN_DEFAULT_TEXTID       = 14319,
+    MAIDEN_REWARD_TEXTID        = 14320,
+    SPELL_SUMMON_ASHWOOD_BRAND  = 62554
+};
+
+#define GOSSIP_HELLO_MAIDEN "Glad to help. my lady. I'm toid you were once the guardian of a fabled sword. Do you know where I might find it?"
+
+class npc_maiden_of_ashwood_lake : public CreatureScript
+{
+public:
+    npc_maiden_of_ashwood_lake() : CreatureScript("npc_maiden_of_ashwood_lake") { }
+
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+    {
+        if(!pPlayer->HasItemCount(44981,1,true))
+        {
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_MAIDEN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            pPlayer->SEND_GOSSIP_MENU(MAIDEN_DEFAULT_TEXTID, pCreature->GetGUID());
+            pCreature->DespawnOrUnsummon(10000);
+            return true;
+        }
+
+        pPlayer->SEND_GOSSIP_MENU(MAIDEN_DEFAULT_TEXTID, pCreature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature /*pCreature*/, uint32 /*uiSender*/, uint32 uiAction)
+    {
+        pPlayer->PlayerTalkClass->ClearMenus();
+        switch(uiAction)
+        {
+            case GOSSIP_ACTION_INFO_DEF+1:
+                pPlayer->CastSpell(pPlayer,SPELL_SUMMON_ASHWOOD_BRAND,true);
+                pPlayer->SEND_GOSSIP_MENU(MAIDEN_REWARD_TEXTID, pCreature->GetGUID());
+                break;
+        }
+        return true;
+    }
+};
+
+
 void AddSC_grizzly_hills()
 {
     new npc_emily();
@@ -705,4 +845,6 @@ void AddSC_grizzly_hills()
     new npc_wounded_skirmisher();
     new npc_lightning_sentry();
     new npc_venture_co_straggler();
+    new npc_lake_frog();
+    new npc_maiden_of_ashwood_lake();
 }
