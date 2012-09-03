@@ -226,7 +226,7 @@ class boss_eadric : public CreatureScript
             }
         }
 
-        void DamageTaken(Unit *done_by, uint32 &damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {
@@ -419,7 +419,7 @@ class boss_paletress : public CreatureScript
                 DoScriptText(SAY_MEM_DIE, me);
         }
 
-        void DamageTaken(Unit *done_by, uint32 &damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {

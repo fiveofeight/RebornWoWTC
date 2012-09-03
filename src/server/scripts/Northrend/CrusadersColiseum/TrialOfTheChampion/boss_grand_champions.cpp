@@ -624,7 +624,7 @@ class boss_warrior_toc5 : public CreatureScript
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {
@@ -789,7 +789,7 @@ class boss_mage_toc5 : public CreatureScript
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {
@@ -966,7 +966,7 @@ class boss_shaman_toc5 : public CreatureScript
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {
@@ -1195,7 +1195,7 @@ class boss_hunter_toc5 : public CreatureScript
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {
@@ -1380,7 +1380,7 @@ class boss_rouge_toc5 : public CreatureScript
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
             if (damage >= me->GetHealth())
             {
