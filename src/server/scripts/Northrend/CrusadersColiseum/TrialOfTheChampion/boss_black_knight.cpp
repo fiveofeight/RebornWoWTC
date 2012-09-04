@@ -540,7 +540,7 @@ public:
                 instance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& uiDamage)
         {
             if (uiDamage >= me->GetHealth() && uiPhase <= PHASE_SKELETON)
             {
