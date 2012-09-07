@@ -74,7 +74,7 @@ namespace Movement
 
         // there is a big chance that current position is unknown if current state is not finalized, need compute it
         // this also allows calculate spline position and update map position in much greater intervals
-        if (!move_spline.Finalized() && !unit.HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !unit.GetTransGUID())
+        if (!move_spline.Finalized())
             real_position = move_spline.ComputePosition();
 
         // should i do the things that user should do? - no.
