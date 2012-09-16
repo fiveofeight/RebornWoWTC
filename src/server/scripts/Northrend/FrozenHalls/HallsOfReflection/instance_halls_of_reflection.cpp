@@ -109,6 +109,8 @@ public:
     {
         instance_halls_of_reflection_InstanceMapScript(Map* map) : InstanceScript(map) {};
 
+        bool m_bIsCall;
+
         uint64 uiFalric;
         uint64 uiMarwyn;
         uint64 uiLichKing;
@@ -128,6 +130,7 @@ public:
         uint64 uiWall[4];
         uint64 uiWallID[4];
         uint64 uiCaveDoor;
+        uint64 m_uiSummonGUID[34];
 
         uint32 uiEncounter[MAX_ENCOUNTER];
         uint32 uiTeamInInstance;
@@ -135,12 +138,17 @@ public:
         uint32 uiIntroDone;
         uint32 uiSummons;
         uint32 uiDataPhase;
+        uint32 m_uiLocNo;
+        uint32 m_uiCheckSummon;
+        uint32 randsummon;
 
         EventMap events;
 
         void Initialize()
         {
             events.Reset();
+
+            m_bIsCall = false;
 
             uiFalric = 0;
             uiMarwyn = 0;
@@ -319,7 +327,12 @@ public:
             if (type == DATA_WAVE_COUNT && data == SPECIAL)
             {
                 CloseDoor(uiFrontDoor);
-                events.ScheduleEvent(EVENT_NEXT_WAVE, 10000);
+                if (!m_bIsCall)
+                {
+                   m_bIsCall = true;
+                   Summon();
+                }
+                events.ScheduleEvent(EVENT_NEXT_WAVE, 15000);
                 return;
             }
 
@@ -537,33 +550,107 @@ public:
             switch (uiWaveCount)
             {
                 case 1:
+                    if (Creature* pFalric = instance->GetCreature(uiFalric))
+                        SpawnWave(pFalric);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+                    break;
                 case 2:
+                    if (Creature* pFalric = instance->GetCreature(uiFalric))
+                        SpawnWave(pFalric);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+                    break;
                 case 3:
+                    if (Creature* pFalric = instance->GetCreature(uiFalric))
+                        SpawnWave(pFalric);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+                    break;
                 case 4:
                     if (Creature* pFalric = instance->GetCreature(uiFalric))
                         SpawnWave(pFalric);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 5:
                     if (GetData(DATA_FALRIC_EVENT) == DONE)
                         events.ScheduleEvent(EVENT_NEXT_WAVE, 10000);
                     else if (Creature* pFalric = instance->GetCreature(uiFalric))
                         if (pFalric->AI())
+                        {
+                            pFalric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_NON_ATTACKABLE);
                             pFalric->AI()->DoAction(ACTION_ENTER_COMBAT);
+                        }
                     break;
                 case 6:
-                case 7:
-                case 8:
-                case 9:
-                    if (Creature* pMarwyn  = instance->GetCreature(uiMarwyn))
+                    if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
                         SpawnWave(pMarwyn);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+                    break;
+                case 7:
+                    if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
+                        SpawnWave(pMarwyn);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+                    break;
+                case 8:
+                    if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
+                        SpawnWave(pMarwyn);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+                    break;
+                case 9:
+                    if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
+                        SpawnWave(pMarwyn);
+
+                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 10:
                     if (GetData(DATA_MARWYN_EVENT) != DONE) // wave should not have been started if DONE. Check anyway to avoid bug exploit!
                         if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
                             if (pMarwyn->AI())
+                            {
+                                pMarwyn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_NON_ATTACKABLE);
                                 pMarwyn->AI()->DoAction(ACTION_ENTER_COMBAT);
+                            }
                     break;
             }
+        }
+
+        void Summon()
+        {
+             m_uiLocNo = 0;
+
+             for (uint8 i = 0; i < 34; i++)
+             {
+                 m_uiCheckSummon = 0;
+                 switch (urand(0, 4))
+                 {
+                     case 0:
+                         randsummon = NPC_WAVE_MERCENARY; break;
+                     case 1:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 2:
+                         randsummon = NPC_WAVE_RIFLEMAN; break;
+                     case 3:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 4:
+                         randsummon = NPC_WAVE_MAGE; break;
+                 }
+
+                 if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
+                 { 
+                     if (Creature* trashwave = pMarwyn->SummonCreature(randsummon, SpawnLoc[i], TEMPSUMMON_DEAD_DESPAWN))
+                     {
+                        m_uiSummonGUID[i] = trashwave->GetGUID();
+                        trashwave->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        trashwave->SetReactState(REACT_PASSIVE);
+                     }
+                 }
+                 m_uiLocNo++;
+             }
         }
 
         // Wipe has been detected. Perform cleanup and reset.
@@ -589,29 +676,22 @@ public:
             }
         }
 
-        // spawn a wave on behalf of the summoner.
-        void SpawnWave(Creature* summoner)
+        // Activate a trash wave.
+        void SpawnWave(Creature* trashwave)
         {
-            uint32 index;
 
-            summoner->SetVisible(true);
-
-            // TODO: do composition at random. # of spawn also depends on uiWaveCount
-            // As of now, it is just one of each.
-            index = urand(0, ENCOUNTER_WAVE_MERCENARY-1);
-            summoner->SummonCreature(NPC_WAVE_MERCENARY, MercenarySpawnPos[index], TEMPSUMMON_DEAD_DESPAWN);
-
-            index = urand(0, ENCOUNTER_WAVE_FOOTMAN-1);
-            summoner->SummonCreature(NPC_WAVE_FOOTMAN, FootmenSpawnPos[index], TEMPSUMMON_DEAD_DESPAWN);
-
-            index = urand(0, ENCOUNTER_WAVE_RIFLEMAN-1);
-            summoner->SummonCreature(NPC_WAVE_RIFLEMAN, RiflemanSpawnPos[index], TEMPSUMMON_DEAD_DESPAWN);
-
-            index = urand(0, ENCOUNTER_WAVE_PRIEST-1);
-            summoner->SummonCreature(NPC_WAVE_PRIEST, PriestSpawnPos[index], TEMPSUMMON_DEAD_DESPAWN);
-
-            index = urand(0, ENCOUNTER_WAVE_MAGE-1);
-            summoner->SummonCreature(NPC_WAVE_MAGE, MageSpawnPos[index], TEMPSUMMON_DEAD_DESPAWN);
+             for (uint8 i = 0; i < 4; i++)
+             {
+                if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                {
+                   trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                   trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                   trashwave->SetReactState(REACT_AGGRESSIVE);
+                   trashwave->SetInCombatWithZone();
+                }
+                m_uiCheckSummon++;
+             }
+             uiWaveCount++;
         }
 
         void Update(uint32 diff)
@@ -628,6 +708,8 @@ public:
                     AddWave();
                     break;
             }
+
+
         }
     };
 

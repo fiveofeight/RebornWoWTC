@@ -143,17 +143,6 @@ enum eEnum
     QUEST_WRATH_OF_THE_LICH_KING_H2               = 24802,
 };
 
-enum Spells
-{
-    SPELL_CAST_VISUAL                  = 65633, //Jaina/Sylavana lo lanzan para invocar a uther
-    SPELL_BOSS_SPAWN_AURA              = 72712, //Falric and Marwyn
-    SPELL_UTHER_DESPAWN                = 70693,
-    SPELL_TAKE_FROSTMOURNE             = 72729,
-    SPELL_FROSTMOURNE_DESPAWN          = 72726,
-    SPELL_FROSTMOURNE_VISUAL           = 73220,
-    SPELL_FROSTMOURNE_SOUNDS           = 70667,
-};
-
 const Position HallsofReflectionLocs[]=
 {
     {5283.234863f, 1990.946777f, 707.695679f, 0.929097f},   // 2 Loralen Follows
@@ -316,6 +305,7 @@ public:
                     if (Creature* pUther = me->SummonCreature(NPC_UTHER, UtherSpawnPos, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         pUther->GetMotionMaster()->MoveIdle();
+                        pUther->CastSpell(pUther, SPELL_BOSS_SPAWN_AURA, true);
                         pUther->SetReactState(REACT_PASSIVE); // be sure he will not aggro arthas
                         uiUther = pUther->GetGUID();
                         me->SetUInt64Value(UNIT_FIELD_TARGET, uiUther);
@@ -416,6 +406,7 @@ public:
                     if (Creature* pUther = me->SummonCreature(NPC_UTHER, UtherSpawnPos, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         pUther->GetMotionMaster()->MoveIdle();
+                        pUther->CastSpell(pUther, SPELL_BOSS_SPAWN_AURA, true);
                         pUther->SetReactState(REACT_PASSIVE); // be sure he will not aggro arthas
                         uiUther = pUther->GetGUID();
                         me->SetUInt64Value(UNIT_FIELD_TARGET, uiUther);
@@ -517,11 +508,7 @@ public:
                 case EVENT_INTRO_LK_3:
                      // The Lich King banishes Uther to the abyss.
                      if (Creature* pUther = me->GetCreature(*me, uiUther))
-                     {
                          pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, true);
-                         pUther->DisappearAndDie();
-                         uiUther = 0;
-                     }
                      events.ScheduleEvent(EVENT_INTRO_LK_4, 5000);
                      break;
 
@@ -549,12 +536,14 @@ public:
                     {
                         pFalric->CastSpell(pFalric, SPELL_BOSS_SPAWN_AURA, true);
                         pFalric->SetVisible(true);
+                        pFalric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         pFalric->GetMotionMaster()->MovePoint(0, 5283.309f, 2031.173f, 709.319f);
                     }
                     if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
                     {
                         pMarwyn->CastSpell(pMarwyn, SPELL_BOSS_SPAWN_AURA, true);
                         pMarwyn->SetVisible(true);
+                        pMarwyn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         pMarwyn->GetMotionMaster()->MovePoint(0, 5335.585f, 1981.439f, 709.319f);
                     }
 
@@ -590,6 +579,7 @@ public:
                     if (Creature* pFalric = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
                         DoScriptText(SAY_FALRIC_INTRO_2, pFalric);
 
+                    instance->SetData(DATA_WAVE_COUNT, SPECIAL);   // start first wave
                     events.ScheduleEvent(EVENT_INTRO_LK_9, 5000);
                     break;
 
@@ -624,7 +614,6 @@ public:
                     if (instance)
                     {
                         instance->SetData(DATA_INTRO_EVENT, DONE);
-                        instance->SetData(DATA_WAVE_COUNT, SPECIAL);   // start first wave
                     }
 
                     if(GameObject* pGate = instance->instance->GetGameObject(instance->GetData64(DATA_FROSTWORN_DOOR)))
@@ -2018,9 +2007,9 @@ class at_hor_waves_restarter : public AreaTriggerScript
                 return true;
 
             if(instance->GetData(DATA_WAVE_COUNT) == SPECIAL)
-                return true;
+                return false;
 
-            if (instance->GetData(DATA_INTRO_EVENT) == DONE && instance->GetData(DATA_MARWYN_EVENT) != DONE)
+            if (instance->GetData(DATA_INTRO_EVENT) == DONE && instance->GetData(DATA_MARWYN_EVENT) != DONE && instance->GetData(DATA_WAVE_COUNT) == FAIL)
             {
                 instance->SetData(DATA_WAVE_COUNT, SPECIAL);
 

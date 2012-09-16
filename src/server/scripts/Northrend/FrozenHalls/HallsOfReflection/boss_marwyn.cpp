@@ -25,7 +25,7 @@ enum Yells
     SAY_SLAY_2                                    = -1668062,
     SAY_DEATH                                     = -1668063,
     SAY_CORRUPTED_FLESH_1                         = -1668064,
-    SAY_CORRUPTED_FLESH_2                         = -1668065,
+    SAY_WELL_OF_CORRUPTION                        = -1668065,
 };
 
 enum Spells
@@ -110,11 +110,12 @@ public:
                     events.ScheduleEvent(EVENT_OBLITERATE, 30000);
                     break;
                 case EVENT_WELL_OF_CORRUPTION:
+                    DoScriptText(SAY_WELL_OF_CORRUPTION, me);
                     DoCast(SPELL_WELL_OF_CORRUPTION);
                     events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13000);
                     break;
                 case EVENT_CORRUPTED_FLESH:
-                    DoScriptText(RAND(SAY_CORRUPTED_FLESH_1, SAY_CORRUPTED_FLESH_2), me);
+                    DoScriptText(SAY_CORRUPTED_FLESH_1, me);
                     DoCast(SPELL_CORRUPTED_FLESH);
                     events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20000);
                     break;
