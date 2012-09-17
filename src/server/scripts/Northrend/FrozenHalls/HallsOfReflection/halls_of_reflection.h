@@ -151,6 +151,8 @@ enum Actions
 
 static Position SpawnLoc[]=
 {
+
+// Yes I know groups here don't agree with instance_halls, but I can't think of another way of doing it atm.
     // Priests
     {5277.74f, 2016.88f, 707.778f, 5.96903f},
     {5295.88f, 2040.34f, 707.778f, 5.07891f},

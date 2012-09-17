@@ -508,7 +508,7 @@ public:
                 case EVENT_INTRO_LK_3:
                      // The Lich King banishes Uther to the abyss.
                      if (Creature* pUther = me->GetCreature(*me, uiUther))
-                         pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, true);
+                         DoCast(pUther, SPELL_UTHER_DESPAWN);
                      events.ScheduleEvent(EVENT_INTRO_LK_4, 5000);
                      break;
 
@@ -537,6 +537,7 @@ public:
                         pFalric->CastSpell(pFalric, SPELL_BOSS_SPAWN_AURA, true);
                         pFalric->SetVisible(true);
                         pFalric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        pFalric->SetSpeed(MOVE_WALK, 0.7f, true);
                         pFalric->GetMotionMaster()->MovePoint(0, 5283.309f, 2031.173f, 709.319f);
                     }
                     if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
@@ -544,6 +545,7 @@ public:
                         pMarwyn->CastSpell(pMarwyn, SPELL_BOSS_SPAWN_AURA, true);
                         pMarwyn->SetVisible(true);
                         pMarwyn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                        pMarwyn->SetSpeed(MOVE_WALK, 0.7f, true);
                         pMarwyn->GetMotionMaster()->MovePoint(0, 5335.585f, 1981.439f, 709.319f);
                     }
 
@@ -624,6 +626,14 @@ public:
                     if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
                         pLichKing->DisappearAndDie();
 
+                    if (Creature* pFalric = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
+                    {
+                        pFalric->SetSpeed(MOVE_RUN, 1.42857f, true);
+                    }
+                    if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
+                    {
+                        pMarwyn->SetSpeed(MOVE_RUN, 1.42857f, true);
+                    }
                     break;
 
                 case EVENT_SKIP_INTRO:
@@ -1189,8 +1199,6 @@ public:
             if (Player* player = (Player*)who)
                 if (player->isGameMaster())
                     return;
-
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             AttackStart(who);
         }

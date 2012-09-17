@@ -41,60 +41,6 @@ enum Events
     EVENT_START_LICH_KING,
 };
 
-static Position PriestSpawnPos[ENCOUNTER_WAVE_PRIEST] =
-{
-    {5277.74f, 2016.88f, 707.778f, 5.96903f},
-    {5295.88f, 2040.34f, 707.778f, 5.07891f},
-    {5320.37f, 1980.13f, 707.778f, 2.00713f},
-    {5280.51f, 1997.84f, 707.778f, 0.296706f},
-    {5302.45f, 2042.22f, 707.778f, 4.90438f},
-    {5306.57f, 1977.47f, 707.778f, 1.50098f},
-};
-
-static Position MageSpawnPos[ENCOUNTER_WAVE_MAGE] =
-{
-    {5312.75f, 2037.12f, 707.778f, 4.59022f},
-    {5309.58f, 2042.67f, 707.778f, 4.69494f},
-    {5275.08f, 2008.72f, 707.778f, 6.21337f},
-    {5279.65f, 2004.66f, 707.778f, 0.069813f},
-    {5275.48f, 2001.14f, 707.778f, 0.174533f},
-    {5316.7f, 2041.55f, 707.778f, 4.50295f},
-};
-
-static Position MercenarySpawnPos[ENCOUNTER_WAVE_MERCENARY] =
-{
-    {5302.25f, 1972.41f, 707.778f, 1.37881f},
-    {5311.03f, 1972.23f, 707.778f, 1.64061f},
-    {5277.36f, 1993.23f, 707.778f, 0.401426f},
-    {5318.7f, 2036.11f, 707.778f, 4.2237f},
-    {5335.72f, 1996.86f, 707.778f, 2.74017f},
-    {5299.43f, 1979.01f, 707.778f, 1.23918f},
-};
-
-static Position FootmenSpawnPos[ENCOUNTER_WAVE_FOOTMAN] =
-{
-    {5306.06f, 2037, 707.778f, 4.81711f},
-    {5344.15f, 2007.17f, 707.778f, 3.15905f},
-    {5337.83f, 2010.06f, 707.778f, 3.22886f},
-    {5343.29f, 1999.38f, 707.778f, 2.9147f},
-    {5340.84f, 1992.46f, 707.778f, 2.75762f},
-    {5325.07f, 1977.6f, 707.778f, 2.07694f},
-    {5336.6f, 2017.28f, 707.778f, 3.47321f},
-    {5313.82f, 1978.15f, 707.778f, 1.74533f},
-    {5280.63f, 2012.16f, 707.778f, 6.05629f},
-    {5322.96f, 2040.29f, 707.778f, 4.34587f},
-};
-
-static Position RiflemanSpawnPos[ENCOUNTER_WAVE_RIFLEMAN] =
-{
-    {5343.47f, 2015.95f, 707.778f, 3.49066f},
-    {5337.86f, 2003.4f, 707.778f, 2.98451f},
-    {5319.16f, 1974, 707.778f, 1.91986f},
-    {5299.25f, 2036, 707.778f, 5.02655f},
-    {5295.64f, 1973.76f, 707.778f, 1.18682f},
-    {5282.9f, 2019.6f, 707.778f, 5.88176f},
-};
-
 class instance_halls_of_reflection : public InstanceMapScript
 {
 public:
@@ -219,9 +165,6 @@ public:
                     break;
                 case NPC_SYLVANAS_PART1:
                     uiSylvanasPart1 = creature->GetGUID();
-                    break;
-                case NPC_FROSTWORN_GENERAL:
-                    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case NPC_JAINA_OUTRO:
                     if (uiTeamInInstance == HORDE)
@@ -552,26 +495,18 @@ public:
                 case 1:
                     if (Creature* pFalric = instance->GetCreature(uiFalric))
                         SpawnWave(pFalric);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 2:
                     if (Creature* pFalric = instance->GetCreature(uiFalric))
                         SpawnWave(pFalric);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 3:
                     if (Creature* pFalric = instance->GetCreature(uiFalric))
                         SpawnWave(pFalric);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 4:
                     if (Creature* pFalric = instance->GetCreature(uiFalric))
                         SpawnWave(pFalric);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 5:
                     if (GetData(DATA_FALRIC_EVENT) == DONE)
@@ -586,26 +521,18 @@ public:
                 case 6:
                     if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
                         SpawnWave(pMarwyn);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 7:
                     if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
                         SpawnWave(pMarwyn);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 8:
                     if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
                         SpawnWave(pMarwyn);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 9:
                     if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
                         SpawnWave(pMarwyn);
-
-                    events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
                     break;
                 case 10:
                     if (GetData(DATA_MARWYN_EVENT) != DONE) // wave should not have been started if DONE. Check anyway to avoid bug exploit!
@@ -626,18 +553,76 @@ public:
              for (uint8 i = 0; i < 34; i++)
              {
                  m_uiCheckSummon = 0;
-                 switch (urand(0, 4))
+                 switch (i)
                  {
                      case 0:
-                         randsummon = NPC_WAVE_MERCENARY; break;
+                         randsummon = NPC_WAVE_PRIEST; break;
                      case 1:
                          randsummon = NPC_WAVE_FOOTMAN; break;
                      case 2:
                          randsummon = NPC_WAVE_RIFLEMAN; break;
                      case 3:
-                         randsummon = NPC_WAVE_PRIEST; break;
+                         randsummon = NPC_WAVE_FOOTMAN; break;
                      case 4:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 5:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 6:
+                         randsummon = NPC_WAVE_RIFLEMAN; break;
+                     case 7:
+                         randsummon = NPC_WAVE_MERCENARY; break;
+                     case 8:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 9:
+                         randsummon = NPC_WAVE_RIFLEMAN; break;
+                     case 10:
                          randsummon = NPC_WAVE_MAGE; break;
+                     case 11:
+                         randsummon = NPC_WAVE_MAGE; break;
+                     case 12:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 13:
+                         randsummon = NPC_WAVE_MERCENARY; break;
+                     case 14:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 15:
+                         randsummon = NPC_WAVE_RIFLEMAN; break;
+                     case 16:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 17:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 18:
+                         randsummon = NPC_WAVE_MAGE; break;
+                     case 19:
+                         randsummon = NPC_WAVE_RIFLEMAN; break;
+                     case 20:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 21:
+                         randsummon = NPC_WAVE_MERCENARY; break;
+                     case 22:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 23:
+                         randsummon = NPC_WAVE_MAGE; break;
+                     case 24:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 25:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 26:
+                         randsummon = NPC_WAVE_MERCENARY; break;
+                     case 27:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 28:
+                         randsummon = NPC_WAVE_MAGE; break;
+                     case 29:
+                         randsummon = NPC_WAVE_PRIEST; break;
+                     case 30:
+                         randsummon = NPC_WAVE_MAGE; break;
+                     case 31:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 32:
+                         randsummon = NPC_WAVE_FOOTMAN; break;
+                     case 33:
+                         randsummon = NPC_WAVE_MERCENARY; break;
                  }
 
                  if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
@@ -666,9 +651,6 @@ public:
                 DoUpdateWorldState(WORLD_STATE_HOR_WAVE_COUNT, uiWaveCount);
                 OpenDoor(uiFrontDoor);
 
-            // TODO
-            // in case of wipe, the event is normally restarted by jumping into the center of the room.
-            // As I can't find a trigger area there, just respawn Jaina/Sylvanas so the event may be restarted.
             if (Creature* pFalric = instance->GetCreature(uiFalric))
                 pFalric->SetVisible(false);
             if (Creature* pMarwyn = instance->GetCreature(uiMarwyn))
@@ -679,7 +661,22 @@ public:
         // Activate a trash wave.
         void SpawnWave(Creature* trashwave)
         {
-
+        if (uiWaveCount = 1)
+         {
+             for (uint8 i = 0; i < 3; i++)
+             {
+                if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                {
+                   trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                   trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                   trashwave->SetReactState(REACT_AGGRESSIVE);
+                   trashwave->SetInCombatWithZone();
+                }
+                m_uiCheckSummon++;
+             }
+         }
+        else if (uiWaveCount >= 2 <= 6)
+        {
              for (uint8 i = 0; i < 4; i++)
              {
                 if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
@@ -691,7 +688,22 @@ public:
                 }
                 m_uiCheckSummon++;
              }
-             uiWaveCount++;
+         }
+        else if (uiWaveCount >= 7)
+        {
+             for (uint8 i = 0; i < 5; i++)
+             {
+                if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                {
+                   trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                   trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                   trashwave->SetReactState(REACT_AGGRESSIVE);
+                   trashwave->SetInCombatWithZone();
+                }
+                m_uiCheckSummon++;
+             }
+         }
+        events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
         }
 
         void Update(uint32 diff)
