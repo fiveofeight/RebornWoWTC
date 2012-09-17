@@ -105,6 +105,7 @@ enum Events
     EVENT_INTRO_H2_1,
     EVENT_INTRO_H2_2,
     EVENT_INTRO_H2_3,
+    EVENT_INTRO_H2_3_1,
     EVENT_INTRO_H2_4,
     EVENT_INTRO_H2_5,
     EVENT_INTRO_H2_6,
@@ -397,6 +398,9 @@ public:
                 case EVENT_INTRO_H2_3:
                     DoScriptText(SAY_SYLVANAS_INTRO_3, me);
                     DoCast(me, SPELL_CAST_VISUAL);
+                    events.ScheduleEvent(EVENT_INTRO_H2_3_1, 2000);
+                    break;
+                case EVENT_INTRO_H2_3_1:
                     instance->HandleGameObject(instance->GetData64(DATA_FROSTMOURNE), true);
                     me->CastSpell(me, SPELL_FROSTMOURNE_SOUNDS, true);
                     events.ScheduleEvent(EVENT_INTRO_H2_4, 6000);
@@ -487,6 +491,8 @@ public:
 
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
                     {
+                        if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
+                            pUther->SetOrientation(pLichKing->GetAngle(pLichKing));
                         pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
                         if (instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
                             DoScriptText(SAY_UTHER_INTRO_A2_9, pUther);
@@ -508,7 +514,7 @@ public:
                 case EVENT_INTRO_LK_3:
                      // The Lich King banishes Uther to the abyss.
                      if (Creature* pUther = me->GetCreature(*me, uiUther))
-                         DoCast(pUther, SPELL_UTHER_DESPAWN);
+                         pUther->CastSpell(pUther, SPELL_UTHER_DESPAWN, false); // todo, either this spell is broken or it's triggered by another spell, because the LK should be able to cast it on uther.  Currently it cannot be cast on someone else.
                      events.ScheduleEvent(EVENT_INTRO_LK_4, 5000);
                      break;
 
@@ -537,7 +543,7 @@ public:
                         pFalric->CastSpell(pFalric, SPELL_BOSS_SPAWN_AURA, true);
                         pFalric->SetVisible(true);
                         pFalric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pFalric->SetSpeed(MOVE_WALK, 0.7f, true);
+                        pFalric->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
                         pFalric->GetMotionMaster()->MovePoint(0, 5283.309f, 2031.173f, 709.319f);
                     }
                     if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
@@ -545,7 +551,7 @@ public:
                         pMarwyn->CastSpell(pMarwyn, SPELL_BOSS_SPAWN_AURA, true);
                         pMarwyn->SetVisible(true);
                         pMarwyn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pMarwyn->SetSpeed(MOVE_WALK, 0.7f, true);
+                        pMarwyn->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
                         pMarwyn->GetMotionMaster()->MovePoint(0, 5335.585f, 1981.439f, 709.319f);
                     }
 
@@ -625,15 +631,6 @@ public:
                     me->DisappearAndDie();
                     if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
                         pLichKing->DisappearAndDie();
-
-                    if (Creature* pFalric = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
-                    {
-                        pFalric->SetSpeed(MOVE_RUN, 1.42857f, true);
-                    }
-                    if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
-                    {
-                        pMarwyn->SetSpeed(MOVE_RUN, 1.42857f, true);
-                    }
                     break;
 
                 case EVENT_SKIP_INTRO:

@@ -115,6 +115,7 @@ public:
             uiTeamInInstance = 0;
             uiWaveCount = 0;
             uiIntroDone = 0;
+            m_uiCheckSummon = 0;
 
             for (uint8 i = 0; i < 4; ++i)
             {
@@ -646,6 +647,7 @@ public:
 
                 SetData(DATA_WAVE_COUNT, FAIL);
                 uiWaveCount = 0;
+                m_uiCheckSummon = 0;
                 events.Reset();
                 DoUpdateWorldState(WORLD_STATE_HOR, 1);
                 DoUpdateWorldState(WORLD_STATE_HOR_WAVE_COUNT, uiWaveCount);
@@ -661,49 +663,114 @@ public:
         // Activate a trash wave.
         void SpawnWave(Creature* trashwave)
         {
-        if (uiWaveCount = 1)
-         {
-             for (uint8 i = 0; i < 3; i++)
-             {
-                if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-                {
-                   trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                   trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                   trashwave->SetReactState(REACT_AGGRESSIVE);
-                   trashwave->SetInCombatWithZone();
-                }
-                m_uiCheckSummon++;
-             }
-         }
-        else if (uiWaveCount >= 2 <= 6)
-        {
-             for (uint8 i = 0; i < 4; i++)
-             {
-                if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-                {
-                   trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                   trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                   trashwave->SetReactState(REACT_AGGRESSIVE);
-                   trashwave->SetInCombatWithZone();
-                }
-                m_uiCheckSummon++;
-             }
-         }
-        else if (uiWaveCount >= 7)
-        {
-             for (uint8 i = 0; i < 5; i++)
-             {
-                if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-                {
-                   trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                   trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                   trashwave->SetReactState(REACT_AGGRESSIVE);
-                   trashwave->SetInCombatWithZone();
-                }
-                m_uiCheckSummon++;
-             }
-         }
-        events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
+            switch (uiWaveCount)
+            {
+                case 1:
+                    for (uint8 i = 0; i < 3; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 2:
+                    for (uint8 i = 0; i < 4; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 3:
+                    for (uint8 i = 0; i < 4; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 4:
+                    for (uint8 i = 0; i < 5; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 6:
+                    for (uint8 i = 0; i < 4; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 7:
+                    for (uint8 i = 0; i < 4; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 8:
+                    for (uint8 i = 0; i < 5; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+                case 9:
+                    for (uint8 i = 0; i < 5; i++)
+                    {
+                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+                        {
+                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
+                            trashwave->SetReactState(REACT_AGGRESSIVE);
+                            trashwave->SetInCombatWithZone();
+                        }
+                        m_uiCheckSummon++;
+                    }
+                    break;
+            }
+            events.ScheduleEvent(EVENT_NEXT_WAVE, 60000);
         }
 
         void Update(uint32 diff)

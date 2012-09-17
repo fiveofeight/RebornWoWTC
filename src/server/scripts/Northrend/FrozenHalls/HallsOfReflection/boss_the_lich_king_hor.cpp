@@ -334,10 +334,11 @@ public:
                if (pLider->IsWithinDistInMap(me, 2.0f) && pInstance->GetData(DATA_LICHKING_EVENT) == IN_PROGRESS)
                {
                    me->setActive(false);
-                   SetEscortPaused(false);
+                   SetEscortPaused(true);
                    me->StopMoving();
                    DoScriptText(SAY_LICH_KING_WIN, me);
-                   me->CastSpell(me, SPELL_FURY_OF_FROSTMOURNE, false);
+                   me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                   me->CastSpell(me, SPELL_FURY_OF_FROSTMOURNE, true);
                    me->DealDamage(pLider, pLider->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                }
            }
@@ -439,7 +440,6 @@ public:
                {
                    if(EmergeTimer < diff)
                    {
-                       //me->RemoveFlag(SPLINEFLAG_WALKING | MOVEMENTFLAG_WALKING, true);
                        Emerge = true;
                        uiLiderGUID = pInstance->GetData64(DATA_ESCAPE_LIDER);
                        if(pLider)
