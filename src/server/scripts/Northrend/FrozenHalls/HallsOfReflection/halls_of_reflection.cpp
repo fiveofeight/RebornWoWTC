@@ -630,7 +630,7 @@ public:
                     {
                         pFalric->SetSpeed(MOVE_RUN, 1.42857f, true);
                     }
-                    if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
+                    if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
                     {
                         pMarwyn->SetSpeed(MOVE_RUN, 1.42857f, true);
                     }
