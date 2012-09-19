@@ -307,3 +307,5 @@ INSERT INTO `reference_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `
 (100001, 50314, 0, 1, 1, 1, 1);
 -- Fix portal spell
 UPDATE `gameobject_template` SET `data0`='53141' WHERE `entry`=202079;
+
+UPDATE  `creature_template` SET  `ScriptName` =  'npc_frostworn_general' WHERE  `entry` =36723;
