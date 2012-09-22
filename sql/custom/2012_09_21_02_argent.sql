@@ -27,7 +27,6 @@ INSERT INTO `pool_quest` (`entry`, `pool_entry`, `description`) VALUES
 (14136, @pool_girana, 'Rescue at Sea'),
 (14140, @pool_girana, 'Stop The Aggressors'),
 (14144, @pool_girana, 'The Light''s Mercy'),
-(14142, @pool_girana, 'You''ve Really Done It This Time, Kul'),
 -- Tylos
 (14092, @pool_tylos, 'Breakfast of Champions'),
 (14141, @pool_tylos, 'Gormok Wants His Snobolds'),
