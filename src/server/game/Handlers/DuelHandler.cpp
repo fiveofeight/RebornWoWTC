@@ -56,9 +56,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     {
        // clear CDs from players
        player->RemoveArenaSpellCooldowns(true);
-       player->RemoveArenaAuras();
        plTarget->RemoveArenaSpellCooldowns(true);
-       plTarget->RemoveArenaAuras();
 
        // remove Debuffs
        player->RemoveAura(41425); // Remove Hypothermia Debuff
