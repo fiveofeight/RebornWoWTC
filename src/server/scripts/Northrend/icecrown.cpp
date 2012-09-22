@@ -298,7 +298,7 @@ public:
                 me->setFaction(14);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
         {
             if (uiDamage >= me->GetHealth() && pDoneBy->GetTypeId() == TYPEID_PLAYER)
             {
@@ -726,7 +726,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* who, uint32& damage, SpellInfo const* /*spellInfo*/)
+        void DamageTaken(Unit* who, uint32& damage)
         {
             if (damage >= me->GetHealth() && who->GetTypeId() == TYPEID_PLAYER && !bDefeated)
             {
