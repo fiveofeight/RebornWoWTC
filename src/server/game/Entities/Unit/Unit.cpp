@@ -173,7 +173,6 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
     , m_vehicleKit(NULL)
     , m_unitTypeMask(UNIT_MASK_NONE)
     , m_HostileRefManager(this)
-    , _lastDamagedTime(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -12117,7 +12116,6 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
         }
 
         SetInCombatWith(target);
-        SetLastDamagedTime(getMSTime());
         target->SetInCombatWith(this);
     }
     Unit* who = target->GetCharmerOrOwnerOrSelf();
@@ -12447,10 +12445,6 @@ int32 Unit::ModifyHealth(int32 dVal)
 
     if (dVal == 0)
         return 0;
-
-    // Part of Evade mechanics. Only track health lost, not gained.
-    if (dVal < 0 && GetTypeId() != TYPEID_PLAYER && !isPet())
-        SetLastDamagedTime(getMSTime());
 
     int32 curHealth = (int32)GetHealth();
 
@@ -13076,25 +13070,6 @@ Unit* Creature::SelectVictim()
     {
         SetInFront(target);
         return target;
-    }
-
-    // Case where mob is being kited.
-    // Mob may not be in range to attack or may have dropped target. In any case,
-    //  don't evade if damage received within the last 10 seconds
-    // Does not apply to world bosses to prevent kiting to cities
-    if (!isWorldBoss())
-    {
-        if (uint32 oldTime = GetLastDamagedTime())
-        {
-            if ((getMSTimeDiff(oldTime, getMSTime()) / 1000) <= 10)
-            {
-                // In some cases target does not exist but need to return it if it does
-                if (target)
-                    return target;
-                else
-                    return NULL;
-            }
-        }
     }
 
     // last case when creature must not go to evade mode:
