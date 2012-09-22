@@ -4,9 +4,6 @@ UPDATE  `quest_template` SET  `RequiredRaces` =  '0' WHERE `title` = "A Worthy W
 UPDATE  `quest_template` SET  `RequiredRaces` =  '0' WHERE `title` = "The Edge Of Winter";
 UPDATE  `quest_template` SET  `RequiredRaces` =  '0' WHERE `title` = "A Blade Fit For A Champion";
 
-
-
-
 UPDATE `quest_template` SET `PrevQuestId`=0 WHERE `id` IN (13718,13714,13715,13716,13717,13697,13719,13720,13721,13722);
 
 UPDATE `quest_template` SET `RequiredRaces`=1101 WHERE `id` IN (13718,13714,13715,13716,13717,13759,13670,13743,13748,13754,13616,13757.13666,13741,13746,13752,13758,13669,13742,13747,13753,13600,13760,13744,13749,13755,13592,13855,13851,13852,13854,13847,13725,13713,13723,13724,13699);
