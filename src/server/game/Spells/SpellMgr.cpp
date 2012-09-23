@@ -3595,6 +3595,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->manaCost = 0;
                 spellInfo->manaPerSecond = 0;
                 break;
+           case 52212: // Death Knight: Death and Decay trigger spell
+               spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+               break;
             default:
                 break;
         }
