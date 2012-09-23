@@ -142,6 +142,7 @@ enum Spells
 
     SPELL_SUMMON_BATTLE_STANDART_A    = 69810,
     SPELL_SUMMON_BATTLE_STANDART_H    = 69811,
+    SPELL_ACHIEVEMENT_SHIP            = 72959,
 
     // Kor'kron Defender
     SPELL_DEVASTATE                   = 69902,
@@ -702,6 +703,7 @@ class npc_rotting_frost_giant : public CreatureScript
                 me->DespawnOrUnsummon(10000);
                 if (InstanceScript* instance = me->GetInstanceScript())
                 {
+                    instance->DoCastSpellOnPlayers(SPELL_ACHIEVEMENT_SHIP);
                     if (instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
                         me->SummonGameObject(RAID_MODE(GO_CAPITAN_CHEST_H_10N, GO_CAPITAN_CHEST_H_25N, GO_CAPITAN_CHEST_H_10H, GO_CAPITAN_CHEST_H_25H), -307.584930f, 2211.561768f, 199.990861f, 0, 0, 0, 0, 0, 100000);
                     else
