@@ -79,6 +79,15 @@ enum Actions
     ACTION_ANT_INTRO,
 };
 
+enum Phases
+{
+    PHASE_INTRO     = 1,
+    PHASE_ONE       = 2,
+
+    PHASE_INTRO_MASK    = 1 << PHASE_INTRO,
+    PHASE_ONE_MASK      = 1 << PHASE_ONE,
+};
+
 class boss_coren_direbrew : public CreatureScript
 {
 public:
@@ -134,9 +143,10 @@ public:
         {
             if (!_introDone && me->IsWithinDistInMap(who, 30.0f))
             {
-                _events.ScheduleEvent(EVENT_COREN_RANT_1, 10000);
-                _events.ScheduleEvent(EVENT_COREN_RANT_3, 17000);
-                _events.ScheduleEvent(EVENT_COREN_RANT_5, 24000);
+                _events.SetPhase(PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_RANT_1, 10000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_RANT_3, 17000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_RANT_5, 24000, 0, PHASE_INTRO);
                 GetCreatureListWithEntryInGrid(_antagonistList, me, NPC_DR_ANTAGONIST, 30.0f);
                     _antagonistList.sort(Trinity::ObjectDistanceOrderPred(me));
                 for (std::list<Creature*>::iterator itr = _antagonistList.begin(); itr != _antagonistList.end(); ++itr)
@@ -148,7 +158,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            _events.ScheduleEvent(EVENT_COREN_DISARM, urand(12000, 20000));
+            _events.ScheduleEvent(EVENT_COREN_DISARM, urand(12000, 20000), 0, PHASE_ONE);
         }
 
         void DoAction(const int32 actionId)
@@ -156,7 +166,9 @@ public:
             if (actionId == ACTION_START_INTRO)
             {
                 _events.Reset();
-                _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0);
+                _events.SetPhase(PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000, 0, PHASE_INTRO);
                 for (std::list<Creature*>::iterator itr = _antagonistList.begin(); itr != _antagonistList.end(); ++itr)
                     (*itr)->AI()->DoAction(ACTION_ANT_INTRO);
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -169,7 +181,7 @@ public:
             if (!players.isEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->getSource())
-                        if (!me || player->IsAtGroupRewardDistance(me))
+                        if (player->IsAtGroupRewardDistance(me))
                             sLFGMgr->RewardDungeonDoneFor(287, player);
 
             if (instance)
@@ -178,7 +190,7 @@ public:
         
         void UpdateAI(uint32 const diff)
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() && !(_events.GetPhaseMask() & PHASE_INTRO_MASK))
                 return;
 
             _events.Update(diff);
@@ -201,9 +213,9 @@ public:
                         break;
                     case EVENT_COREN_INTRO_1:
                         Talk(SAY_COREN_INTRO_1);
-                        _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000);
                         break;
                     case EVENT_COREN_INTRO_2:
+                        _events.SetPhase(PHASE_ONE);
                         me->setFaction(FACTION_HOSTILE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                         if (Unit* unit = me->SelectNearestTarget())
@@ -212,7 +224,7 @@ public:
                         break;
                     case EVENT_COREN_DISARM:
                         DoCastVictim(SPELL_DIREBREW_DISARM);
-                        _events.ScheduleEvent(EVENT_COREN_DISARM, urand(12000, 20000));
+                        _events.ScheduleEvent(EVENT_COREN_DISARM, urand(12000, 20000), 0, PHASE_ONE);
                         break;
                 }
             }
@@ -238,24 +250,32 @@ class npc_dark_iron_antagonist : public CreatureScript
         {
             npc_dark_iron_antagonistAI(Creature* creature) : ScriptedAI(creature)  {  }
 
+        void Reset()
+        {
+        _events.SetPhase(PHASE_INTRO);
+        }
+        
         void DoAction(const int32 actionId)
         {
             if (actionId == ACTION_ANT_RANT)
             {
-                _events.ScheduleEvent(EVENT_COREN_RANT_2, 14000);
-                _events.ScheduleEvent(EVENT_COREN_RANT_2, 20000);
+                _events.ScheduleEvent(EVENT_COREN_RANT_2, 14000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_RANT_2, 20000, 0, PHASE_INTRO);
             }
 
             if (actionId == ACTION_ANT_INTRO)
             {
                 _events.Reset();
-                _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0);
-                _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000);
+                _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000, 0, PHASE_INTRO);
             }
         }
 
             void UpdateAI(uint32 const diff)
             {
+                if (!UpdateVictim() && !(_events.GetPhaseMask() & PHASE_INTRO_MASK))
+                    return;
+                    
                 _events.Update(diff);
 
                 while (uint32 eventId = _events.ExecuteEvent())
@@ -272,6 +292,7 @@ class npc_dark_iron_antagonist : public CreatureScript
                             me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                             break;
                         case EVENT_COREN_INTRO_2:
+                            _events.SetPhase(PHASE_ONE);
                             Talk(SAY_DARK_IRON_AGGRO);
                             me->setFaction(FACTION_HOSTILE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
