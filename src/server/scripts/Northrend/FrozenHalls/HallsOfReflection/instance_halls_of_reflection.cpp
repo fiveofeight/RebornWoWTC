@@ -36,9 +36,9 @@ enum eEnum
 
 enum Events
 {
-    EVENT_NONE,
-    EVENT_NEXT_WAVE,
-    EVENT_START_LICH_KING,
+    EVENT_NONE                  = 1,
+    EVENT_NEXT_WAVE             = 2,
+    EVENT_ADVANCE_WAVE          = 3,
 };
 
 class instance_halls_of_reflection : public InstanceMapScript
@@ -56,6 +56,7 @@ public:
         instance_halls_of_reflection_InstanceMapScript(Map* map) : InstanceScript(map) {};
 
         bool m_bIsCall;
+        bool WaveAdvanced;
 
         uint64 uiFalric;
         uint64 uiMarwyn;
@@ -81,11 +82,13 @@ public:
         uint32 uiEncounter[MAX_ENCOUNTER];
         uint32 uiTeamInInstance;
         uint32 uiWaveCount;
+        uint32 uiWaveState;
         uint32 uiIntroDone;
         uint32 uiSummons;
         uint32 uiDataPhase;
         uint32 m_uiLocNo;
         uint32 m_uiCheckSummon;
+        uint32 WaveAlive;
         uint32 randsummon;
 
         EventMap events;
@@ -95,6 +98,7 @@ public:
             events.Reset();
 
             m_bIsCall = false;
+            WaveAdvanced = false;
 
             uiFalric = 0;
             uiMarwyn = 0;
@@ -114,8 +118,10 @@ public:
             uiCaveDoor = 0;
             uiTeamInInstance = 0;
             uiWaveCount = 0;
+            uiWaveState = 0;
             uiIntroDone = 0;
             m_uiCheckSummon = 0;
+            WaveAlive = 0;
 
             for (uint8 i = 0; i < 4; ++i)
             {
@@ -167,6 +173,8 @@ public:
                 case NPC_SYLVANAS_PART1:
                     uiSylvanasPart1 = creature->GetGUID();
                     break;
+                case NPC_FROSTWORN_GENERAL:
+                    break;
                 case NPC_JAINA_OUTRO:
                     if (uiTeamInInstance == HORDE)
                         creature->UpdateEntry(NPC_SYLVANA_OUTRO, HORDE);
@@ -176,6 +184,26 @@ public:
                 case BOSS_LICH_KING:
                     creature->SetHealth(20917000);
                     uiLichKing = creature->GetGUID();
+                    break;
+            }
+        }
+
+        void OnUnitDeath(Unit* unit)
+        {
+            Creature* creature = unit->ToCreature();
+            if (!creature)
+                return;
+
+            switch (creature->GetEntry())
+            {
+                case NPC_WAVE_MERCENARY:
+                case NPC_WAVE_FOOTMAN:
+                case NPC_WAVE_RIFLEMAN:
+                case NPC_WAVE_PRIEST:
+                case NPC_WAVE_MAGE:
+                    WaveAlive = WaveAlive--;
+                    break;
+                default:
                     break;
             }
         }
@@ -268,26 +296,44 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            if (type == DATA_WAVE_COUNT && data == SPECIAL)
-            {
-                CloseDoor(uiFrontDoor);
-                if (!m_bIsCall)
-                {
-                   m_bIsCall = true;
-                   Summon();
-                }
-                events.ScheduleEvent(EVENT_NEXT_WAVE, 15000);
-                return;
-            }
-
-            if (uiWaveCount && data == NOT_STARTED)
-                DoWipe();
-
             switch (type)
             {
                 case DATA_INTRO_EVENT:
                     uiIntroDone = data;
                     break;
+                case DATA_WAVE_STATE:
+                    uiWaveState = data;
+                    
+                    if (data == SPECIAL) // Called on first spawn
+                    {
+                        sLog->outFatal(LOG_FILTER_GENERAL, "SetData Special scheduled new wave.");
+                        CloseDoor(uiFrontDoor);
+                        if (!m_bIsCall)
+                        {
+                           m_bIsCall = true;
+                           Summon();
+                            sLog->outFatal(LOG_FILTER_GENERAL, "SetData Special tried to spawn a new wave.");
+                        }
+                        events.ScheduleEvent(EVENT_NEXT_WAVE, 15000);
+                     }
+                     
+                     if (data == IN_PROGRESS) // Called on failed wave
+                    {
+                        sLog->outFatal(LOG_FILTER_GENERAL, "SetData In Progress scheduled new wave.");
+                        CloseDoor(uiFrontDoor);
+                        if (!m_bIsCall)
+                        {
+                           m_bIsCall = true;
+                           Summon();
+                            sLog->outFatal(LOG_FILTER_GENERAL, "SetData In Progress tried to spawn a new wave.");
+                        }
+                        events.ScheduleEvent(EVENT_NEXT_WAVE, 3000);
+                    }
+
+                    if (uiWaveCount && data == FAIL)
+                        DoWipe();
+                    break;
+                    
                 case DATA_FALRIC_EVENT:
                     uiEncounter[0] = data;
                     if (data == DONE)
@@ -333,7 +379,6 @@ public:
                             pLider->DespawnOrUnsummon(10000);
 
                         DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_NOT_RETREATING_EVENT);
-                        DoCastSpellOnPlayers(5); // Kill all players
 
                         SetData(DATA_PHASE, 3);
                         instance->SummonCreature(BOSS_LICH_KING, OutroSpawns[0]);
@@ -391,6 +436,7 @@ public:
                 case DATA_FALRIC_EVENT:         return uiEncounter[0];
                 case DATA_MARWYN_EVENT:         return uiEncounter[1];
                 case DATA_WAVE_COUNT:           return uiWaveCount;
+                case DATA_WAVE_STATE:           return uiWaveState;
 
                 case DATA_FROSWORN_EVENT:       return uiEncounter[2];
 
@@ -631,8 +677,9 @@ public:
                      if (Creature* trashwave = pMarwyn->SummonCreature(randsummon, SpawnLoc[i], TEMPSUMMON_DEAD_DESPAWN))
                      {
                         m_uiSummonGUID[i] = trashwave->GetGUID();
-                        trashwave->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        trashwave->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
                         trashwave->SetReactState(REACT_PASSIVE);
+                        trashwave->CastSpell(trashwave, SPELL_SPIRIT_SPAWN, true);
                      }
                  }
                  m_uiLocNo++;
@@ -642,16 +689,22 @@ public:
         // Wipe has been detected. Perform cleanup and reset.
         void DoWipe()
         {
-
             if (GetData(DATA_MARWYN_EVENT) != DONE) {
 
-                SetData(DATA_WAVE_COUNT, FAIL);
                 uiWaveCount = 0;
+                WaveAlive = 0;
+                m_bIsCall = false;
+                WaveAdvanced = false;
                 m_uiCheckSummon = 0;
                 events.Reset();
                 DoUpdateWorldState(WORLD_STATE_HOR, 1);
                 DoUpdateWorldState(WORLD_STATE_HOR_WAVE_COUNT, uiWaveCount);
                 OpenDoor(uiFrontDoor);
+                for (uint8 i = 0; i < 34; i++)
+                {
+                    if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[i]))
+                    trashwave->DespawnOrUnsummon(5000);
+                }
 
             if (Creature* pFalric = instance->GetCreature(uiFalric))
                 pFalric->SetVisible(false);
@@ -670,38 +723,26 @@ public:
                     {
                         if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
                         {
+                            trashwave->AI()->DoAction(ACTION_TRASH_ACTIVATE);
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
                         }
                         m_uiCheckSummon++;
+                        WaveAlive++;
                     }
                     break;
                 case 2:
-                    for (uint8 i = 0; i < 4; i++)
-                    {
-                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-                        {
-                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
-                        }
-                        m_uiCheckSummon++;
-                    }
-                    break;
                 case 3:
                     for (uint8 i = 0; i < 4; i++)
                     {
                         if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
                         {
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
+                            trashwave->AI()->DoAction(ACTION_TRASH_ACTIVATE);
                         }
                         m_uiCheckSummon++;
+                        WaveAlive++;
                     }
                     break;
                 case 4:
@@ -709,64 +750,40 @@ public:
                     {
                         if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
                         {
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
+                            trashwave->AI()->DoAction(ACTION_TRASH_ACTIVATE);
                         }
                         m_uiCheckSummon++;
+                        WaveAlive++;
                     }
                     break;
                 case 6:
-                    for (uint8 i = 0; i < 4; i++)
-                    {
-                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-                        {
-                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
-                        }
-                        m_uiCheckSummon++;
-                    }
-                    break;
                 case 7:
                     for (uint8 i = 0; i < 4; i++)
                     {
                         if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
                         {
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
+                            trashwave->AI()->DoAction(ACTION_TRASH_ACTIVATE);
                         }
                         m_uiCheckSummon++;
+                        WaveAlive++;
                     }
                     break;
                 case 8:
-                    for (uint8 i = 0; i < 5; i++)
-                    {
-                        if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-                        {
-                            trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
-                        }
-                        m_uiCheckSummon++;
-                    }
-                    break;
                 case 9:
                     for (uint8 i = 0; i < 5; i++)
                     {
                         if (Creature* trashwave = instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
                         {
+                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             trashwave->CastSpell(trashwave, SPELL_SPIRIT_ACTIVATE_VIS, true);
-                            trashwave->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC);
-                            trashwave->SetReactState(REACT_AGGRESSIVE);
-                            trashwave->SetInCombatWithZone();
+                            trashwave->AI()->DoAction(ACTION_TRASH_ACTIVATE);
                         }
                         m_uiCheckSummon++;
+                        WaveAlive++;
                     }
                     break;
             }
@@ -778,6 +795,16 @@ public:
             if (!instance->HavePlayers())
                 return;
 
+            if (WaveAlive == 0 && !WaveAdvanced)
+            {
+                if (uiWaveCount == 1 || uiWaveCount == 2 || uiWaveCount == 3 || uiWaveCount == 4 || uiWaveCount == 6 || uiWaveCount == 7 ||uiWaveCount == 8  || uiWaveCount == 9)
+                {
+                    WaveAdvanced = true;
+                    events.RescheduleEvent(EVENT_NEXT_WAVE, 1000);
+                    events.ScheduleEvent(EVENT_ADVANCE_WAVE, 5000);
+                }
+            }
+
             events.Update(diff);
 
             switch (events.ExecuteEvent())
@@ -786,9 +813,10 @@ public:
                     uiWaveCount++;
                     AddWave();
                     break;
+                case EVENT_ADVANCE_WAVE:
+                    WaveAdvanced = false;
+                    break;
             }
-
-
         }
     };
 

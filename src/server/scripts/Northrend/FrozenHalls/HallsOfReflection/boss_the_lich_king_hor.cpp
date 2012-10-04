@@ -17,7 +17,7 @@
 
 /* ScriptData
 SDName: boss_Lich_king
-SD%Complete: 0%
+SD%Complete: 70%
 SDComment: new script for tc implementation.
 SDCategory: Halls of Reflection
 EndScriptData */
@@ -28,17 +28,17 @@ EndScriptData */
 
 enum
 {
-   SPELL_WINTER                       = 69780,
-   SPELL_FURY_OF_FROSTMOURNE          = 70063,
-   SPELL_SOUL_REAPER                  = 73797,
-   SPELL_RAISE_DEAD                   = 69818,
-   SPELL_ICE_PRISON                   = 69708,
-   SPELL_DARK_ARROW                   = 70194,
+   SPELL_WINTER                             = 69780,
+   SPELL_FURY_OF_FROSTMOURNE   = 70063,
+   SPELL_SOUL_REAPER                    = 73797,
+   SPELL_RAISE_DEAD                      = 69818,
+   SPELL_ICE_PRISON                       = 69708,
+   SPELL_DARK_ARROW                    = 70194,
    SPELL_HARVEST_SOUL                 = 70070,
 
    //Raging gnoul
    SPELL_EMERGE_VISUAL                = 50142,
-   SPELL_GNOUL_JUMP                   = 70150,
+   SPELL_GHOUL_JUMP                   = 70150,
 
    //Witch Doctor
    SPELL_COURSE_OF_DOOM               = 70144,
@@ -192,6 +192,8 @@ public:
                    break;
                case 2:
                    DoCast(me, SPELL_WINTER);
+                   me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                   me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE );
                    DoScriptText(SAY_LICH_KING_WINTER, me);
                    me->SetSpeed(MOVE_WALK, walkSpeed, true);
                    StepTimer = 1000;
@@ -337,9 +339,8 @@ public:
                    SetEscortPaused(true);
                    me->StopMoving();
                    DoScriptText(SAY_LICH_KING_WIN, me);
-                   me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                    me->CastSpell(me, SPELL_FURY_OF_FROSTMOURNE, true);
-                   me->DealDamage(pLider, pLider->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                   me->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE, TRIGGERED_NONE);
                }
            }
 
@@ -396,7 +397,7 @@ public:
        InstanceScript* pInstance;
        uint32 EmergeTimer;
        bool Emerge;
-       bool Jumped;
+       bool jumped;
        uint64 uiLiderGUID;
 
        void Reset()
@@ -404,7 +405,7 @@ public:
            DoCast(me, SPELL_EMERGE_VISUAL);
            EmergeTimer = 4000;
            Emerge = false;
-           Jumped = false;
+           jumped = false;
        }
 
        void JustDied(Unit* /*killer*/)
@@ -415,55 +416,21 @@ public:
            pInstance->SetData(DATA_SUMMONS, 0);
        }
 
-       void AttackStart(Unit* who)
-       {
-           if (!who)
-               return;
-
-           if(Emerge == false)
-               return;
-
-           ScriptedAI::AttackStart(who);
-       }
-
        void UpdateAI(const uint32 diff)
        {
-           if(!pInstance)
-               return;
+           if (!UpdateVictim())
+                return;
 
-           if(pInstance->GetData(DATA_LICHKING_EVENT) == IN_PROGRESS)
-           {
-               uiLiderGUID = pInstance->GetData64(DATA_ESCAPE_LIDER);
-               Creature* pLider = ((Creature*)Unit::GetUnit((*me), uiLiderGUID));
-
-               if(Emerge != true)
-               {
-                   if(EmergeTimer < diff)
-                   {
-                       Emerge = true;
-                       uiLiderGUID = pInstance->GetData64(DATA_ESCAPE_LIDER);
-                       if(pLider)
-                       {
-                           DoResetThreat();
-                           me->AI()->AttackStart(pLider);
-                           me->GetMotionMaster()->Clear();
-                           me->GetMotionMaster()->MoveChase(pLider);
-                       }
-                   }
-                   else
-                       EmergeTimer -= diff;
-               }
-
-               if(Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
-               {
-                   if(!Jumped && me->IsWithinDistInMap(target, 30.0f) && !me->IsWithinDistInMap(target, 5.0f))
-                   {
-                       Jumped = true;
-                       DoCast(target, SPELL_GNOUL_JUMP);
-                   }
-               }
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
+            {
+                if (!jumped && me->IsWithinDistInMap(target, 30.0f) && !me->IsWithinDistInMap(target, 5.0f))
+                {
+                    jumped = true;
+                    DoCast(target, SPELL_GHOUL_JUMP);
+                }
            }
-           else if (pInstance->GetData(DATA_LICHKING_EVENT) == FAIL || pInstance->GetData(DATA_LICHKING_EVENT) == NOT_STARTED)
+           
+           if (pInstance->GetData(DATA_LICHKING_EVENT) == FAIL || pInstance->GetData(DATA_LICHKING_EVENT) == NOT_STARTED)
                me->DespawnOrUnsummon();
 
            DoMeleeAttackIfReady();

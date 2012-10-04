@@ -1,4 +1,5 @@
 DELETE FROM `creature` WHERE `id` =37225;  -- Remove spawned Uther
+DELETE FROM `creature` WHERE `guid` IN (2022890, 2022900);
 INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES ('2022890', '38112', '668', '3', '1', '0', '0', '5271.65', '2042.5', '709.32', '5.51217', '604800', '0', '0', '377468', '0', '0', '0', '0', '0');
 INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES ('2022900', '38113', '668', '3', '1', '0', '0', '5344.75', '1972.87', '709.319', '2.33445', '604800', '0', '0', '539240', '0', '0', '0', '0', '0');
 
@@ -24,9 +25,16 @@ DELETE FROM `creature_template` WHERE `entry` =37554;  -- Sylvanas part 1
 INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction_A`, `faction_H`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `mindmg`, `maxdmg`, `dmgschool`, `attackpower`, `dmg_multiplier`, `baseattacktime`, `rangeattacktime`, `unit_class`, `unit_flags`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `minrangedmg`, `maxrangedmg`, `rangedattackpower`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `InhabitType`, `Health_mod`, `Mana_mod`, `Armor_mod`, `RacialLeader`, `questItem1`, `questItem2`, `questItem3`, `questItem4`, `questItem5`, `questItem6`, `movementId`, `RegenHealth`, `equipment_id`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `WDBVerified`) VALUES ('37554', '0', '0', '0', '0', '0', '30776', '0', '0', '0', 'Lady Sylvanas Windrunner', '', '', '0', '80', '80', '2', '1770', '1770', '2', '0.888888', '0.99206', '0.8', '1', '346', '499', '0', '287', '7.5', '1000', '0', '8', '33088', '8', '0', '0', '0', '0', '0', '315', '468', '69', '7', '262144', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '3', '500', '100', '1', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1290', '0', '0', 'npc_jaina_and_sylvana_hor_part2', '12340');
 DELETE FROM `creature_template` WHERE `entry` =36955; -- Lady Proudmoore part 1
 INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction_A`, `faction_H`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `mindmg`, `maxdmg`, `dmgschool`, `attackpower`, `dmg_multiplier`, `baseattacktime`, `rangeattacktime`, `unit_class`, `unit_flags`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `minrangedmg`, `maxrangedmg`, `rangedattackpower`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `InhabitType`, `Health_mod`, `Mana_mod`, `Armor_mod`, `RacialLeader`, `questItem1`, `questItem2`, `questItem3`, `questItem4`, `questItem5`, `questItem6`, `movementId`, `RegenHealth`, `equipment_id`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `WDBVerified`) VALUES ('36955', '0', '0', '0', '0', '0', '30867', '0', '0', '0', 'Lady Jaina Proudmoore', '', '', '0', '80', '80', '2', '84', '84', '2', '1', '1.14286', '0.8', '1', '346', '499', '0', '287', '7.5', '0', '0', '8', '0', '8', '0', '0', '0', '0', '0', '315', '468', '69', '7', '262144', '0', '0', '0', '0', '0', '0', '0', '0', '0', '69708', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '3', '500', '100', '1', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1221', '0', '0', 'npc_jaina_and_sylvana_hor_part2', '12340');
+
+
+UPDATE  `creature_template` SET  `ScriptName` =  'npc_frostworn_general' WHERE  `entry` =36723;
+UPDATE  `creature_template` SET  `ScriptName` =  'npc_raging_gnoul' WHERE  `entry` =36940;
+UPDATE  `creature_template` SET  `ScriptName` =  'npc_risen_witch_doctor' WHERE  `entry` =36941;
+UPDATE  `creature_template` SET  `ScriptName` =  'npc_abon' WHERE  `entry` =37069;
+
 -- Area Trigger, for wave restarter
--- DELETE FROM `areatrigger_scripts` WHERE `entry` =5697;
--- INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES ('5697', 'at_hor_waves_restarter');
+DELETE FROM `areatrigger_scripts` WHERE `entry` =5697;
+INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES ('5697', 'at_hor_waves_restarter');
 
 -- Normal
 UPDATE `creature_template` SET `unit_flags`=576 WHERE `entry` IN (38172, 38175, 38176, 38173, 38177, 38113, 38112);
@@ -308,4 +316,23 @@ INSERT INTO `reference_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `
 -- Fix portal spell
 UPDATE `gameobject_template` SET `data0`='53141' WHERE `entry`=202079;
 
-UPDATE  `creature_template` SET  `ScriptName` =  'npc_frostworn_general' WHERE  `entry` =36723;
+-- Death text for trash
+DELETE FROM `creature_text` WHERE `entry` = 38173;
+INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES 
+('38173', '0', '0', 'This is not our final rest.', '12', '0', '10', '0', '0', '0', 'HoR Trash death');
+
+-- Fixing script text according to BossTalk
+UPDATE `script_texts` SET `content_default`="The chill of this place... I can feel my blood freezing." WHERE `entry` = "-1668001";
+UPDATE `script_texts` SET `content_default`="What is that! Up ahead! Could it be? Heroes, at my side!" WHERE `entry` = "-1668002";
+UPDATE `script_texts` SET `content_default`="Frostmourne: the blade that destroyed our kingdom..." WHERE `entry` = "-1668003";
+UPDATE `script_texts` SET `content_default`="Stand back! Touch that blade and your soul will be scarred for all eternity! I must attempt to commune with the spirits locked away within Frostmourne. Give me space. Back up, please." WHERE `entry` = "-1668004";
+UPDATE `script_texts` SET `content_default`="Uther! Dear Uther... I... I'm so sorry." WHERE `entry` = "-1668006";
+UPDATE `script_texts` SET `content_default`="No girl, Arthas is not here. Arthas is merely a presence within the Lich Kings mind. A dwindling presence." WHERE `entry` = "-1668009";
+UPDATE `script_texts` SET `content_default`="But Uther... If there is any hope of reaching Arthas, I... I must try." WHERE `entry` = "-1668010";
+UPDATE `script_texts` SET `content_default`="Jaina listen to me. You must destroy the Lich King! You cannot reason with him! He will kill you and your allies and raise you all as powerful soldiers of the scourge!" WHERE `entry` = "-1668011";
+UPDATE `script_texts` SET `content_default`="Aye, Aargh! He... He is coming! You... You must..." WHERE `entry` = "-1668035";
+
+DELETE FROM `script_texts` WHERE `entry`IN (-1594473, -1594474);
+INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES 
+('0', '-1594473', 'Foolish girl, you seek that which I killed long ago. He is merely a ghost now, a faint echo in my mind.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '17229', '0', '0', '0', 'LK HoR intro end, Alliance'),
+('0', '-1594474', 'I will not make the same mistake again Sylvanas, this time there will be no escape. You failed to serve me in undeath, now all that remains for you is oblivion.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '17228', '0', '0', '0', 'LK HoR intro end, Horde');

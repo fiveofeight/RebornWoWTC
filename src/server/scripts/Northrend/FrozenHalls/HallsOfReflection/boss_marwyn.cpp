@@ -66,6 +66,11 @@ public:
             if (instance)
                 instance->SetData(DATA_MARWYN_EVENT, NOT_STARTED);
         }
+        
+        void JustReachedHome()
+        {
+            instance->SetData(DATA_WAVE_STATE, FAIL);
+        }
 
         void EnterCombat(Unit* /*who*/)
         {
@@ -84,7 +89,10 @@ public:
             DoScriptText(SAY_DEATH, me);
 
             if (instance)
+            {
                 instance->SetData(DATA_MARWYN_EVENT, DONE);
+                instance->SetData(DATA_WAVE_STATE, DONE);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/)

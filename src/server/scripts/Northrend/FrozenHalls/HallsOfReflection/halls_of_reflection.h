@@ -30,14 +30,15 @@ enum Data
     DATA_INTRO_EVENT       = 5,
     DATA_TEAM_IN_INSTANCE  = 6,
     DATA_WAVE_COUNT        = 7,
+    DATA_WAVE_STATE       = 8,
 
-    DATA_SUMMONS           = 8,
-    DATA_ICE_WALL_1        = 9,
-    DATA_ICE_WALL_2        = 10,
-    DATA_ICE_WALL_3        = 11,
-    DATA_ICE_WALL_4        = 12,
+    DATA_SUMMONS           = 9,
+    DATA_ICE_WALL_1        = 10,
+    DATA_ICE_WALL_2        = 11,
+    DATA_ICE_WALL_3        = 12,
+    DATA_ICE_WALL_4        = 13,
 
-    DATA_PHASE             = 13,
+    DATA_PHASE             = 14,
 };
 
 enum Data64
@@ -120,6 +121,7 @@ enum Achievements
 
 enum InstanceSpells
 {
+    SPELL_SPIRIT_SPAWN             = 72630, // Well of Corruption small.
     SPELL_SPIRIT_ACTIVATE_VIS      = 72130, // Visual for Falric/Marwyn trash
     SPELL_CAST_VISUAL              = 65633, // Sylvanas and Jaine use this aparently
     SPELL_BOSS_SPAWN_AURA          = 72712, // Falric, Marwyn and Uther
@@ -146,6 +148,7 @@ enum HorWorldStates
 enum Actions
 {
     ACTION_ENTER_COMBAT,
+    ACTION_TRASH_ACTIVATE,
 };
 
 
