@@ -40,6 +40,11 @@ enum Texts
     SAY_DARK_IRON_AGGRO             = 2,
 };
 
+enum NPCs
+{
+    NPC_DR_ANTAGONIST               = 23795,
+};
+
 enum Spells
 {
     // Coren
@@ -70,6 +75,8 @@ enum EventTypes
 enum Actions
 {
     ACTION_START_INTRO,
+    ACTION_ANT_RANT,
+    ACTION_ANT_INTRO,
 };
 
 class boss_coren_direbrew : public CreatureScript
@@ -128,6 +135,13 @@ public:
             if (!_introDone && me->IsWithinDistInMap(who, 30.0f))
             {
                 _events.ScheduleEvent(EVENT_COREN_RANT_1, 10000);
+                _events.ScheduleEvent(EVENT_COREN_RANT_3, 17000);
+                _events.ScheduleEvent(EVENT_COREN_RANT_5, 24000);
+                GetCreatureListWithEntryInGrid(_antagonistList, me, NPC_DR_ANTAGONIST, 30.0f);
+                    _antagonistList.sort(Trinity::ObjectDistanceOrderPred(me));
+                for (std::list<Creature*>::iterator itr = _antagonistList.begin(); itr != _antagonistList.end(); ++itr)
+                    (*itr)->AI()->DoAction(ACTION_ANT_RANT);
+                    
                 _introDone = true;
             }
         }
@@ -141,26 +155,32 @@ public:
         {
             if (actionId == ACTION_START_INTRO)
             {
+                _events.Reset();
                 _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0);
+                for (std::list<Creature*>::iterator itr = _antagonistList.begin(); itr != _antagonistList.end(); ++itr)
+                    (*itr)->AI()->DoAction(ACTION_ANT_INTRO);
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
 
         void JustDied(Unit* /*killer*/)
         {
-            if (instance)
-                instance->SetData(DATA_COREN, DONE);
-
-            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            Map::PlayerList const& players = instance->instance->GetPlayers();
             if (!players.isEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->getSource())
-                        if (player->IsAtGroupRewardDistance(me))
+                        if (!me || player->IsAtGroupRewardDistance(me))
                             sLFGMgr->RewardDungeonDoneFor(287, player);
+
+            if (instance)
+                instance->SetData(DATA_COREN, DONE);
         }
         
         void UpdateAI(uint32 const diff)
         {
+            if (!UpdateVictim())
+                return;
+
             _events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -172,22 +192,22 @@ public:
                 {
                     case EVENT_COREN_RANT_1:
                         Talk(SAY_COREN_RANT_1);
-                        _events.ScheduleEvent(EVENT_COREN_RANT_2, 5000);
                         break;
                     case EVENT_COREN_RANT_3:
                         Talk(SAY_COREN_RANT_2);
-                        _events.ScheduleEvent(EVENT_COREN_RANT_4, 5000);
                         break;
                     case EVENT_COREN_RANT_5:
                         Talk(SAY_COREN_RANT_3);
                         break;
                     case EVENT_COREN_INTRO_1:
                         Talk(SAY_COREN_INTRO_1);
-                        _events.ScheduleEvent(EVENT_COREN_INTRO_2, 2500);
+                        _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000);
                         break;
                     case EVENT_COREN_INTRO_2:
                         me->setFaction(FACTION_HOSTILE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        if (Unit* unit = me->SelectNearestTarget())
+                            AttackStart(unit);
                         DoZoneInCombat();
                         break;
                     case EVENT_COREN_DISARM:
@@ -202,6 +222,7 @@ public:
     private:
         EventMap _events;
         bool _introDone;
+        std::list<Creature*> _antagonistList;
     };
     CreatureAI* GetAI(Creature* creature) const
     {
@@ -217,6 +238,22 @@ class npc_dark_iron_antagonist : public CreatureScript
         {
             npc_dark_iron_antagonistAI(Creature* creature) : ScriptedAI(creature)  {  }
 
+        void DoAction(const int32 actionId)
+        {
+            if (actionId == ACTION_ANT_RANT)
+            {
+                _events.ScheduleEvent(EVENT_COREN_RANT_2, 14000);
+                _events.ScheduleEvent(EVENT_COREN_RANT_2, 20000);
+            }
+
+            if (actionId == ACTION_ANT_INTRO)
+            {
+                _events.Reset();
+                _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0);
+                _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000);
+            }
+        }
+
             void UpdateAI(uint32 const diff)
             {
                 _events.Update(diff);
@@ -227,11 +264,9 @@ class npc_dark_iron_antagonist : public CreatureScript
                     {
                         case EVENT_COREN_RANT_2:
                             Talk(SAY_DARK_IRON_CHEER);
-                            _events.ScheduleEvent(EVENT_COREN_RANT_2, 5000);
                             break;
                         case EVENT_COREN_RANT_4:
                             Talk(SAY_DARK_IRON_NO);
-                            _events.ScheduleEvent(EVENT_COREN_RANT_4, 5000);
                             break;
                         case EVENT_COREN_INTRO_1:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
@@ -240,6 +275,9 @@ class npc_dark_iron_antagonist : public CreatureScript
                             Talk(SAY_DARK_IRON_AGGRO);
                             me->setFaction(FACTION_HOSTILE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            if (Unit* unit = me->SelectNearestTarget())
+                                AttackStart(unit);
+                            DoZoneInCombat();
                             break;
                         default:
                             break;
