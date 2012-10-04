@@ -85,6 +85,7 @@ public:
        uint32 StepTimer;
        uint32 uiWall;
        bool StartEscort;
+       bool WipedGroup;
        bool NonFight;
        float walkSpeed;
 
@@ -94,6 +95,7 @@ public:
                return;
            NonFight = false;
            StartEscort = false;
+           WipedGroup = false;
            walkSpeed = 1.0f;
            uiWall = 0;
        }
@@ -333,13 +335,13 @@ public:
            // Leader caught, wipe
            if (Creature* pLider = ((Creature*)Unit::GetUnit((*me), pInstance->GetData64(DATA_ESCAPE_LIDER))))
            {
-               if (pLider->IsWithinDistInMap(me, 2.0f) && pInstance->GetData(DATA_LICHKING_EVENT) == IN_PROGRESS)
+               if (!WipedGroup && pLider->IsWithinDistInMap(me, 2.0f) && pInstance->GetData(DATA_LICHKING_EVENT) == IN_PROGRESS)
                {
+                    WipedGroup = true;
                    me->setActive(false);
                    SetEscortPaused(true);
                    me->StopMoving();
                    DoScriptText(SAY_LICH_KING_WIN, me);
-                   me->CastSpell(me, SPELL_FURY_OF_FROSTMOURNE, true);
                    me->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE, TRIGGERED_NONE);
                }
            }
