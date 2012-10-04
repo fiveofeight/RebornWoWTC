@@ -805,7 +805,7 @@ void Battleground::EndBattleground(uint32 winner)
                         if (plTeamID == winnerArenaTeam->GetId())
                         {
                             changeType = 1; //win
-                            resultRating = winnerTeamRatin;
+                            resultRating = winnerTeamRating;
                             resultTeamID = plTeamID;
                             ratingChange = winnerChange;
                         }

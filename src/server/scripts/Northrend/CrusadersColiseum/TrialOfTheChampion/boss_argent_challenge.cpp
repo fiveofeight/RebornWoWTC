@@ -935,7 +935,7 @@ class spell_gen_reflective_shield : public SpellScriptLoader
                 Unit * caster = GetCaster();
                 if (!caster)
                     return;
-                int32 bp = CalculatePctN(absorbAmount, 25);
+                int32 bp = CalculatePct(absorbAmount, 25);
                 target->CastCustomSpell(target, SPELL_REFLECTIVE_SHIELD_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
             }
 
