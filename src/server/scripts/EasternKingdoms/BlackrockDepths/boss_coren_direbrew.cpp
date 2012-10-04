@@ -259,13 +259,16 @@ class npc_dark_iron_antagonist : public CreatureScript
         {
             if (actionId == ACTION_ANT_RANT)
             {
+                _events.Reset();
+                _events.SetPhase(PHASE_INTRO);
                 _events.ScheduleEvent(EVENT_COREN_RANT_2, 14000, 0, PHASE_INTRO);
-                _events.ScheduleEvent(EVENT_COREN_RANT_2, 20000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_COREN_RANT_4, 20000, 0, PHASE_INTRO);
             }
 
             if (actionId == ACTION_ANT_INTRO)
             {
                 _events.Reset();
+                _events.SetPhase(PHASE_INTRO);
                 _events.ScheduleEvent(EVENT_COREN_INTRO_1, 0, 0, PHASE_INTRO);
                 _events.ScheduleEvent(EVENT_COREN_INTRO_2, 3000, 0, PHASE_INTRO);
             }
