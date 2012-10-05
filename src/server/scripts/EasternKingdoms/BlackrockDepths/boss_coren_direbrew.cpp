@@ -177,13 +177,13 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            Map::PlayerList const& players = instance->instance->GetPlayers();
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty())
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     if (Player* player = i->getSource())
                         if (player->IsAtGroupRewardDistance(me))
                             sLFGMgr->RewardDungeonDoneFor(287, player);
-
+            
             if (instance)
                 instance->SetData(DATA_COREN, DONE);
         }
