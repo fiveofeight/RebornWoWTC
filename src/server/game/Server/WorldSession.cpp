@@ -518,14 +518,6 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- Leave all channels before player delete...
         _player->CleanupChannels();
 
-        ///- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
-        _player->UninviteFromGroup();
-
-        // remove player from the group if he is:
-        // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
-        if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && m_Socket)
-            _player->RemoveFromGroup();
-
         //! Send update to group and reset stored max enchanting level
         if (_player->GetGroup())
         {
