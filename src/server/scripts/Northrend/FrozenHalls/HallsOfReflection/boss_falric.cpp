@@ -100,7 +100,7 @@ public:
 
             events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 23000);
             events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 9000);
-            events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(15000, 30000)); // TODO adjust timer.
+            events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(20000, 30000)); // TODO adjust timer.
         }
 
         void JustDied(Unit* /*killer*/)

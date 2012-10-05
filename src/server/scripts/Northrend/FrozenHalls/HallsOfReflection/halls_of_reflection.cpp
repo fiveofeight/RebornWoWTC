@@ -814,10 +814,10 @@ public:
         }
         void EnterCombat(Unit* /*who*/)
         {
-            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 8000); // TODO: adjust timers
-            events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 12000);
-            events.ScheduleEvent(EVENT_COWER_IN_FEAR, 20000);
-            events.ScheduleEvent(EVENT_DARK_MENDING, 20000);
+            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 8000, 0, PHASE_ONE); // TODO: adjust timers
+            events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 12000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_COWER_IN_FEAR, 20000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_DARK_MENDING, 20000, 0, PHASE_ONE);
         }
 
         void JustDied(Unit* /*killer*/)
@@ -851,41 +851,41 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ACTIVATE_TRASH:
+                    	events.Reset();
+                        events.SetPhase(PHASE_ONE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetReactState(REACT_AGGRESSIVE);
 						if (Unit* unit = me->SelectNearestTarget())
 						    AttackStart(unit);
 							
                         DoZoneInCombat();
-						events.Reset();
-                        events.SetPhase(PHASE_ONE);
                         return;
                     case EVENT_SHADOW_WORD_PAIN:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_SHADOW_WORD_PAIN);
-                        events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 8000);
+                        events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 8000, 0, PHASE_ONE);
                         return;
                     case EVENT_CIRCLE_OF_DESTRUCTION:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_CIRCLE_OF_DESTRUCTION);
-                        events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 12000);
+                        events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 12000, 0, PHASE_ONE);
                         return;
                     case EVENT_COWER_IN_FEAR:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_COWER_IN_FEAR);
-                        events.ScheduleEvent(EVENT_COWER_IN_FEAR, 20000);
+                        events.ScheduleEvent(EVENT_COWER_IN_FEAR, 20000, 0, PHASE_ONE);
                         return;
                     case EVENT_DARK_MENDING:
                         // find an ally with missing HP
                         if (Unit* target = DoSelectLowestHpFriendly(40, DUNGEON_MODE(30000, 50000)))
                         {
                             DoCast(target, SPELL_DARK_MENDING);
-                            events.ScheduleEvent(EVENT_DARK_MENDING, 20000);
+                            events.ScheduleEvent(EVENT_DARK_MENDING, 20000, 0, PHASE_ONE);
                         }
                         else
                         {
                             // no friendly unit with missing hp. re-check in just 5 sec.
-                            events.ScheduleEvent(EVENT_DARK_MENDING, 5000);
+                            events.ScheduleEvent(EVENT_DARK_MENDING, 5000, 0, PHASE_ONE);
                         }
                         return;
                 }
@@ -945,11 +945,11 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            events.ScheduleEvent(EVENT_FIREBALL, 3000); // TODO: adjust timers
-            events.ScheduleEvent(EVENT_FLAMESTRIKE, 15000);
-            events.ScheduleEvent(EVENT_FROSTBOLT, 9000);
-            events.ScheduleEvent(EVENT_CHAINS_OF_ICE, 12000);
-            events.ScheduleEvent(EVENT_HALLUCINATION, 40000);
+            events.ScheduleEvent(EVENT_FIREBALL, 3000, 0, PHASE_ONE); // TODO: adjust timers
+            events.ScheduleEvent(EVENT_FLAMESTRIKE, 15000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_FROSTBOLT, 9000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_CHAINS_OF_ICE, 12000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_HALLUCINATION, 40000, 0, PHASE_ONE);
         }
 
         void UpdateAI(const uint32 diff)
@@ -967,33 +967,33 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ACTIVATE_TRASH:
+                        events.Reset();
+                        events.SetPhase(PHASE_ONE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetReactState(REACT_AGGRESSIVE);
 						if (Unit* unit = me->SelectNearestTarget())
 	                        AttackStart(unit);
 							
                         DoZoneInCombat();
-                        events.Reset();
-                        events.SetPhase(PHASE_ONE);
                         return;
                     case EVENT_FIREBALL:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_FIREBALL);
-                        events.ScheduleEvent(EVENT_FIREBALL, 15000);
+                        events.ScheduleEvent(EVENT_FIREBALL, 15000, 0, PHASE_ONE);
                         return;
                     case EVENT_FLAMESTRIKE:
                         DoCast(SPELL_FLAMESTRIKE);
-                        events.ScheduleEvent(EVENT_FLAMESTRIKE, 15000);
+                        events.ScheduleEvent(EVENT_FLAMESTRIKE, 15000, 0, PHASE_ONE);
                         return;
                     case EVENT_FROSTBOLT:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_FROSTBOLT);
-                        events.ScheduleEvent(EVENT_FROSTBOLT, 15000);
+                        events.ScheduleEvent(EVENT_FROSTBOLT, 15000, 0, PHASE_ONE);
                         return;
                     case EVENT_CHAINS_OF_ICE:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_CHAINS_OF_ICE);
-                        events.ScheduleEvent(EVENT_CHAINS_OF_ICE, 15000);
+                        events.ScheduleEvent(EVENT_CHAINS_OF_ICE, 15000, 0, PHASE_ONE);
                         return;
                     case EVENT_HALLUCINATION:
                         DoCast(SPELL_HALLUCINATION);
@@ -1079,10 +1079,10 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            events.ScheduleEvent(EVENT_SHADOW_STEP, 8000); // TODO: adjust timers
-            events.ScheduleEvent(EVENT_DEADLY_POISON, 5000);
-            events.ScheduleEvent(EVENT_ENVENOMED_DAGGER_THROW, 15000);
-            events.ScheduleEvent(EVENT_KIDNEY_SHOT, 24000);
+            events.ScheduleEvent(EVENT_SHADOW_STEP, 8000, 0, PHASE_ONE); // TODO: adjust timers
+            events.ScheduleEvent(EVENT_DEADLY_POISON, 5000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_ENVENOMED_DAGGER_THROW, 15000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_KIDNEY_SHOT, 24000, 0, PHASE_ONE);
         }
 
         void UpdateAI(const uint32 diff)
@@ -1100,31 +1100,31 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ACTIVATE_TRASH:
+                        events.Reset();
+                        events.SetPhase(PHASE_ONE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetReactState(REACT_AGGRESSIVE);
 						if (Unit* unit = me->SelectNearestTarget())
                             AttackStart(unit);
 							
                         DoZoneInCombat();
-                        events.Reset();
-                        events.SetPhase(PHASE_ONE);
                         return;
                     case EVENT_SHADOW_STEP:
                         DoCast(SPELL_SHADOW_STEP);
-                        events.ScheduleEvent(EVENT_SHADOW_STEP, 8000);
+                        events.ScheduleEvent(EVENT_SHADOW_STEP, 8000, 0, PHASE_ONE);
                         return;
                     case EVENT_DEADLY_POISON:
                         DoCast(me->getVictim(), SPELL_DEADLY_POISON);
-                        events.ScheduleEvent(EVENT_DEADLY_POISON, 10000);
+                        events.ScheduleEvent(EVENT_DEADLY_POISON, 10000, 0, PHASE_ONE);
                         return;
                     case EVENT_ENVENOMED_DAGGER_THROW:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_ENVENOMED_DAGGER_THROW);
-                        events.ScheduleEvent(EVENT_ENVENOMED_DAGGER_THROW, 15000);
+                        events.ScheduleEvent(EVENT_ENVENOMED_DAGGER_THROW, 15000, 0, PHASE_ONE);
                         return;
                     case EVENT_KIDNEY_SHOT:
                         DoCast(me->getVictim(), SPELL_KIDNEY_SHOT);
-                        events.ScheduleEvent(EVENT_KIDNEY_SHOT, 20000);
+                        events.ScheduleEvent(EVENT_KIDNEY_SHOT, 20000, 0, PHASE_ONE);
                         return;
                 }
             }
@@ -1185,9 +1185,9 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000); // TODO: adjust timers
-            events.ScheduleEvent(EVENT_SHIELD_BASH, 10000);
-            events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000);
+            events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000, 0, PHASE_ONE); // TODO: adjust timers
+            events.ScheduleEvent(EVENT_SHIELD_BASH, 10000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000, 0, PHASE_ONE);
         }
 
         void UpdateAI(const uint32 diff)
@@ -1205,26 +1205,26 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ACTIVATE_TRASH:
+                        events.Reset();
+                        events.SetPhase(PHASE_ONE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
                         me->SetReactState(REACT_AGGRESSIVE);
 						if (Unit* unit = me->SelectNearestTarget())
                            AttackStart(unit);
 							
                         DoZoneInCombat();
-                        events.Reset();
-                        events.SetPhase(PHASE_ONE);
                         return;
                     case EVENT_SPECTRAL_STRIKE:
                         DoCast(me->getVictim(), SPELL_SPECTRAL_STRIKE);
-                        events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000);
+                        events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000, 0, PHASE_ONE);
                         return;
                     case EVENT_SHIELD_BASH:
                         DoCast(me->getVictim(), SPELL_SHIELD_BASH);
-                        events.ScheduleEvent(EVENT_SHIELD_BASH, 5000);
+                        events.ScheduleEvent(EVENT_SHIELD_BASH, 5000, 0, PHASE_ONE);
                         return;
                     case EVENT_TORTURED_ENRAGE:
                         DoCast(SPELL_TORTURED_ENRAGE);
-                        events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000);
+                        events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000, 0, PHASE_ONE);
                         return;
                 }
             }
@@ -1283,10 +1283,10 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
-            events.ScheduleEvent(EVENT_SHOOT, 2000); // TODO: adjust timers
-            events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
-            events.ScheduleEvent(EVENT_FROST_TRAP, 1000);
-            events.ScheduleEvent(EVENT_ICE_SHOT, 15000);
+            events.ScheduleEvent(EVENT_SHOOT, 2000, 0, PHASE_ONE); // TODO: adjust timers
+            events.ScheduleEvent(EVENT_CURSED_ARROW, 10000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_FROST_TRAP, 1000, 0, PHASE_ONE);
+            events.ScheduleEvent(EVENT_ICE_SHOT, 15000, 0, PHASE_ONE);
         }
 
         void UpdateAI(const uint32 diff)
@@ -1304,33 +1304,33 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ACTIVATE_TRASH:
+                        events.Reset();
+                        events.SetPhase(PHASE_ONE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                         me->SetReactState(REACT_AGGRESSIVE);
 						if (Unit* unit = me->SelectNearestTarget())
                             AttackStart(unit);
 							
                         DoZoneInCombat();
-                        events.Reset();
-                        events.SetPhase(PHASE_ONE);
                         break;
                     case EVENT_SHOOT:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_SHOOT);
-                        events.ScheduleEvent(EVENT_SHOOT, 2000);
+                        events.ScheduleEvent(EVENT_SHOOT, 2000, 0, PHASE_ONE);
                         return;
                     case EVENT_CURSED_ARROW:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_CURSED_ARROW);
-                        events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
+                        events.ScheduleEvent(EVENT_CURSED_ARROW, 10000, 0, PHASE_ONE);
                         return;
                     case EVENT_FROST_TRAP:
                         DoCast(SPELL_FROST_TRAP);
-                        events.ScheduleEvent(EVENT_FROST_TRAP, 30000);
+                        events.ScheduleEvent(EVENT_FROST_TRAP, 30000, 0, PHASE_ONE);
                         return;
                     case EVENT_ICE_SHOT:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             DoCast(target, SPELL_ICE_SHOT);
-                        events.ScheduleEvent(EVENT_ICE_SHOT, 15000);
+                        events.ScheduleEvent(EVENT_ICE_SHOT, 15000, 0, PHASE_ONE);
                         return;
                 }
             }
@@ -1343,21 +1343,21 @@ public:
 
 enum GENERAL_EVENT
 {
-    SAY_AGGRO                    = -1594519,
-    SAY_DEATH                    = -1594520,
+    SAY_AGGRO                              = -1594519,
+    SAY_DEATH                               = -1594520,
 
-    SPELL_SHIELD_THROWN          = 69222,
-    H_SPELL_SHIELD_THROWN        = 73076,
-    SPELL_SPIKE                  = 69184,
-    H_SPELL_SPIKE                = 70399,
-    SPELL_CLONE_NAME             = 57507,
-    SPELL_CLONE_MODEL            = 45204,
+    SPELL_SHIELD_THROWN            = 69222,
+    H_SPELL_SHIELD_THROWN         = 73076,
+    SPELL_SPIKE                             = 69184,
+    H_SPELL_SPIKE                         = 70399,
+    SPELL_CLONE_NAME                  = 57507,
+    SPELL_CLONE_MODEL                = 45204,
 
     // Reflection'Spells
-    SPELL_BALEFUL_STRIKE         = 69933,
-    SPELL_SPIRIT_BURST           = 69900,
-    H_SPELL_BALEFUL_STRIKE       = 70400,
-    H_SPELL_SPIRIT_BURST         = 73046,
+    SPELL_BALEFUL_STRIKE             = 69933,
+    SPELL_SPIRIT_BURST                = 69900,
+    H_SPELL_BALEFUL_STRIKE         = 70400,
+    H_SPELL_SPIRIT_BURST            = 73046,
 };
 
 class npc_frostworn_general : public CreatureScript
@@ -2189,12 +2189,9 @@ class at_hor_waves_restarter : public AreaTriggerScript
         {
             InstanceScript* instance = player->GetInstanceScript();
 
-            sLog->outFatal(LOG_FILTER_GENERAL, "at_hor_waves_restarter triggered.  Intro event (%x) Marwyn event (%x) Wave State (%x)", instance->GetData(DATA_INTRO_EVENT), instance->GetData(DATA_MARWYN_EVENT), instance->GetData(DATA_WAVE_STATE));
-
             if (instance->GetData(DATA_INTRO_EVENT) == DONE && instance->GetData(DATA_MARWYN_EVENT) != DONE && instance->GetData(DATA_WAVE_STATE) == FAIL)
             {
                 instance->SetData(DATA_WAVE_STATE, IN_PROGRESS);
-                sLog->outFatal(LOG_FILTER_GENERAL, "at_hor_waves_restarter set wave count to special.");
 
                 if (Creature* pFalric = player->GetCreature(*player, instance->GetData64(DATA_FALRIC)))
                 {

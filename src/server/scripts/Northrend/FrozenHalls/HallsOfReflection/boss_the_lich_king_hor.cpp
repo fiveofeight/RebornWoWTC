@@ -193,9 +193,9 @@ public:
                    ++Step;
                    break;
                case 2:
-                   DoCast(me, SPELL_WINTER);
-                   me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                   me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE );
+                   DoCast(me, SPELL_WINTER);
                    DoScriptText(SAY_LICH_KING_WINTER, me);
                    me->SetSpeed(MOVE_WALK, walkSpeed, true);
                    StepTimer = 1000;
@@ -312,11 +312,6 @@ public:
                DoMeleeAttackIfReady();
            }
 
-           if(me->isInCombat() && pInstance->GetData(DATA_LICHKING_EVENT) == IN_PROGRESS)
-           {
-               npc_escortAI::EnterEvadeMode();
-           }
-
            // Start chase for leader
            if(pInstance->GetData(DATA_LICHKING_EVENT) == IN_PROGRESS && StartEscort != true)
            {
@@ -343,6 +338,7 @@ public:
                    me->StopMoving();
                    DoScriptText(SAY_LICH_KING_WIN, me);
                    me->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE, TRIGGERED_NONE);
+                   me->DealDamage(pLider, pLider->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false); // Probably a hack
                }
            }
 

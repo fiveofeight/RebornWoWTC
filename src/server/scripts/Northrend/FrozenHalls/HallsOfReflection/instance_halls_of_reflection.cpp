@@ -306,26 +306,22 @@ public:
                     
                     if (data == SPECIAL) // Called on first spawn
                     {
-                        sLog->outFatal(LOG_FILTER_GENERAL, "SetData Special scheduled new wave.");
                         CloseDoor(uiFrontDoor);
                         if (!m_bIsCall)
                         {
                            m_bIsCall = true;
                            Summon();
-                            sLog->outFatal(LOG_FILTER_GENERAL, "SetData Special tried to spawn a new wave.");
                         }
                         events.ScheduleEvent(EVENT_NEXT_WAVE, 15000);
                      }
                      
                      if (data == IN_PROGRESS) // Called on failed wave
                     {
-                        sLog->outFatal(LOG_FILTER_GENERAL, "SetData In Progress scheduled new wave.");
                         CloseDoor(uiFrontDoor);
                         if (!m_bIsCall)
                         {
                            m_bIsCall = true;
                            Summon();
-                            sLog->outFatal(LOG_FILTER_GENERAL, "SetData In Progress tried to spawn a new wave.");
                         }
                         events.ScheduleEvent(EVENT_NEXT_WAVE, 3000);
                     }
