@@ -156,8 +156,9 @@ void CreatureAI::EnterEvadeMode()
         {
             // Required to prevent attacking creatures that are evading and cause them to reenter combat
             // Does not apply to MoveFollow
-            me->CombatStop(true);
-            me->AddUnitState(UNIT_STATE_EVADE);
+            if (!me->GetFormation()) // Possibly hacky, but currently NPCs in formations don't properly reach home which means they perma-evade
+                me->AddUnitState(UNIT_STATE_EVADE);
+
             me->GetMotionMaster()->MoveTargetedHome();
         }
     }
