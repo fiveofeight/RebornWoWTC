@@ -1447,6 +1447,9 @@ bool Creature::canStartAttack(Unit const* who, bool force) const
     if (isCivilian())
         return false;
 
+    if (IsInEvadeMode())
+        return false;
+
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
         return false;
 
@@ -1936,7 +1939,7 @@ void Creature::CallForHelp(float radius)
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
 {
     // Is it evading?
-    if (HasUnitState(UNIT_STATE_EVADE))
+    if (IsInEvadeMode())
         return false;
 
     // is it true?
@@ -2028,6 +2031,9 @@ void Creature::SaveRespawnTime()
 // this should not be called by petAI or
 bool Creature::canCreatureAttack(Unit const* victim, bool /*force*/) const
 {
+    if (IsInEvadeMode())
+        return false;
+
     if (!victim->IsInMap(this))
         return false;
 
