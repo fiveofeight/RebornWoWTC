@@ -32,13 +32,14 @@ EndScriptData */
 //this texts are already used by 3975 and 3976
 enum Says
 {
-    SAY_ENTRANCE                = -1189001,
-    SAY_REJOINED                = -1189002,
-    SAY_LOST_HEAD               = -1189003,
-    SAY_CONFLAGRATION           = -1189004,
-    SAY_SPROUTING_PUMPKINS      = -1189005,
-    SAY_PLAYER_DEATH            = -1189006,
-    SAY_DEATH                   = -1189007
+    SAY_ENTRANCE                = -3141580,
+    SAY_REJOINED                = -1189101,
+    SAY_LOST_HEAD               = -1189102,
+    SAY_LOST_HEAD2              = -1189103,
+    SAY_CONFLAGRATION           = -1189104,
+    SAY_SPROUTING_PUMPKINS      = -1189105,
+    SAY_PLAYER_DEATH            = -1189106,
+    SAY_DEATH                   = -1189107,
 };
 
 uint32 RandomLaugh[] = {11965, 11975, 11976};
@@ -69,6 +70,7 @@ enum Spells
     SPELL_FLYING_HEAD           = 42399,       //visual flying head
     SPELL_HEAD                  = 42413,       //visual buff, "head"
     SPELL_HEAD_IS_DEAD          = 42428,       //at killing head, Phase 3
+    SPELL_CREATE_PUMPKIN_TREATS = 42754,
 
     SPELL_PUMPKIN_AURA          = 42280,
     SPELL_PUMPKIN_AURA_GREEN    = 42294,
@@ -98,41 +100,20 @@ struct Locations
 
 static Locations FlightPoint[]=
 {
-    {1754.00f, 1346.00f, 17.50f},
-    {1765.00f, 1347.00f, 19.00f},
-    {1784.00f, 1346.80f, 25.40f},
-    {1803.30f, 1347.60f, 33.00f},
-    {1824.00f, 1350.00f, 42.60f},
-    {1838.80f, 1353.20f, 49.80f},
-    {1852.00f, 1357.60f, 55.70f},
-    {1861.30f, 1364.00f, 59.40f},
-    {1866.30f, 1374.80f, 61.70f},
-    {1864.00f, 1387.30f, 63.20f},
-    {1854.80f, 1399.40f, 64.10f},
-    {1844.00f, 1406.90f, 64.10f},
-    {1824.30f, 1411.40f, 63.30f},
-    {1801.00f, 1412.30f, 60.40f},
-    {1782.00f, 1410.10f, 55.50f},
-    {1770.50f, 1405.20f, 50.30f},
-    {1765.20f, 1400.70f, 46.60f},
-    {1761.40f, 1393.40f, 41.70f},
-    {1759.10f, 1386.70f, 36.60f},
-    {1757.80f, 1378.20f, 29.00f},
-    {1758.00f, 1367.00f, 19.51f}
+    {1764.957f, 1347.432f, 18.7f},
+    {1774.625f, 1345.035f, 20.8f},
+    {1789.114f, 1341.439f, 26.8f},
+    {1798.446f, 1345.865f, 30.8f},
+    {1791.671f, 1360.825f, 30.1f},
+    {1777.449f, 1364.652f, 25.1f},
+    {1770.126f, 1361.402f, 20.7f},
+    {1755.552f, 1366.757f, 19.5f}
 };
 
 static Locations Spawn[]=
 {
     {1776.27f, 1348.74f, 19.20f},       //spawn point for pumpkin shrine mob
     {1765.28f, 1347.46f, 17.55f}     //spawn point for smoke
-};
-
-static const char* Text[]=
-{
-    "Horseman rise...",
-    "Your time is nigh...",
-    "You felt death once...",
-    "Now, know demise!"
 };
 
 #define EMOTE_LAUGHS    "Headless Horseman laughs"  // needs assigned to db.
@@ -310,7 +291,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 DoCast(me, SPELL_HEAD_LANDS, true);
                 DoCast(me, SPELL_HEAD, false);
-                SaySound(SAY_LOST_HEAD);
+                DoScriptText(RAND(SAY_LOST_HEAD, SAY_LOST_HEAD2), me);
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MoveFleeing(caster->getVictim());
             }
@@ -436,10 +417,9 @@ public:
             me->SetVisible(false);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT | MOVEMENTFLAG_DISABLE_GRAVITY);
-            me->SetSpeed(MOVE_WALK, 5.0f, true);
+            me->SetSpeed(MOVE_FLIGHT, 3.2f, true);
             wp_reached = false;
             count = 0;
-            say_timer = 3000;
             id = 0;
             Phase = 0;
         }
@@ -454,31 +434,29 @@ public:
             switch (id)
             {
                 case 0:
+                    {
                     me->SetVisible(true);
-                    break;
-                case 1:
-                {
                     if (Creature* smoke = me->SummonCreature(HELPER, Spawn[1].x, Spawn[1].y, Spawn[1].z, 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
                         CAST_AI(mob_wisp_invis::mob_wisp_invisAI, smoke->AI())->SetType(3);
                     DoCast(me, SPELL_RHYME_BIG);
-                    break;
-                }
-                case 6:
                     if (instance)
                         instance->SetData(GAMEOBJECT_PUMPKIN_SHRINE, 0);   //hide gameobject
                     break;
-                case 19:
+                    }
+                case 6:
                     me->RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT | MOVEMENTFLAG_DISABLE_GRAVITY);
                     break;
-                case 20:
+                case 7:
                 {
                     Phase = 1;
                     IsFlying = false;
                     wp_reached = false;
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    SaySound(SAY_ENTRANCE);
                     if (Unit* player = Unit::GetUnit(*me, PlayerGUID))
+                    {
                         DoStartMovement(player);
+                        AttackStart(player);
+                    }
                     break;
                 }
             }
@@ -638,46 +616,25 @@ public:
                 switch (Phase)
                 {
                     case 0:
-                    {
-                        if (!IsFlying)
-                        {
-                            if (say_timer <= diff)
-                            {
-                                say_timer = 3000;
-                                Player* player = SelectRandomPlayer(100.0f, false);
-                                if (count < 3)
-                                {
-                                    if (player)
-                                        player->Say(Text[count], 0);
-                                }
-                                else
-                                {
-                                    DoCast(me, SPELL_RHYME_BIG);
-                                    if (player)
-                                    {
-                                        player->Say(Text[count], 0);
-                                        player->HandleEmoteCommand(ANIM_EMOTE_SHOUT);
-                                    }
-                                    wp_reached = true;
-                                    IsFlying = true;
-                                    count = 0;
-                                    break;
-                                }
-                                ++count;
-                            }
-                            else say_timer -= diff;
-                        }
-                        else
-                        {
-                            if (wp_reached)
-                            {
-                                wp_reached = false;
-                                me->GetMotionMaster()->Clear(false);
-                                me->GetMotionMaster()->MovePoint(id, FlightPoint[id].x, FlightPoint[id].y, FlightPoint[id].z);
-                            }
-                        }
-                    }
-                    break;
+                       if (!IsFlying)
+                       {
+                           DoCast(me, SPELL_RHYME_BIG);
+                           DoScriptText(SAY_ENTRANCE, me);
+                           wp_reached = true;
+                           IsFlying = true;
+                           count = 0;
+                       }
+
+                       else
+                       {
+                           if (wp_reached)
+                           {
+                               wp_reached = false;
+                               me->GetMotionMaster()->Clear(false);
+                               me->GetMotionMaster()->MovePoint(id, FlightPoint[id].x, FlightPoint[id].y, FlightPoint[id].z);
+                           }
+                       }
+                       break;
                     case 1:
                         if (burned)
                             break;
@@ -872,20 +829,13 @@ public:
                 return true;
             instance->SetData(DATA_HORSEMAN_EVENT, IN_PROGRESS);
         }
-    /*  if (soil->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER && player->getLevel() > 64)
-        {
-            player->PrepareQuestMenu(soil->GetGUID());
-            player->SendPreparedQuest(soil->GetGUID());
-        }
-        if (player->GetQuestStatus(11405) == QUEST_STATUS_INCOMPLETE && player->getLevel() > 64)
-        { */
+
             player->AreaExploredOrEventHappens(11405);
-            if (Creature* horseman = soil->SummonCreature(HH_MOUNTED, FlightPoint[20].x, FlightPoint[20].y, FlightPoint[20].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0))
+            if (Creature* horseman = soil->SummonCreature(HH_MOUNTED, FlightPoint[7].x, FlightPoint[7].y, FlightPoint[7].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0))
             {
                 CAST_AI(boss_headless_horseman::boss_headless_horsemanAI, horseman->AI())->PlayerGUID = player->GetGUID();
                 CAST_AI(boss_headless_horseman::boss_headless_horsemanAI, horseman->AI())->FlyMode();
             }
-        //}
         return true;
     }
 };
