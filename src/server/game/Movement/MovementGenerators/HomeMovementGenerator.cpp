@@ -42,8 +42,6 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
     // at apply we can select more nice return points base at current movegen
     //if (owner.GetMotionMaster()->empty() || !owner.GetMotionMaster()->top()->GetResetPosition(owner,x,y,z))
     //{
-    owner.ClearUnitState(UNIT_STATE_FOLLOW);
-    owner.ClearUnitState(UNIT_STATE_CHASE);
     owner.GetHomePosition(x, y, z, o);
     init.SetFacing(o);
     //}

@@ -1935,6 +1935,10 @@ void Creature::CallForHelp(float radius)
 
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
 {
+    // Is it evading?
+    if (HasUnitState(UNIT_STATE_EVADE))
+        return false;
+
     // is it true?
     if (!HasReactState(REACT_AGGRESSIVE))
         return false;

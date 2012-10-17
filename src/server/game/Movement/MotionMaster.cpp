@@ -196,6 +196,9 @@ void MotionMaster::MoveRandom(float spawndist)
 
 void MotionMaster::MoveTargetedHome()
 {
+    if (_owner->HasUnitState(UNIT_STATE_LOST_CONTROL))
+        return;
+
     Clear(false);
 
     if (_owner->GetTypeId()==TYPEID_UNIT && !((Creature*)_owner)->GetCharmerOrOwnerGUID())
@@ -221,6 +224,9 @@ void MotionMaster::MoveTargetedHome()
 
 void MotionMaster::MoveConfused()
 {
+    if (_owner->HasUnitState(UNIT_STATE_EVADE))
+        return;
+
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
         sLog->outDebug(LOG_FILTER_GENERAL, "Player (GUID: %u) move confused", _owner->GetGUIDLow());
@@ -237,7 +243,7 @@ void MotionMaster::MoveConfused()
 void MotionMaster::MoveChase(Unit* target, float dist, float angle)
 {
     // ignore movement request if target not exist
-    if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) || _owner->HasUnitState(UNIT_STATE_EVADE))
         return;
 
     //_owner->ClearUnitState(UNIT_STATE_FOLLOW);
@@ -262,7 +268,7 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot)
 {
     // ignore movement request if target not exist
-    if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE) || _owner->HasUnitState(UNIT_STATE_EVADE))
         return;
 
     //_owner->AddUnitState(UNIT_STATE_FOLLOW);
@@ -285,6 +291,9 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
 
 void MotionMaster::MovePoint(uint32 id, float x, float y, float z)
 {
+    if (_owner->HasUnitState(UNIT_STATE_EVADE))
+        return;
+
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
         sLog->outDebug(LOG_FILTER_GENERAL, "Player (GUID: %u) targeted point (Id: %u X: %f Y: %f Z: %f)", _owner->GetGUIDLow(), id, x, y, z);
@@ -455,6 +464,9 @@ void MotionMaster::MoveSeekAssistanceDistract(uint32 time)
 
 void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
 {
+    if (_owner->HasUnitState(UNIT_STATE_EVADE))
+        return;
+
     if (!enemy)
         return;
 
@@ -551,6 +563,9 @@ void MotionMaster::Mutate(MovementGenerator *m, MovementSlot slot)
 
 void MotionMaster::MovePath(uint32 path_id, bool repeatable)
 {
+    if (_owner->HasUnitState(UNIT_STATE_EVADE))
+        return;
+
     if (!path_id)
         return;
     //We set waypoint movement as new default movement generator
