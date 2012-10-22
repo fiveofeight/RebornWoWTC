@@ -44,10 +44,26 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature& creature)
     //bool is_water_ok = creature.CanSwim();                // not used?
     bool is_air_ok = creature.CanFly();
 
-    const float angle = float(rand_norm()) * static_cast<float>(M_PI*2.0f);
-    const float range = float(rand_norm()) * wander_distance;
-    const float distanceX = range * std::cos(angle);
-    const float distanceY = range * std::sin(angle);
+    // curr_angle can be set to -1 if previous move attempt failed and we need to try a new direction
+    float prev_angle = curr_angle;
+    if (curr_angle < 0)
+    curr_angle = float(rand_norm()) * static_cast<float>(M_PI*2.0f);
+
+    // step distance is greater for flyers since they are less affected by ground changes
+    // and the animation resynch with each step is more noticeable
+    float max_step_distance = (is_air_ok) ? 20.0 : 5.0;
+    float step_distance = (wander_distance > max_step_distance) ? max_step_distance : wander_distance;
+
+    float distanceX = step_distance * cos(curr_angle) + creature.GetPositionX() - respX;
+    float distanceY = step_distance * sin(curr_angle) + creature.GetPositionY() - respY;
+    float newDistXY = sqrtf(distanceX*distanceX + distanceY*distanceY);
+    while (newDistXY > wander_distance)
+    {
+    curr_angle = float(rand_norm()) * static_cast<float>(M_PI*2.0f);
+    distanceX = step_distance * cos(curr_angle) + creature.GetPositionX() - respX;
+    distanceY = step_distance * sin(curr_angle) + creature.GetPositionY() - respY;
+    newDistXY = sqrtf(distanceX*distanceX + distanceY*distanceY);
+    }
 
     destX = respX + distanceX;
     destY = respY + distanceY;
@@ -60,14 +76,11 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature& creature)
 
     if (is_air_ok)                                          // 3D system above ground and above water (flying mode)
     {
-        // Limit height change
-        const float distanceZ = float(rand_norm()) * sqrtf(travelDistZ)/2.0f;
-        destZ = respZ + distanceZ;
-        float levelZ = map->GetWaterOrGroundLevel(destX, destY, destZ-2.0f);
-
-        // Problem here, we must fly above the ground and water, not under. Let's try on next tick
-        if (levelZ >= destZ)
-            return;
+        // Maintain same height as at spawn point (minimum 2 Z)
+        float spawnHeight = respZ - map->GetHeight(creature.GetPhaseMask(), respX, respY, MAX_HEIGHT);
+        if (spawnHeight < 2.0)
+        spawnHeight = 2.0;
+        destZ = spawnHeight + map->GetHeight(creature.GetPhaseMask(), destX, destY, MAX_HEIGHT);
     }
     //else if (is_water_ok)                                 // 3D system under water and above ground (swimming mode)
     else                                                    // 2D only
@@ -90,22 +103,34 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature& creature)
                 destZ = map->GetHeight(creature.GetPhaseMask(), destX, destY, respZ+travelDistZ-2.0f, true);
 
                 // let's forget this bad coords where a z cannot be find and retry at next tick
-                if (fabs(destZ - respZ) > travelDistZ)
+                if (fabs(destZ - respZ) > travelDistZ) 
+                {
+                    curr_angle = -1; // try new direction on next tick
                     return;
+                }
             }
         }
     }
 
     if (is_air_ok)
         i_nextMoveTime.Reset(0);
-    else
+    else if (prev_angle == curr_angle)
+        i_nextMoveTime.Reset(0);
+    else // if we are changing directions, don't move on this tick
+    {
+        destX = creature.GetPositionX();
+        destY = creature.GetPositionY();
+        destZ = creature.GetPositionZ();
+        running = urand(1,100) <= RUNNING_CHANCE_RANDOMMV;
         i_nextMoveTime.Reset(urand(500, 10000));
+    }
 
     creature.AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
     Movement::MoveSplineInit init(creature);
     init.MoveTo(destX, destY, destZ);
-    init.SetWalk(true);
+
+    init.SetWalk(!running);
     init.Launch();
 
     //Call for creature group update
