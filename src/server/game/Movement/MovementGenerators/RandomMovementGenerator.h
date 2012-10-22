@@ -39,8 +39,6 @@ class RandomMovementGenerator : public MovementGeneratorMedium< T, RandomMovemen
 
         uint32 i_nextMove;
         float wander_distance;
-        float curr_angle;
-        bool running;
 };
 #endif
 
