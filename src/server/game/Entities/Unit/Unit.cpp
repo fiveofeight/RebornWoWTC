@@ -9446,6 +9446,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     else
     {
         if (victim->ToCreature()->IsInEvadeMode())
+            CombatStop();
+            DeleteThreatList();
             return false;
     }
 
@@ -13100,9 +13102,8 @@ Unit* Creature::SelectVictim()
     //  don't evade if damage received within the last 10 seconds
     // Does not apply to world bosses to prevent kiting to cities
     if (!isWorldBoss() && !GetInstanceId())
-        if (!target)
-            if (time(NULL) - GetLastDamagedTime() <= MAX_AGGRO_RESET_TIME && target && target->isAlive())
-                return target;
+        if (time(NULL) - GetLastDamagedTime() <= MAX_AGGRO_RESET_TIME)
+            return target;
 
     // last case when creature must not go to evade mode:
     // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
