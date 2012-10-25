@@ -9446,8 +9446,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     else
     {
         if (victim->ToCreature()->IsInEvadeMode())
-            CombatStop();
-            DeleteThreatList();
             return false;
     }
 
