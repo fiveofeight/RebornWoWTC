@@ -5,4 +5,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 33550; 
 UPDATE `creature_template` SET `ScriptName` = "npc_boneguard_mounted" WHERE `entry` IN (34127, 33429);
 DELETE FROM `spell_script_names` WHERE `spell_id` = 63000;
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (`spell_id` = 63000, `ScriptName` = "spell_gen_trample_scourge");
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (63000, "spell_gen_trample_scourge");
+UPDATE `creature` SET `spawntimesecs` = 4 WHERE `id` IN (33562, 33559, 33558, 33564, 33561, 33382, 33383, 33384, 33306, 33285, 33739, 33738, 33747, 33743, 33740, 33746, 33748, 33744, 33745, 33749);
+
