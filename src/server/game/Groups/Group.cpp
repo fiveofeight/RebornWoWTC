@@ -112,6 +112,7 @@ bool Group::Create(Player* leader)
 
     if (!isLFGGroup())
         m_lootMethod = GROUP_LOOT;
+
     m_lootThreshold = ITEM_QUALITY_UNCOMMON;
     m_looterGuid = leaderGuid;
 
@@ -221,13 +222,7 @@ void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, 
 
     SubGroupCounterIncrease(subgroup);
 
-    if (isLFGGroup())
-    {
-        LfgDungeonSet Dungeons;
-        Dungeons.insert(sLFGMgr->GetDungeon(GetGUID()));
-        sLFGMgr->SetSelectedDungeons(member.guid, Dungeons);
-        sLFGMgr->SetState(member.guid, sLFGMgr->GetState(GetGUID()));
-    }
+    sLFGMgr->SetupGroupMember(member.guid, GetGUID());
 }
 
 void Group::ConvertToLFG()
@@ -601,9 +596,9 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
 
         if (isLFGGroup() && GetMembersCount() == 1)
         {
-            Player* Leader = ObjectAccessor::FindPlayer(GetLeaderGUID());
-            LFGDungeonData const* dungeon = sLFGMgr->GetLFGDungeon(sLFGMgr->GetDungeon(GetGUID()));
-            if ((Leader && dungeon && Leader->isAlive() && Leader->GetMapId() != uint32(dungeon->map)) || !dungeon)
+            Player* leader = ObjectAccessor::FindPlayer(GetLeaderGUID());
+            uint32 mapId = sLFGMgr->GetDungeonMapId(GetGUID());
+            if (!mapId || !leader || (leader->isAlive() && leader->GetMapId() != mapId))
             {
                 Disband();
                 return false;
@@ -2093,7 +2088,7 @@ void Group::BroadcastGroupUpdate(void)
         {
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
             pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
-            sLog->outDebug(LOG_FILTER_GENERAL, "-- Forced group value update for '%s'", pp->GetName());
+            sLog->outDebug(LOG_FILTER_GENERAL, "-- Forced group value update for '%s'", pp->GetName().c_str());
         }
     }
 }
@@ -2101,12 +2096,12 @@ void Group::BroadcastGroupUpdate(void)
 void Group::ResetMaxEnchantingLevel()
 {
     m_maxEnchantingLevel = 0;
-    Player* pMember = NULL;
+    Player* member = NULL;
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        pMember = ObjectAccessor::FindPlayer(citr->guid);
-        if (pMember && m_maxEnchantingLevel < pMember->GetSkillValue(SKILL_ENCHANTING))
-            m_maxEnchantingLevel = pMember->GetSkillValue(SKILL_ENCHANTING);
+        member = ObjectAccessor::FindPlayer(citr->guid);
+        if (member && m_maxEnchantingLevel < member->GetSkillValue(SKILL_ENCHANTING))
+            m_maxEnchantingLevel = member->GetSkillValue(SKILL_ENCHANTING);
     }
 }
 

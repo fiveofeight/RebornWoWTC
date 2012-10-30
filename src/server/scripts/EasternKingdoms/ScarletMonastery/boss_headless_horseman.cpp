@@ -99,6 +99,7 @@ static Position flightPos[]=
 
 #define GOSSIP_OPTION "Call the Headless Horseman."
 
+
 class boss_headless_horseman : public CreatureScript
 {
     public:
@@ -361,7 +362,6 @@ class boss_headless_horseman : public CreatureScript
             return new boss_headless_horsemanAI(creature);
         }
 };
-
 
 class npc_horseman_head : public CreatureScript
 {
