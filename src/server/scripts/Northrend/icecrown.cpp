@@ -795,7 +795,8 @@ public:
         {
             if (damage >= me->GetHealth() && who->GetTypeId() == TYPEID_PLAYER && !bDefeated)
             {
-                me->GetMotionMaster()->Clear();
+                me->DeleteThreatList();
+                me->CombatStop(false);
                 bDefeated = true;
                 me->SetFullHealth();
                 damage = 0;
@@ -921,9 +922,10 @@ public:
 
             if (Player* challengee = ObjectAccessor::GetPlayer(*me, challengeeGUID))
             {
-                if (!challengee->GetVehicle())
+                if (!challengee->GetVehicle() && me->isInCombat())
                 {
-                    me->GetMotionMaster()->Clear();
+                    me->DeleteThreatList();
+                    me->CombatStop(false);
                     challengee->CastSpell(challengee, SPELL_NO_MUSIC, false);
                     Talk(SAY_VICTORY);
                     me->setFaction(35);

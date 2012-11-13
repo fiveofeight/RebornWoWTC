@@ -85,9 +85,12 @@ enum eEnums
     CHAMP_UC_2            = -1999985,
     CHAMP_IF_1            = -1999978,
     CHAMP_IF_2            = -1999979,
+};
 
-
-        
+enum Gossip
+{
+    GOSSIP_NOT_MOUNTED_A  = 14757,
+    GOSSIP_NOT_MOUNTED_H  = 15043,
 };
 
 enum IntroPhase
@@ -799,26 +802,39 @@ class npc_announcer_toc5 : public CreatureScript
     {
         InstanceScript* pInstance = creature->GetInstanceScript();
 
-        if (pInstance &&
-            pInstance->GetData(BOSS_GRAND_CHAMPIONS) == DONE &&
-            pInstance->GetData(BOSS_BLACK_KNIGHT) == DONE &&
-            (pInstance->GetData(BOSS_ARGENT_CHALLENGE_E) == DONE ||
-            pInstance->GetData(BOSS_ARGENT_CHALLENGE_P) == DONE))
+        if (!player->GetVehicle() && pInstance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
+        {
+            if (pInstance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
+                player->SEND_GOSSIP_MENU(GOSSIP_NOT_MOUNTED_H, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(GOSSIP_NOT_MOUNTED_A, creature->GetGUID());
 
-            return false;
+            return true;
+        }
 
-        if (pInstance &&
-            pInstance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED &&
-            pInstance->GetData(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED &&
-            pInstance->GetData(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED &&
-            pInstance->GetData(BOSS_BLACK_KNIGHT) == NOT_STARTED)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        else if (pInstance)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        else
+        {
+            if (pInstance &&
+                pInstance->GetData(BOSS_GRAND_CHAMPIONS) == DONE &&
+                pInstance->GetData(BOSS_BLACK_KNIGHT) == DONE &&
+                (pInstance->GetData(BOSS_ARGENT_CHALLENGE_E) == DONE ||
+                pInstance->GetData(BOSS_ARGENT_CHALLENGE_P) == DONE))
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+                return false;
 
-        return true;
+            if (pInstance &&
+                pInstance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED &&
+                pInstance->GetData(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED &&
+                pInstance->GetData(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED &&
+                pInstance->GetData(BOSS_BLACK_KNIGHT) == NOT_STARTED)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            else if (pInstance)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+    
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+    
+            return true;
+        }
     };
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
