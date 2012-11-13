@@ -198,7 +198,7 @@ uint32 FlightPathMovementGenerator::GetPathAtMapEnd() const
 
 void FlightPathMovementGenerator::Initialize(Player* player)
 {
-    DoReset(player);
+    Reset(player);
     InitEndGridInfo();
 }
 

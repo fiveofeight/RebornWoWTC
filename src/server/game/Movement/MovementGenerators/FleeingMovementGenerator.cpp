@@ -155,7 +155,7 @@ void FleeingMovementGenerator<Creature>::Finalize(Creature* owner)
 template<class T>
 void FleeingMovementGenerator<T>::Reset(T* owner)
 {
-    DoInitialize(owner);
+    Initialize(owner);
 }
 
 template<class T>

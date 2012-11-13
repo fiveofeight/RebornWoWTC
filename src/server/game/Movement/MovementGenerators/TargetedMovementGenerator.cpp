@@ -190,7 +190,7 @@ void ChaseMovementGenerator<T>::Finalize(T* owner)
 template<class T>
 void ChaseMovementGenerator<T>::Reset(T* owner)
 {
-    DoInitialize(owner);
+    Initialize(owner);
 }
 
 template<class T>
@@ -263,7 +263,7 @@ void FollowMovementGenerator<T>::Finalize(T* owner)
 template<class T>
 void FollowMovementGenerator<T>::Reset(T* owner)
 {
-    DoInitialize(owner);
+    Initialize(owner);
 }
 
 template<class T>

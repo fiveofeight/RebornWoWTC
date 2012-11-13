@@ -129,7 +129,7 @@ void RandomMovementGenerator<Creature>::Initialize(Creature* creature)
 template<>
 void RandomMovementGenerator<Creature>::Reset(Creature* creature)
 {
-    DoInitialize(creature);
+    Initialize(creature);
 }
 
 template<>
