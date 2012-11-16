@@ -865,7 +865,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 // ******************* CapturePoint **********************
 // *******************************************************
 
-BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_capturePoint(NULL)
+BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_capturePointGUID(0)
 {
     m_team = TEAM_NEUTRAL;
     m_value = 0;
@@ -880,19 +880,21 @@ BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_
 
 bool BfCapturePoint::HandlePlayerEnter(Player* player)
 {
-    if (m_capturePoint)
-    {
-        player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
-        player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, uint32(ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f)));
-        player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
-    }
+    if (m_capturePointGUID)
+        if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+        {
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, uint32(ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f)));
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
+        }
     return m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second;
 }
 
 GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
 {
-    if (m_capturePoint)
-        player->SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 0);
+    if (m_capturePointGUID)
+        if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 0);
 
     GuidSet::iterator current = m_activePlayers[player->GetTeamId()].find(player->GetGUID());
 
@@ -905,15 +907,18 @@ GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
 
 void BfCapturePoint::SendChangePhase()
 {
-    if (!m_capturePoint)
+    if (!m_capturePointGUID)
         return;
-
-    // send this too, sometimes the slider disappears, dunno why :(
-    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
-    // send these updates to only the ones in this objective
-    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
-    // send this too, sometimes it resets :S
-    SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
+        
+    if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+    {
+        // send this too, sometimes the slider disappears, dunno why :(
+        SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
+        // send these updates to only the ones in this objective
+        SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
+        // send this too, sometimes it resets :S
+        SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
+    }
 }
 
 bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
@@ -922,7 +927,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 
     sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Creating capture point %u", capturePoint->GetEntry());
 
-    m_capturePoint = capturePoint;
+    m_capturePointGUID = capturePoint->GetGUID();
 
     // check info existence
     GameObjectTemplate const* goinfo = capturePoint->GetGOInfo();
@@ -954,11 +959,15 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 
 bool BfCapturePoint::DelCapturePoint()
 {
-    if (m_capturePoint)
+    if (m_capturePointGUID)
     {
-        m_capturePoint->SetRespawnTime(0);                  // not save respawn time
-        m_capturePoint->Delete();
-        m_capturePoint = NULL;
+        if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+        {
+            capturePoint->SetRespawnTime(0);                  // not save respawn time
+            capturePoint->Delete();
+            capturePoint = NULL;
+        }
+        m_capturePointGUID = 0;
     }
 
     return true;
@@ -966,37 +975,40 @@ bool BfCapturePoint::DelCapturePoint()
 
 bool BfCapturePoint::Update(uint32 diff)
 {
-    if (!m_capturePoint)
+    if (!m_capturePointGUID)
         return false;
 
-    float radius = m_capturePoint->GetGOInfo()->capturePoint.radius;
-
-    for (uint8 team = 0; team < 2; ++team)
+    if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
     {
-        for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
+        float radius = capturePoint->GetGOInfo()->capturePoint.radius;
+
+        for (uint8 team = 0; team < 2; ++team)
         {
-            if (Player* player = sObjectAccessor->FindPlayer(*itr))
+            for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
             {
-                if (!m_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
-                    itr = HandlePlayerLeave(player);
+                if (Player* player = sObjectAccessor->FindPlayer(*itr))
+                {
+                    if (!capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
+                        itr = HandlePlayerLeave(player);
+                    else
+                        ++itr;
+                }
                 else
                     ++itr;
             }
-            else
-                ++itr;
         }
+
+        std::list<Player*> players;
+        Trinity::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
+        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
+        capturePoint->VisitNearbyWorldObject(radius, searcher);
+    
+        for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+            if ((*itr)->IsOutdoorPvPActive())
+                if (m_activePlayers[(*itr)->GetTeamId()].insert((*itr)->GetGUID()).second)
+                    HandlePlayerEnter(*itr);
     }
-
-    std::list<Player*> players;
-    Trinity::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
-    m_capturePoint->VisitNearbyWorldObject(radius, searcher);
-
-    for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
-        if ((*itr)->IsOutdoorPvPActive())
-            if (m_activePlayers[(*itr)->GetTeamId()].insert((*itr)->GetGUID()).second)
-                HandlePlayerEnter(*itr);
-
+    
     // get the difference of numbers
     float fact_diff = ((float) m_activePlayers[0].size() - (float) m_activePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
     if (G3D::fuzzyEq(fact_diff, 0.0f))
