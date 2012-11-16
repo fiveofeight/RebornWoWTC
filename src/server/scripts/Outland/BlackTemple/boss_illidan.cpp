@@ -455,7 +455,7 @@ public:
 
             if (CheckTimer <= diff)
             {
-                ChargeCheck();
+                // ChargeCheck(); Disabled for now, Flames can fall through the map and start charging when they shouldn't, and mmaps is broken for BT.
                 EnrageCheck();
                 CheckTimer = 1000;
             } else CheckTimer -= diff;
