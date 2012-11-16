@@ -384,10 +384,10 @@ class BattlefieldWG : public Battlefield
         bool SetupBattlefield();
 
         /// Return pointer to relic object
-        GameObject* GetRelic() { return sObjectAccessor->GetObjectInWorld(m_titansRelic, (GameObject*)NULL); }
+        GameObject* GetRelic() { return sObjectAccessor->GetObjectInWorld(m_titansRelicGUID, (GameObject*)NULL); }
 
         /// Define relic object
-        void SetRelic(uint64 relic) { m_titansRelic = relic; }
+        void SetRelic(uint64 relicGUID) { m_titansRelicGUID = relicGUID; }
 
         /// Check if players can interact with the relic (Only if the last door has been broken)
         bool CanInteractWithRelic() { return m_isRelicInteractible; }
@@ -433,7 +433,7 @@ class BattlefieldWG : public Battlefield
         uint32 m_tenacityStack;
         uint32 m_saveTimer;
 
-        uint64 m_titansRelic;
+        uint64 m_titansRelicGUID;
 };
 
 uint32 const VehNumWorldState[]        = { 3680, 3490 };
@@ -1121,7 +1121,7 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        if(GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
+        if (GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
         {
             // Rebuild gameobject
             if (build->IsDestructibleBuilding())
@@ -1186,7 +1186,7 @@ struct BfWGGameObjectBuilding
                 m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team));
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-                if(GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
+                if (GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
                     if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 10.0f))
                         go->EnableCollision(false);
                 m_WG->SetRelicInteractible(true);
@@ -1202,7 +1202,7 @@ struct BfWGGameObjectBuilding
 
     void Init(GameObject* go, uint32 type, uint32 worldstate, uint32 nameid)
     {
-        if(!go)
+        if (!go)
             return;
         
         // GameObject associated to object
@@ -1389,11 +1389,11 @@ struct BfWGGameObjectBuilding
                     m_WG->ShowNpc(creature, true);
 
         for (GuidSet::const_iterator itr = m_GameObjectList[m_WG->GetDefenderTeam()].begin(); itr != m_GameObjectList[m_WG->GetDefenderTeam()].end(); ++itr)
-            if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+            if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
                 object->SetRespawnTime(RESPAWN_ONE_DAY);
 
         for (GuidSet::const_iterator itr = m_GameObjectList[m_WG->GetAttackerTeam()].begin(); itr != m_GameObjectList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+            if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
                 object->SetRespawnTime(RESPAWN_IMMEDIATELY);
     }
 
@@ -1405,7 +1405,7 @@ struct BfWGGameObjectBuilding
             {
                 if (Creature* creature = unit->ToCreature())
                 {
-                    if(GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
+                    if (GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
                     {
                         if (disable)
                             m_WG->HideNpc(creature);
@@ -1441,7 +1441,7 @@ struct BfWGGameObjectBuilding
             {
                 if (Creature* creature = unit->ToCreature())
                 {
-                    if(GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
+                    if (GameObject* build = sObjectAccessor->GetObjectInWorld(m_BuildGUID, (GameObject*)NULL))
                     {
                         if (disable)
                             m_WG->HideNpc(creature);
@@ -1557,7 +1557,7 @@ struct WintergraspWorkshopData
     uint32 m_WorldState;
     uint32 m_TeamControl;                                   // Team witch control the workshop
     GuidSet m_CreatureOnPoint[2];                           // Contain all Creature associate to this point
-    GuidSet m_GameObjectOnPoint[2];                     // Contain all Gameobject associate to this point
+    GuidSet m_GameObjectOnPoint[2];                         // Contain all Gameobject associate to this point
     uint32 m_NameId;                                        // Id of trinity_string witch contain name of this node, using for alert message
 
     WintergraspWorkshopData(BattlefieldWG* WG)
@@ -1626,12 +1626,12 @@ struct WintergraspWorkshopData
 
                 // Show Alliance gameobject
                 for (GuidSet::const_iterator itr = m_GameObjectOnPoint[TEAM_ALLIANCE].begin(); itr != m_GameObjectOnPoint[TEAM_ALLIANCE].end(); ++itr)
-                    if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+                    if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
                         object->SetRespawnTime(RESPAWN_IMMEDIATELY);
 
                 // Hide Horde gameobject
                 for (GuidSet::const_iterator itr = m_GameObjectOnPoint[TEAM_HORDE].begin(); itr != m_GameObjectOnPoint[TEAM_HORDE].end(); ++itr)
-                    if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+                    if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
                         object->SetRespawnTime(RESPAWN_ONE_DAY);
 
 
@@ -1667,12 +1667,12 @@ struct WintergraspWorkshopData
 
                 // Hide Alliance gameobject
                 for (GuidSet::const_iterator itr = m_GameObjectOnPoint[TEAM_ALLIANCE].begin(); itr != m_GameObjectOnPoint[TEAM_ALLIANCE].end(); ++itr)
-                    if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+                    if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
                         object->SetRespawnTime(RESPAWN_ONE_DAY);
 
                 // Show Horde gameobject
                 for (GuidSet::const_iterator itr = m_GameObjectOnPoint[TEAM_HORDE].begin(); itr != m_GameObjectOnPoint[TEAM_HORDE].end(); ++itr)
-                    if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+                    if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
                         object->SetRespawnTime(RESPAWN_IMMEDIATELY);
 
                 // Update worlstate

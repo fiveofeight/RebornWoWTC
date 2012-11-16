@@ -104,7 +104,8 @@ class BfCapturePoint
 
         bool SetCapturePointData(GameObject* capturePoint);
         GameObject* GetCapturePointGo() { return sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL); }
-
+        uint32 GetCapturePointEntry(){ return m_capturePointEntry; }
+        
         TeamId GetTeamId() { return m_team; }
     protected:
         bool DelCapturePoint();
@@ -412,7 +413,7 @@ class Battlefield : public ZoneScript
         void BroadcastPacketToWar(WorldPacket& data) const;
 
         // CapturePoint system
-        void AddCapturePoint(BfCapturePoint* cp) { if(cp->GetCapturePointGo()) m_capturePoints[cp->GetCapturePointGo()->GetEntry()] = cp; }
+        void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints[cp->GetCapturePointEntry()] = cp; }
 
         BfCapturePoint* GetCapturePoint(uint32 lowguid) const
         {

@@ -172,7 +172,7 @@ bool BattlefieldWG::SetupBattlefield()
     // Spawn all gameobjects
     for (uint8 i = 0; i < WG_MAX_OBJ; i++)
     {
-        if(GameObject* go = SpawnGameObject(WGGameObjectBuilding[i].entry, WGGameObjectBuilding[i].x, WGGameObjectBuilding[i].y, WGGameObjectBuilding[i].z, WGGameObjectBuilding[i].o))
+        if (GameObject* go = SpawnGameObject(WGGameObjectBuilding[i].entry, WGGameObjectBuilding[i].x, WGGameObjectBuilding[i].y, WGGameObjectBuilding[i].z, WGGameObjectBuilding[i].o))
         {
             BfWGGameObjectBuilding* b = new BfWGGameObjectBuilding(this);
             b->Init(go, WGGameObjectBuilding[i].type, WGGameObjectBuilding[i].WorldState, WGGameObjectBuilding[i].nameId);
@@ -185,7 +185,7 @@ bool BattlefieldWG::SetupBattlefield()
     // Spawning portal defender
     for (uint8 i = 0; i < WG_MAX_TELEPORTER; i++)
     {
-        if(GameObject* go = SpawnGameObject(WGPortalDefenderData[i].entry, WGPortalDefenderData[i].x, WGPortalDefenderData[i].y, WGPortalDefenderData[i].z, WGPortalDefenderData[i].o))
+        if (GameObject* go = SpawnGameObject(WGPortalDefenderData[i].entry, WGPortalDefenderData[i].x, WGPortalDefenderData[i].y, WGPortalDefenderData[i].z, WGPortalDefenderData[i].o))
         {
             DefenderPortalList.insert(go->GetGUID());
             go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetDefenderTeam()]);
@@ -215,13 +215,13 @@ bool BattlefieldWG::Update(uint32 diff)
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
-    if(GameObject* relic = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0))
+    if (GameObject* relic = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0))
     {
         // Update faction of relic, only attacker can click on
         relic->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetAttackerTeam()]);
         // Set in use (not allow to click on before last door is broken)
         relic->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-        m_titansRelic = relic->GetGUID();
+        m_titansRelicGUID = relic->GetGUID();
     }
     else
         sLog->outError(LOG_FILTER_BATTLEFIELD, "WG: Failed to spawn titan relic.");
@@ -306,10 +306,10 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
     // Remove relic
-    if (m_titansRelic)
-        if(GameObject* relic = sObjectAccessor->GetObjectInWorld(m_titansRelic, (GameObject*)NULL))
+    if (m_titansRelicGUID)
+        if (GameObject* relic = sObjectAccessor->GetObjectInWorld(m_titansRelicGUID, (GameObject*)NULL))
             relic->RemoveFromWorld();
-    m_titansRelic = 0;
+    m_titansRelicGUID = 0;
 
     // Remove turret
     for (GuidSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
@@ -356,17 +356,17 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             graveyard->GiveControlTo(GetDefenderTeam());
 
     for (GuidSet::const_iterator itr = m_KeepGameObject[GetDefenderTeam()].begin(); itr != m_KeepGameObject[GetDefenderTeam()].end(); ++itr)
-        if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+        if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
             object->SetRespawnTime(RESPAWN_IMMEDIATELY);
 
     for (GuidSet::const_iterator itr = m_KeepGameObject[GetAttackerTeam()].begin(); itr != m_KeepGameObject[GetAttackerTeam()].end(); ++itr)
-        if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+        if (GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
             object->SetRespawnTime(RESPAWN_ONE_DAY);
 
     // Update portal defender faction
     for (GuidSet::const_iterator itr = DefenderPortalList.begin(); itr != DefenderPortalList.end(); ++itr)
-        if(GameObject* object = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
-            object->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetDefenderTeam()]);
+        if (GameObject* portal = sObjectAccessor->GetObjectInWorld(*itr, (GameObject*)NULL))
+            portal->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetDefenderTeam()]);
 
     // Saving data
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
@@ -941,19 +941,18 @@ void BattlefieldWG::ProcessEvent(WorldObject *obj, uint32 eventId)
     {
         if (CanInteractWithRelic())
             EndBattle(false);
-        else
-            if(GameObject* relic = GetRelic())
-                relic->SetRespawnTime(RESPAWN_IMMEDIATELY);
+        else if (GameObject* relic = GetRelic())
+            relic->SetRespawnTime(RESPAWN_IMMEDIATELY);
     }
 
     // if destroy or damage event, search the wall/tower and update worldstate/send warning message
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
     {
-        if(GameObject* build = sObjectAccessor->GetObjectInWorld((*itr)->m_BuildGUID, (GameObject*)NULL))
+        if (GameObject* build = sObjectAccessor->GetObjectInWorld((*itr)->m_BuildGUID, (GameObject*)NULL))
         {
             if (go->GetEntry() == build->GetEntry())
             {
-                if(GameObject* build = sObjectAccessor->GetObjectInWorld((*itr)->m_BuildGUID, (GameObject*)NULL))
+                if (GameObject* build = sObjectAccessor->GetObjectInWorld((*itr)->m_BuildGUID, (GameObject*)NULL))
                 {
                     if (build->GetGOInfo()->building.damagedEvent == eventId)
                         (*itr)->Damaged();

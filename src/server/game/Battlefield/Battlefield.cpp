@@ -881,19 +881,22 @@ BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_
 bool BfCapturePoint::HandlePlayerEnter(Player* player)
 {
     if (m_capturePointGUID)
-        if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+    {
+        if (GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
         {
             player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
             player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, uint32(ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f)));
             player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
         }
+    }
+    
     return m_activePlayers[player->GetTeamId()].insert(player->GetGUID()).second;
 }
 
 GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
 {
     if (m_capturePointGUID)
-        if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+        if (GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
             player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 0);
 
     GuidSet::iterator current = m_activePlayers[player->GetTeamId()].find(player->GetGUID());
@@ -910,7 +913,7 @@ void BfCapturePoint::SendChangePhase()
     if (!m_capturePointGUID)
         return;
         
-    if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+    if (GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
     {
         // send this too, sometimes the slider disappears, dunno why :(
         SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
@@ -927,7 +930,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 
     sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Creating capture point %u", capturePoint->GetEntry());
 
-    m_capturePointGUID = capturePoint->GetGUID();
+    m_capturePointGUID = MAKE_NEW_GUID(capturePoint->GetGUIDLow(), capturePoint->GetEntry(), HIGHGUID_GAMEOBJECT);
 
     // check info existence
     GameObjectTemplate const* goinfo = capturePoint->GetGOInfo();
@@ -961,7 +964,7 @@ bool BfCapturePoint::DelCapturePoint()
 {
     if (m_capturePointGUID)
     {
-        if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+        if (GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
         {
             capturePoint->SetRespawnTime(0);                  // not save respawn time
             capturePoint->Delete();
@@ -978,7 +981,7 @@ bool BfCapturePoint::Update(uint32 diff)
     if (!m_capturePointGUID)
         return false;
 
-    if(GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
+    if (GameObject* capturePoint = sObjectAccessor->GetObjectInWorld(m_capturePointGUID, (GameObject*)NULL))
     {
         float radius = capturePoint->GetGOInfo()->capturePoint.radius;
 
