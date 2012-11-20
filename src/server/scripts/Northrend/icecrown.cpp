@@ -31,6 +31,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "Player.h"
 #include "Vehicle.h"
 #include "SpellScript.h"
 
