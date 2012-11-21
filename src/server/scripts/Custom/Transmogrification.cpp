@@ -28,6 +28,7 @@ Item link icon to Are You sure text
 
 #include "ScriptPCH.h"
 #include "Transmogrification.h"
+#include "Language.h"
 
 class NPC_Transmogrify : public CreatureScript
 {

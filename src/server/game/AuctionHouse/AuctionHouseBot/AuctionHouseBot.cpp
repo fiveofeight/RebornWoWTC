@@ -21,6 +21,7 @@
 #include "AuctionHouseMgr.h"
 #include "AuctionHouseBot.h"
 #include <vector>
+#include "Player.h"
 
 using namespace std;
 vector<uint32> npcItems;
