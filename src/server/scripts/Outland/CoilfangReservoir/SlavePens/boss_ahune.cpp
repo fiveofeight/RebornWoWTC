@@ -291,10 +291,7 @@ class npc_frozen_core : public CreatureScript
                     if (Unit* owner = me->GetOwner())
                     {
                         if (me->GetHealth() < damage)
-                        {
-                            owner->GetAI()->DoSummonLoot();
-                            owner->Kill(owner);
-                        }
+                            me->DealDamage(owner, owner->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                     }
                 }
             }
