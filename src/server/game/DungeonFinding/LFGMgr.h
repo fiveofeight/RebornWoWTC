@@ -18,8 +18,9 @@
 #ifndef _LFGMGR_H
 #define _LFGMGR_H
 
-#include "Common.h"
 #include <ace/Singleton.h>
+#include "DBCStructure.h"
+#include "Field.h"
 #include "LFG.h"
 #include "LFGQueue.h"
 #include "LFGGroupData.h"
@@ -253,7 +254,7 @@ struct LfgPlayerBoot
 {
     time_t cancelTime;                                     ///< Time left to vote
     bool inProgress;                                       ///< Vote in progress
-    LfgAnswerContainer votes;                                    ///< Player votes (-1 not answer | 0 Not agree | 1 agree)
+    LfgAnswerContainer votes;                              ///< Player votes (-1 not answer | 0 Not agree | 1 agree)
     uint64 victim;                                         ///< Player guid to be kicked (can't vote)
     std::string reason;                                    ///< kick reason
 };
@@ -321,7 +322,7 @@ class LFGMgr
 
         // Vote kick
         void InitBoot(uint64 gguid, uint64 kguid, uint64 vguid, std::string const& reason);
-        void UpdateBoot(uint64 guid, bool accept);
+        void UpdateBoot(uint64 guid, LfgAnswer accept = LFG_ANSWER_PENDING);
 
         void InitializeLockedDungeons(Player* player, uint8 level = 0);
 

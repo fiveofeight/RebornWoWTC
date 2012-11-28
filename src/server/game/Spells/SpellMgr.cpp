@@ -3158,6 +3158,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 51852: // The Eye of Acherus (no spawn in phase 2 in db)
                 spellInfo->EffectMiscValue[0] |= 1;
                 break;
+            case 45671: // Midsummer - Juggle Torch (Catch, Quest)
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 45907: // Midsummer - Torch Target Picker
+                spellInfo->AttributesEx &= ~SPELL_ATTR1_CANT_TARGET_SELF;
+                break;
             case 51912: // Crafty's Ultra-Advanced Proto-Typical Shortening Blaster
                 spellInfo->EffectAmplitude[0] = 3000;
                 break;
