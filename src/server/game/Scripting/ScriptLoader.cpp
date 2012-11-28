@@ -553,6 +553,7 @@ void AddSC_boss_leotheras_the_blind();
 void AddSC_boss_morogrim_tidewalker();
 void AddSC_instance_serpentshrine_cavern();
 void AddSC_boss_the_lurker_below();
+void AddSC_boss_ahune();                    // Ahune summer boss
 void AddSC_boss_hydromancer_thespia();       //CR Steam Vault
 void AddSC_boss_mekgineer_steamrigger();
 void AddSC_boss_warlord_kalithresh();
@@ -1031,6 +1032,7 @@ void AddOutlandScripts()
     AddSC_boss_morogrim_tidewalker();
     AddSC_instance_serpentshrine_cavern();
     AddSC_boss_the_lurker_below();
+    AddSC_boss_ahune();                    // Ahune summer boss
     AddSC_boss_hydromancer_thespia();       //CR Steam Vault
     AddSC_boss_mekgineer_steamrigger();
     AddSC_boss_warlord_kalithresh();
