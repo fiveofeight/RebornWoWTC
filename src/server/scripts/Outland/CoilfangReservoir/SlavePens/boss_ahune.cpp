@@ -164,16 +164,17 @@ public:
 
         void DamageTaken(Unit* pDoneBy, uint32 &damage)
         {
-            if(me->GetHealth() < damage)
+            if (damage >= me->GetHealth())
             {
-                damage = 0;
                 DoSummonLoot();
+                damage = me->GetHealth() - 1;
             }
         }
 
         void DoSummonLoot()
         {
             DoCast(me, SPELL_LOOT_CHEST);
+            DoCast(me, SPELL_AHUNE_ACHIEVEMENT);
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty())
@@ -289,8 +290,11 @@ class npc_frozen_core : public CreatureScript
                 {
                     if (Unit* owner = me->GetOwner())
                     {
-                        if (owner->GetHealth() < damage)
-                            who->Kill(owner);
+                        if (me->GetHealth() < damage)
+                        {
+                            owner->GetAI()->DoSummonLoot();
+                            owner->Kill(owner);
+                        }
                     }
                 }
             }
