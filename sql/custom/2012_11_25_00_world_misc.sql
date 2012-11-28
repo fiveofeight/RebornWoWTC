@@ -564,7 +564,15 @@ INSERT INTO gameobject_loot_template (entry, item, ChanceOrQuestChance, lootmode
 (28682,54804,0,1,2,1,1),
 (28682,54803,0,1,2,1,1),
 (28682,54802,0,1,2,1,1),
-(28682,54801,0,1,2,1,1);
+(28682,54801,0,1,2,1,1),
+(28682,54806,0,1,2,1,1);
+
+-- Satchel
+DELETE FROM `item_loot_template` WHERE entry = 54536;
+INSERT INTO `item_loot_template` (entry, item, ChanceOrQuestChance, lootmode, groupid, mincountOrRef, maxcount) VALUES
+(54536, 49426, 100, 1, 0, 2, 2),
+(54536, 23247, 100, 1, 0, 10, 15),
+(54536, 53641, 4, 1, 0, 1, 1);
 
 DELETE FROM creature WHERE id=25740 OR guid=@CGUID+60; -- Ahune spawn
 DELETE FROM game_event_creature WHERE guid=@CGUID+60;
