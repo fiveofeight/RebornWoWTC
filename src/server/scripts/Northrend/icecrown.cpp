@@ -1472,19 +1472,22 @@ public:
                     events.ScheduleEvent(EVENT_BONEGUARD_SHIELD_OOC, 50000);
                     break;
                 case EVENT_BONEGUARD_CHARGE:
-                    if (me->GetDistance(me->getVictim()) > 10.0f && me->GetDistance(me->getVictim()) <= 25.0f)
+                    if (UpdateVictim())
                     {
-                        DoCastVictim(SPELL_CHARGE_COMBAT);
-                        events.ScheduleEvent(EVENT_BONEGUARD_CHARGE, 10000);
-                    }
-                    else
-                    {
-                        // move away for charge...
-                        float angle = me->GetAngle(me->getVictim());
-                        float x = me->GetPositionX() + 20.0f * cos(angle);
-                        float y = me->GetPositionY() + 20.0f * sin(angle);
-                        me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
-                        bCharge = true;
+                        if (me->GetDistance(me->getVictim()) > 10.0f && me->GetDistance(me->getVictim()) <= 25.0f)
+                        {
+                            DoCastVictim(SPELL_CHARGE_COMBAT);
+                            events.ScheduleEvent(EVENT_BONEGUARD_CHARGE, 10000);
+                        }
+                        else
+                        {
+                            // move away for charge...
+                            float angle = me->GetAngle(me->getVictim());
+                            float x = me->GetPositionX() + 20.0f * cos(angle);
+                            float y = me->GetPositionY() + 20.0f * sin(angle);
+                            me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
+                            bCharge = true;
+                        }
                     }
                     break;
                 case EVENT_BONEGUARD_SHIELD_BREAKER:
