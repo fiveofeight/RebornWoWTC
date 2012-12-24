@@ -27,13 +27,6 @@ EndScriptData */
 
 #define MAX_ENCOUNTER  4
 
-enum eEnums
-{
-    SAY_START                               = -1999927,
-    SAY_START11                             = -1999953,
-    SAY_START_9                             = -1999950
-};
-
 class instance_trial_of_the_champion : public InstanceMapScript
 {
 public:
@@ -54,10 +47,10 @@ public:
         uint16 uiMovementDone;
         uint16 uiGrandChampionsDeaths;
         uint8 uiArgentSoldierDeaths;
-		uint8 uiAgroDone;
         uint8 uiAggroDone;
 
         uint64 uiAnnouncerGUID;
+        uint64 blackknightGUID;
         uint64 uiHighlordGUID;
         uint64 uiMainGateGUID;
         uint64 uiMainGate1GUID;
@@ -84,6 +77,7 @@ public:
             TeamInInstance = 0;
 
             uiAnnouncerGUID        = 0;
+            blackknightGUID        = 0;
             uiHighlordGUID         = 0;
             uiMainGateGUID         = 0;
             uiMainGate1GUID        = 0;
@@ -219,10 +213,6 @@ public:
                         creature->UpdateEntry(NPC_ARELAS, ALLIANCE);
                     uiAnnouncerGUID = creature->GetGUID();
                     break;
-                case NPC_JAEREN_AN:
-                    if (TeamInInstance == ALLIANCE)
-                        creature->UpdateEntry(NPC_ARELAS_AN,ALLIANCE);
-                    break;
                 case VEHICLE_ARGENT_WARHORSE:
                 case VEHICLE_ARGENT_BATTLEWORG:
                     VehicleList.push_back(creature->GetGUID());
@@ -231,6 +221,8 @@ public:
                 case NPC_PALETRESS:
                     uiArgentChampionGUID = creature->GetGUID();
                     break;
+                case NPC_BLACK_KNIGHT:
+                    blackknightGUID = creature->GetGUID();
             }
         }
 
@@ -316,14 +308,6 @@ public:
                         }
                     }
                     break;
-                case DATA_AGGRO_DONE:
-                    uiAgroDone = uiData;
-                    if (Creature* pAnnouncer = instance->GetCreature(uiAnnouncerGUID))
-                    {                                     
-                        DoScriptText(SAY_START11, pAnnouncer);
-                        pAnnouncer->SetVisible(false);                  
-                    }
-                    break;
                 case DATA_AGRO_DONE:
                     uiAggroDone = uiData;
                     if (Creature* pAnnouncer = instance->GetCreature(uiAnnouncerGUID))
@@ -376,6 +360,8 @@ public:
             switch(uiData)
             {
                 case DATA_ANNOUNCER: return uiAnnouncerGUID;
+                case DATA_ARGENT_CHAMPION: return uiArgentChampionGUID;
+                case DATA_BLACK_KNIGHT: return blackknightGUID;
                 case DATA_HIGHLORD:  return uiHighlordGUID;
                 case DATA_MAIN_GATE: return uiMainGateGUID;
                 case DATA_MAIN_GATE1: return uiMainGate1GUID;

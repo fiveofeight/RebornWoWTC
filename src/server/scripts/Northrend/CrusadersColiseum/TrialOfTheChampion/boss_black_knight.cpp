@@ -27,46 +27,24 @@ EndScriptData */
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
 
-/* enum eEnums
-{
-    //Yell
-    SAY_DEATH_3                             = -1999935,
-    SAY_AGGRO                               = -1999929,
-    SAY_AGGRO_2                             = -1999930,
-    SAY_SLAY                                = -1999932,
-    SAY_DEATH_1                             = -1999933,
-    SAY_DEATH                               = -1999934,
-    SAY_START5                              = -1999936,
-    SAY_START6                              = -1999937,
-    SAY_START7                              = -1999928,
-    SAY_START8                              = -1999929,
-    SAY_START9                              = -1999952,
-    SAY_START10                             = -1999932,
-    SAY_START11                             = -1999953,
-    SAY_KILL                                = -1999969,
-    SAY_KILL1                               = -1999970
-}; */
-
-enum eEnums
+enum Talk
 {
 
-   SAY_INTRO_1                             = -1999928, // You spoiled my grand entrance, Rat.
-   SAY_INTRO_2                             = -1999952, // What is the meaning of this? -Tirion
-   SAY_INTRO_3                             = -1999929, // Did you honestly think an agent of the Lich King would be bested on the field of your pathetic little tournament?
-   SAY_INTRO_4                             = -1999930, // I have come to finish my task
-   SAY_AGGRO                               = -1999931, // This farce ends here!
-   SAY_AGGRO_A                             = -1999998, // Don't just stand there; kill him!
-   SAY_AGGRO_H                             = -1999999, // Tear him apart!
-   SAY_KILL_1                              = -1999969, // Pathetic
-   SAY_KILL_2                              = -1999970, // A waste of flesh.
-   SAY_PHASE_1                             = -1999933, // My roting flash was just getting in the way!
-   SAY_PHASE_2                             = -1999934, // I have no need for bones to best you!
-   SAY_DEATH                               = -1999935, // No! I must not fail...again...
-   SAY_START11                             = -1999953, // I am too young.
+   SAY_INTRO_1                             = 0, // You spoiled my grand entrance, Rat.
+   SAY_INTRO_2                             = 22, // What is the meaning of this? -Tirion
+   SAY_INTRO_3                             = 1, // Did you honestly think an agent of the Lich King would be bested on the field of your pathetic little tournament?
+   SAY_INTRO_4                             = 2, // I have come to finish my task
+   SAY_AGGRO                               = 3, // This farce ends here!
+   SAY_AGGRO_A                             = 12, // Don't just stand there; kill him!
+   SAY_AGGRO_H                             = 12, // Tear him apart!
+   SAY_KILLED_PLAYER                       = 4, // Pathetic | A waste of flesh.
+   SAY_PHASE_1                             = 5, // My roting flash was just getting in the way!
+   SAY_PHASE_2                             = 6, // I have no need for bones to best you!
+   SAY_DEATH                               = 7, // No! I must not fail...again...
 };
 
 
-enum eSpells
+enum Spells
 {
     //phase 1
     SPELL_PLAGUE_STRIKE     = 67724,
@@ -101,13 +79,13 @@ enum eSpells
     SPELL_KILL_CREDIT       = 68663
 };
 
-enum eModels
+enum Models
 {
     MODEL_SKELETON = 29846,
     MODEL_GHOST    = 21300
 };
 
-enum eEquip
+enum Equip
 {
      EQUIP_SWORD               = 40343
 };
@@ -120,7 +98,7 @@ enum IntroPhase
     FINISHED,
 };
 
-enum ePhases
+enum Phases
 {
     PHASE_UNDEAD    = 3,
     PHASE_SKELETON  = 4,
@@ -134,7 +112,7 @@ enum Creatures
     CREATURE_ANNOUNCER                    = 35004,
 };
 
-const Position MoveKnightPos         = {746.993286f, 622.990784f, 411.417237f, 4.712464f}; // Jaina/Sylvanas walks to throne
+const Position MoveKnightPos         = {746.993286f, 622.990784f, 411.417237f, 4.712464f};
 
 class boss_black_knight : public CreatureScript
 {
@@ -165,7 +143,6 @@ public:
         uint8 uiPhase;
         uint8 uiIntroPhase;
 
-        // Creature* pAnnouncer;
         Creature* pHighlord;
         Creature* pAnnouncer;
 
@@ -283,79 +260,78 @@ public:
             if (Phase == IDLE)
                 return;
 
-        if (Phase == INTRO)
-        {
-        if (uiIntroTimer <= uiDiff)
-        {
-    	    switch (uiIntroPhase)
+            if (Phase == INTRO)
             {
-                case 0:
-                    me->SetFacingTo(4.665f);
-                    ++uiIntroPhase;
-                    uiIntroTimer = 3000;
-                    break;
-                case 1:
+                if (uiIntroTimer <= uiDiff)
                 {
-                    Creature* pAnnouncer = Unit::GetCreature(*me, instance->GetData64(DATA_ANNOUNCER));
-                    DoScriptText(SAY_START11, pAnnouncer);
-                    // DoCast(pAnnouncer, SPELL_DEATH_RESPITE_H);
-                    ++uiIntroPhase;
-                    uiIntroTimer = 2000;
-                    break;
-                }
-                case 2:
-                {
-                    Creature* pAnnouncer = Unit::GetCreature(*me, instance->GetData64(DATA_ANNOUNCER));
-                    pAnnouncer->DisappearAndDie();
-                    me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
-                    me->GetMotionMaster()->MovePoint(0, MoveKnightPos);
-                    ++uiIntroPhase;
-                    uiIntroTimer = 2000;
-                    break;
-                }
-                case 3:
-		    DoScriptText(SAY_INTRO_3, me);
-                    ++uiIntroPhase;
-                    uiIntroTimer = 6000;
-		    break;
-		case 4:
-		    DoScriptText(SAY_INTRO_4, me);
-		    ++uiIntroPhase;
-		    uiIntroTimer = 3000;
-		    break;
-		case 5:
-		    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->AI()->AttackStart(me->getVictim());
-		    Phase = NORMAL;
-		    break;
-		}
-	    } 
-            else
-                uiIntroTimer -= uiDiff;
-           return;
-           }
-
-
-            if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
-                return;
-
-            if (bEventInProgress)
-                if (uiResurrectTimer <= uiDiff)
-                {
-                    me->SetFullHealth();
-                    me->AttackStop();
-
-                    switch (uiPhase)
+            	    switch (uiIntroPhase)
                     {
-                        case PHASE_UNDEAD:
-                            DoScriptText(SAY_PHASE_1, me);
+                        case 0:
+                            ++uiIntroPhase;
+                            uiIntroTimer = 3000;
                             break;
-                        case PHASE_SKELETON:
-                            DoScriptText(SAY_PHASE_2, me);
+                        case 1: // MEH
+                            ++uiIntroPhase;
+                            uiIntroTimer = 2000;
                             break;
-                    }
+                        case 2:
+                            if (Creature* announcer = Unit::GetCreature(*me, instance->GetData64(DATA_ANNOUNCER)))
+                                announcer->DisappearAndDie();
+
+                            me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                            me->GetMotionMaster()->MovePoint(0, MoveKnightPos);
+                            ++uiIntroPhase;
+                            uiIntroTimer = 2000;
+                            break;
+                        case 3:
+        		            Talk(SAY_INTRO_3);
+                            ++uiIntroPhase;
+                            uiIntroTimer = 6000;
+        		            break;
+                		case 4:
+        		            Talk(SAY_INTRO_4);
+        		            ++uiIntroPhase;
+        		            uiIntroTimer = 3000;
+        		            break;
+        		        case 5:
+        		            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            ++uiIntroPhase;
+                            uiIntroTimer = 3000;
+                            break;
+                        case 6:
+                            if (Unit* unit = me->SelectNearestTarget())
+                                AttackStart(unit);
+
+                            DoZoneInCombat();
+        		            Phase = NORMAL;
+        		            break;
+                		}
+        	        } 
+                    else
+                        uiIntroTimer -= uiDiff;
+                   return;
+                }
+
+                if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
+                  return;
+
+                if (bEventInProgress)
+                    if (uiResurrectTimer <= uiDiff)
+                    {
+                        me->SetFullHealth();
+                        me->AttackStop();
+
+                        switch (uiPhase)
+                        {
+                            case PHASE_UNDEAD:
+                                Talk(SAY_PHASE_1);
+                                break;
+                            case PHASE_SKELETON:
+                                Talk(SAY_PHASE_2);
+                                break;
+                        }
 
                     DoCast(me, SPELL_BLACK_KNIGHT_RES, true);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -506,11 +482,8 @@ public:
         void EnterCombat(Unit* who)
         {
             bEventInBattle = true;
-            DoScriptText(SAY_AGGRO, me);
-            // if (instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-               // DoScriptText(SAY_AGGRO_H, me);
-            // else
-                // DoScriptText(SAY_AGGRO_A, me);
+            Talk(SAY_AGGRO);
+
             SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
 
             if (me->ToTempSummon())
@@ -535,17 +508,17 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(urand(0, 1) ? SAY_KILL_1 : SAY_KILL_2, me);
+            Talk(SAY_KILLED_PLAYER);
             if (instance)
                 instance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& uiDamage)
+        void DamageTaken(Unit* /*who*/, uint32& damage)
         {
-            if (uiDamage >= me->GetHealth() && uiPhase <= PHASE_SKELETON)
+            if (damage >= me->GetHealth() && uiPhase <= PHASE_SKELETON)
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                uiDamage = 0;
+                damage = 0;
                 me->SetHealth(0);
                 me->AddUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED);
                 RemoveSummons();
@@ -561,7 +534,7 @@ public:
                 }
                 bEventInProgress = true;
             }
-            else if (uiDamage >= me->GetHealth() && uiPhase == PHASE_GHOST && !bCredit)
+            else if (damage >= me->GetHealth() && uiPhase == PHASE_GHOST && !bCredit)
             {
                 bCredit = true;
                 HandleSpellOnPlayersInInstanceToC5(me, 68663);
@@ -571,9 +544,12 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             //DoCast(me, SPELL_KILL_CREDIT);
-            DoScriptText(SAY_DEATH, me);
-                    if (TempSummon* summ = me->ToTempSummon())
-                            summ->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
+            Talk(SAY_DEATH);
+            if (TempSummon* summ = me->ToTempSummon())
+                summ->SetTempSummonType(TEMPSUMMON_DEAD_DESPAWN);
+
+            if (Creature* herald = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ANNOUNCER)))
+                herald->AI()->DoAction(ACTION_OUTRO);
 
             if (instance)
             {
@@ -613,12 +589,12 @@ public:
             uiAttackTimer = 3500;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
 
-            if (uiAttackTimer <= uiDiff)
+            if (uiAttackTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                 {
@@ -626,7 +602,7 @@ public:
                         DoCast(target, DUNGEON_MODE(SPELL_LEAP, SPELL_LEAP_H));
                 }
                 uiAttackTimer = 3500;
-            } else uiAttackTimer -= uiDiff;
+            } else uiAttackTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -658,12 +634,12 @@ public:
             uiClawTimer = 1000;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 diff)
         {
             if (!UpdateVictim())
                 return;
 
-            if (uiLeapTimer <= uiDiff)
+            if (uiLeapTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                 {
@@ -671,13 +647,13 @@ public:
                         DoCast(target, DUNGEON_MODE(SPELL_LEAP, SPELL_LEAP_H));
                 }
                 uiLeapTimer = 10000;
-            } else uiLeapTimer -= uiDiff;
+            } else uiLeapTimer -= diff;
 
-            if (uiClawTimer <= uiDiff)
+            if (uiClawTimer <= diff)
             {
                 DoCastVictim(DUNGEON_MODE(SPELL_CLAW, SPELL_CLAW_H));
                 uiClawTimer = 1000;
-            } else uiClawTimer -= uiDiff;
+            } else uiClawTimer -= diff;
 
 
 
@@ -723,7 +699,8 @@ public:
                         break;
                     case 2:
                         me->SetSpeed(MOVE_FLIGHT, 2.0f);
-                        DoScriptText(SAY_INTRO_1, me);
+                        if (Creature* blackknight = Unit::GetCreature(*me, instance->GetData64(DATA_BLACK_KNIGHT)))
+                            blackknight->AI()->Talk(SAY_INTRO_1);
                         break;
                     case 3:
                         me->SetSpeed(MOVE_FLIGHT, 2.0f);
@@ -735,12 +712,10 @@ public:
                         me->SetSpeed(MOVE_FLIGHT, 2.0f);
                         break;
                     case 6:
-                    {
                         me->SetSpeed(MOVE_FLIGHT, 2.0f);
-                        Creature* pHighlord = Unit::GetCreature(*me, instance->GetData64(DATA_HIGHLORD));
-                        DoScriptText(SAY_INTRO_2, pHighlord);
+                        if (Creature* tirion = Unit::GetCreature(*me, instance->GetData64(DATA_HIGHLORD)))
+                            tirion->AI()->Talk(SAY_INTRO_2);
                         break;
-                    }
                     case 7:
                         me->SetSpeed(MOVE_FLIGHT, 2.0f);
                         break;

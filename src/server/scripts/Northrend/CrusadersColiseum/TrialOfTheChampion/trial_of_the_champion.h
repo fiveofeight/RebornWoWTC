@@ -41,6 +41,7 @@ enum eData
 enum Data64
 {
     DATA_ANNOUNCER,
+    DATA_ARGENT_CHAMPION,
     DATA_HIGHLORD,
     DATA_MAIN_GATE,
     DATA_MAIN_GATE1,
@@ -100,10 +101,10 @@ enum eNpcs
     NPC_JAEREN                  = 35004,
     NPC_ARELAS                  = 35005,
     NPC_HIGHLORD                = 34996,
-    
-    // Announcer
-    NPC_JAEREN_AN               = 35591,
-    NPC_ARELAS_AN               = 35592,
+    NPC_THRALL                  = 34994, 
+    NPC_GARROSH                 = 34995, 
+    NPC_VARIAN                  = 34990, 
+    NPC_JAINA_PROUDMOORE        = 34992,
 
     // Memory
     MEMORY_ALGALON              = 35052,
@@ -179,6 +180,11 @@ enum eVehicles
     VEHICLE_ARGENT_BATTLEWORG                       = 36558,
     VEHICLE_GR                                      = 35492, 
     VEHICLE_BLACK_KNIGHT                            = 35491
+};
+
+enum Actions
+{
+    ACTION_OUTRO                        = 0,
 };
 
 void HandleSpellOnPlayersInInstanceToC5(Unit* caller, uint32 spellId);

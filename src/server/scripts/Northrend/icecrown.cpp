@@ -1356,8 +1356,6 @@ public:
 
         void Reset(){}
 
-		void JustDied(Unit* Player /*victim*/){}
-
 		void UpdateAI(const uint32 /*diff*/){}
     };
 
