@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,8 +35,7 @@ enum Yells
     SAY_V07TRON_ACTIVATE                        = 11,
     SAY_V07TRON_SLAY                            = 12,
     SAY_V07TRON_DEATH                           = 13,
-    SAY_BERSERK                                 = 14,
-    SAY_YS_HELP                                 = 15
+    SAY_BERSERK                                 = 14
 };
 
 enum Spells

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -125,7 +125,7 @@ class boss_sapphiron : public CreatureScript
                 _EnterCombat();
 
                 me->CastSpell(me, SPELL_FROST_AURA, true);
-            
+
                 events.ScheduleEvent(EVENT_BERSERK, 15 * MINUTE * IN_MILLISECONDS);
                 EnterPhaseGround();
 
@@ -245,7 +245,7 @@ class boss_sapphiron : public CreatureScript
                         switch (eventId)
                         {
                             case EVENT_BERSERK:
-                                DoScriptText(EMOTE_ENRAGE, me);
+                                Talk(EMOTE_ENRAGE);
                                 DoCast(me, SPELL_BERSERK);
                                 return;
                             case EVENT_CLEAVE:

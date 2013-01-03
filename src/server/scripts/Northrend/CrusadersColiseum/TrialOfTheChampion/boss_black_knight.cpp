@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,13 +14,6 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Boss Black Knight
-SD%Complete: 80%
-SDComment: missing yells. not sure about timers.
-SDCategory: Trial of the Champion
-EndScriptData */
 
 #include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
@@ -479,7 +472,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* who)
         {
             bEventInBattle = true;
             Talk(SAY_AGGRO);

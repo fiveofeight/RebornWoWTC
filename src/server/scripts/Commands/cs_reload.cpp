@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -126,9 +126,7 @@ public:
             { "pickpocketing_loot_template",  SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesPickpocketingCommand, "", NULL},
             { "points_of_interest",           SEC_ADMINISTRATOR, true,  &HandleReloadPointsOfInterestCommand,           "", NULL },
             { "prospecting_loot_template",    SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesProspectingCommand,   "", NULL },
-            { "quest_end_scripts",            SEC_ADMINISTRATOR, true,  &HandleReloadQuestEndScriptsCommand,            "", NULL },
             { "quest_poi",                    SEC_ADMINISTRATOR, true,  &HandleReloadQuestPOICommand,                   "", NULL },
-            { "quest_start_scripts",          SEC_ADMINISTRATOR, true,  &HandleReloadQuestStartScriptsCommand,          "", NULL },
             { "quest_template",               SEC_ADMINISTRATOR, true,  &HandleReloadQuestTemplateCommand,              "", NULL },
             { "reference_loot_template",      SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesReferenceCommand,     "", NULL },
             { "reserved_name",                SEC_ADMINISTRATOR, true,  &HandleReloadReservedNameCommand,               "", NULL },
@@ -264,8 +262,6 @@ public:
         sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading Scripts...");
         HandleReloadGameObjectScriptsCommand(handler, "a");
         HandleReloadEventScriptsCommand(handler, "a");
-        HandleReloadQuestEndScriptsCommand(handler, "a");
-        HandleReloadQuestStartScriptsCommand(handler, "a");
         HandleReloadSpellScriptsCommand(handler, "a");
         handler->SendGlobalGMSysMessage("DB tables `*_scripts` reloaded.");
         HandleReloadDbScriptStringCommand(handler, "a");
@@ -1042,46 +1038,6 @@ public:
         sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading Scripts from `creature_ai_scripts`...");
         sEventAIMgr->LoadCreatureEventAI_Scripts();
         handler->SendGlobalGMSysMessage("DB table `creature_ai_scripts` reloaded.");
-        return true;
-    }
-
-    static bool HandleReloadQuestEndScriptsCommand(ChatHandler* handler, const char* args)
-    {
-        if (sScriptMgr->IsScriptScheduled())
-        {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (*args != 'a')
-            sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading Scripts from `quest_end_scripts`...");
-
-        sObjectMgr->LoadQuestEndScripts();
-
-        if (*args != 'a')
-            handler->SendGlobalGMSysMessage("DB table `quest_end_scripts` reloaded.");
-
-        return true;
-    }
-
-    static bool HandleReloadQuestStartScriptsCommand(ChatHandler* handler, const char* args)
-    {
-        if (sScriptMgr->IsScriptScheduled())
-        {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (*args != 'a')
-            sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading Scripts from `quest_start_scripts`...");
-
-        sObjectMgr->LoadQuestStartScripts();
-
-        if (*args != 'a')
-            handler->SendGlobalGMSysMessage("DB table `quest_start_scripts` reloaded.");
-
         return true;
     }
 

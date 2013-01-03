@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -322,7 +322,7 @@ class LFGMgr
 
         // Vote kick
         void InitBoot(uint64 gguid, uint64 kguid, uint64 vguid, std::string const& reason);
-        void UpdateBoot(uint64 guid, LfgAnswer accept = LFG_ANSWER_PENDING);
+        void UpdateBoot(uint64 guid, bool accept);
 
         void InitializeLockedDungeons(Player* player, uint8 level = 0);
 

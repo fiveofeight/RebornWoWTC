@@ -26,7 +26,7 @@ EndScriptData */
 #include "trial_of_the_champion.h"
 #include "ScriptedEscortAI.h"
 
-enum eSpells
+enum Spells
 {
     //Eadric
     SPELL_EADRIC_ACHIEVEMENT    = 68197,
