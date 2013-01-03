@@ -479,7 +479,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             bEventInBattle = true;
             Talk(SAY_AGGRO);

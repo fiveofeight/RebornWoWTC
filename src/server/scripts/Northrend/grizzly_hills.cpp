@@ -712,7 +712,7 @@ enum eLakeFrog
     SPELL_WARTS                     = 62581,
     NPC_MAIDEN_OF_ASHWOOD_LAKE      = 33220,
     SUMMON_ASHOOD_BRAND_SPELL       = 62554,
-    SAY_MAIDEM                      = -1850015, // Can it really be? Free after all these years?
+    SAY_MAIDEM                      = 0, // Can it really be? Free after all these years?
 
     QUEST_BLADE_HUMAN               = 13603,
     QUEST_BLADE_ALLIANCE            = 13666,
@@ -772,7 +772,7 @@ public:
                 {
                     if (Unit* pMaidem = me->SummonCreature(NPC_MAIDEN_OF_ASHWOOD_LAKE,me->GetPositionX(),me->GetPositionY(),me->GetPositionZ(),0,TEMPSUMMON_TIMED_DESPAWN,30000))
                     {
-                        DoScriptText(SAY_MAIDEM, pMaidem);
+                        pMaidem->AI()->Talk(SAY_MAIDEM);
                         me->DisappearAndDie();		
                         me->Respawn(true); 
                     }

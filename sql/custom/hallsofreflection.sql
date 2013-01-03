@@ -45,21 +45,6 @@ UPDATE `creature_template` SET `unit_flags`=576 WHERE `entry` IN (38172, 38175, 
 UPDATE `creature_template` SET `unit_flags`=576 WHERE `entry` IN (38599, 38603, 38524, 38525, 38563, 38544, 38564);
 -- Fix faction on Heroic 
 UPDATE `creature_template` SET `faction_A`=16, `faction_H`=16 WHERE `entry` = 37720;
--- Fix missing script texts for Sylvanas, Proudmoore, LK, and Frostsworn
-DELETE FROM `script_texts` WHERE `entry` =-1594519;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594519', 'You are not worthy to face the Lich King!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ?????????? ????????? ????? ??????? - ?????!', '16921', '1', '0', '0', '67234');
-DELETE FROM `script_texts` WHERE `entry` =-1594474;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594474', 'I will not make the same mistake again, Sylvanas. This time there will be no escape. You failed to serve me in undeath.  Now, all that remains for you, is oblivion.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ?? ??????? ??????? ??????, ????????. ?? ???? ??? ???? ?? ????????. ?? ?? ????????? ????? ??????? ? ?????? ???? ???? ?????? ????????!', '17228', '1', '0', '0', '67234');
-DELETE FROM `script_texts` WHERE `entry` =-1594520;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594520', 'Master, I have failed...', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '????????... ? ?????? ???...', '16922', '1', '0', '0', '67234');
-DELETE FROM `script_texts` WHERE `entry` =-1594477;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594477', 'Your allies have arrived, Jaina, just as you promised. You will all become powerful agents of the Scourge.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '???? ???????? ???????, ??????! ??? ?? ? ???????... ??-??-??-??... ??? ?? ??????? ???????? ????????? ?????...', '17212', '1', '0', '0', '67234');
-DELETE FROM `script_texts` WHERE `entry` =-1594478;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594478', 'I will not make the same mistake again, Sylvanas. This time there will be no escape. You will all serve me in death!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ?? ??????? ??????? ??????, ????????! ?? ???? ??? ???? ?? ????????. ?? ??? ?????? ??????? ??? ????? ??????...', '17213', '1', '0', '0', '67234');
-DELETE FROM `script_texts` WHERE `entry` =-1594479;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594479', 'He is too powerful, we must leave this place at once! My magic will hold him in place for only a short time! Come quickly, heroes!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ??????? ?????. ?? ?????? ????????? ?? ???? ??? ????? ??????. ??? ????? ???????? ??? ?????????, ??????? ?????...', '16644', '0', '0', '1', '67234');
-DELETE FROM `script_texts` WHERE `entry` =-1594480;
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES ('0', '-1594480', 'He''s too powerful! Heroes, quickly, come to me! We must leave this place immediately! I will do what I can do hold him in place while we flee.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ??????? ?????. ????? ??????, ?? ????. ?? ?????? ????????? ?????? ??????????. ? ?????????? ??? ?????????, ???? ?? ????? ???????.', '17058', '0', '0', '1', '67234');
 -- Sylvanas Waypoints to ship
 DELETE FROM `script_waypoint` WHERE `entry` =37554;
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
@@ -206,43 +191,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 (150185, 202211, 631, 15, 1, -437.564, 1959.54, 203.37, 0, 0, 0, 0, 1, 6000, 100, 1),
 (153019, 500002, 668, 3, 1, 5247.09, 1586.39, 773.922, 5.86166, 0, 0, 0.209207, -0.977871, 300, 0, 1),
 (153020, 500003, 668, 3, 1, 5245.17, 1582.11, 761.72, 5.86166, 0, 0, 0.209207, -0.977871, 300, 0, 1);
--- Escape scriptext
-DELETE FROM `script_texts` WHERE `entry` IN (-1594487, -1594488, -1594489, -1594490, -1594491, -1594492, -1594493, -1594494, -1594495, -1594496, -1594497, -1594498, -1594499, -1594500, -1594501, -1594502, -1594503, -1594505, -1594526, -1594522, -1594523, -1594521, -1594527, -1594524, -1594525, -1594506, -1594507, -1594508);
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES
-(0, -1594506, 'The master surveyed his kingdom and found it... lacking. His judgement was swift and without mercy. Death to all!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '???????? ???????? ???? ??????????? ? ??????? ??? ????????! ??? ??? ??? ??????? ? ??????? - ??????? ???? ??????!', 16738, 1, 0, 0, '67234'),
-(0, -1594505, 'Soldiers of Lordaeron, rise to meet your master''s call!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '??????? ?????????, ?????????? ?? ???? ?????????!', 16714, 1, 0, 0, '67234'),
-(0, -1594503, 'BLASTED DEAD END! So this is how it ends. Prepare yourselves, heroes, for today we make our final stand!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '????????? ?????, ?????? ??? ?????????? ?????. ?????????? ?????, ??? ???? ????????? ?????.', 17061, 1, 0, 0, '67234'),
-(0, -1594502, 'It... It''s a dead end. We have no choice but to fight. Steel yourself heroes, for this is our last stand!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?????? ?????? ??????. ?????? ??? ???????? ?????????. ??? ???? ????????? ?????!', 16647, 1, 0, 0, '67234'),
-(0, -1594501, 'We''re almost there! Don''t give up!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ????? ?????????, ?? ??????????!', 17060, 1, 0, 0, '67234'),
-(0, -1594500, 'There''s an opening up ahead. GO NOW!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ???? ?????, ??????!', 17059, 1, 0, 0, '67234'),
-(0, -1594499, 'We''re almost there... Don''t give up!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ????? ?????????, ?? ??????????!', 16646, 1, 0, 0, '67234'),
-(0, -1594498, 'There''s an opening up ahead. GO NOW!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ???? ?????, ??????!', 16645, 1, 0, 0, '67234'),
-(0, -1594497, 'You won''t impede our escape, fiend. Keep the undead off me while I bring this barrier down!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ?? ????????? ??? ????, ??????. ??????????? ??????, ? ? ???????? ??? ????????.', 17032, 1, 0, 0, '67234'),
-(0, -1594496, 'I grow tired of these games, Arthas! Your walls can''t stop me!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ?????? ?? ???? ??? ?????. ???? ????? ?? ????????? ????!', 17031, 1, 0, 0, '67234'),
-(0, -1594495, 'Your barriers can''t hold us back much longer, monster. I will shatter them all!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '???? ???????? ?????? ?? ???????? ???, ????????. ? ????? ?? ? ????!', 16610, 1, 0, 0, '67234'),
-(0, -1594494, 'He''s playing with us! I''ll show him what happens to ice when it meets fire!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ? ???? ??????. ?  ?????? ??? ??? ?????? ????? ??? ??????????? ?? ?????!', 16609, 0, 0, 0, '67234'),
-(0, -1594493, 'How long can you fight it?', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '??? ????? ?? ??????? ???????????????', 17220, 1, 0, 0, '67234'),
-(0, -1594492, 'Another dead end.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?? ? ???????!', 17219, 1, 0, 0, '67234'),
-(0, -1594491, 'Succumb to the chill of the grave.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?????????? ????????? ??????!', 17218, 1, 0, 0, '67234'),
-(0, -1594490, 'Another barrier? Stand strong, champions! I will bring the wall down!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '??? ???? ????????. ????????? ?????! ? ??????? ??? ?????!', 17030, 1, 0, 0, '67234'),
-(0, -1594489, 'Another ice wall! Keep the undead from interrupting my incantation so that I may bring this wall down!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '????? ??????? ?????... ? ??????? ??, ?????? ?? ????? ?????? ???????? ??? ??????????...', 16608, 1, 0, 0, '67234'),
-(0, -1594488, 'No wall can hold the Banshee Queen! Keep the undead at bay, heroes! I will tear this barrier down!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '??????? ????? ?? ??????? ???????? ??????. ??????? ?????? ?? ??????????, ? ??????? ??? ????????.', 17029, 1, 0, 0, '67234'),
-(0, -1594487, 'I will destroy this barrier. You must hold the undead back!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ??????? ??? ????????, ? ?? ??????????? ?????? ?? ??????????!', 16607, 1, 0, 0, '67234'),
-(0, -1594522, 'Fire! FIRE!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ??????? ??? ????????, ? ?? ??????????? ?????? ?? ??????????!', 16732, 1, 0, 0, '67234'),
-(0, -1594523, 'Get onboard, now! This whole mountainside could collapse at any moment.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ??????? ??? ????????, ? ?? ??????????? ?????? ?? ??????????!', 16733, 1, 0, 0, '67234'),
-(0, -1594521, ' We are safe, for now. His strength has increased ten-fold since our last battle! It will take a mighty army to destroy the Lich King, an army greater than even the Horde can rouse.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '? ??????? ??? ????????, ? ?? ??????????? ?????? ?? ??????????!', 17062, 1, 0, 0, '67234');
--- Lady Proudmoore Escape scriptext
--- DELETE FROM `script_texts` WHERE `entry` IN (
--- Lich King Escape scripttext
-DELETE FROM `script_texts` WHERE `entry` IN (-1594486, -1594491, -1594482, -1594483, -1594481, -1594504, -1594485);
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES
-(0, -1594504, 'Nowhere to run! You''re mine now...', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '??-??-??... ?????? ??????. ?????? ?? ???!', 17223, 1, 0, 0, '67234'),
-(0, -1594491, 'Succumb to the chill of the grave.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?????????? ????????? ??????!', 17218, 1, 0, 0, '67234'),
-(0, -1594486, 'There is no escape!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?????? ??????!', 17217, 1, 0, 0, '67234'),
-(0, -1594485, 'All is lost!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '??????? ? ???????.', 17215, 1, 0, 0, '67234'),
-(0, -1594483, 'Minions seize them.  Bring their corpses back to me!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '???????? ??! ????????? ??? ?? ????!', 17222, 1, 0, 0, '67234'),
-(0, -1594482, 'Rise minions, do not left them us!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?????????? ???????????, ?? ????? ?? ???????!', 17216, 1, 0, 0, '67234'),
-(0, -1594481, 'Death''s cold embrace awaits.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '?????? ???????????? ??????? ???????!', 17221, 1, 0, 0, '67234');
+
 -- Spawn Gobject
 DELETE FROM `gameobject` WHERE `id` IN ( 201385, 201885, 202396, 500001, 201596, 201709, 500002, 202211, 500003, 202079, 202212, 201710, 202337, 202336 );
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
@@ -319,23 +268,115 @@ INSERT INTO `reference_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `
 -- Fix portal spell
 UPDATE `gameobject_template` SET `data0`='53141' WHERE `entry`=202079;
 
--- Death text for trash
-DELETE FROM `creature_text` WHERE `entry` = 38173;
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES 
-('38173', '0', '0', 'This is not our final rest.', '12', '0', '10', '0', '0', '0', 'HoR Trash death');
-
--- Fixing script text according to BossTalk
-UPDATE `script_texts` SET `content_default`="The chill of this place... I can feel my blood freezing." WHERE `entry` = "-1668001";
-UPDATE `script_texts` SET `content_default`="What is that! Up ahead! Could it be? Heroes, at my side!" WHERE `entry` = "-1668002";
-UPDATE `script_texts` SET `content_default`="Frostmourne: the blade that destroyed our kingdom..." WHERE `entry` = "-1668003";
-UPDATE `script_texts` SET `content_default`="Stand back! Touch that blade and your soul will be scarred for all eternity! I must attempt to commune with the spirits locked away within Frostmourne. Give me space. Back up, please." WHERE `entry` = "-1668004";
-UPDATE `script_texts` SET `content_default`="Uther! Dear Uther... I... I'm so sorry." WHERE `entry` = "-1668006";
-UPDATE `script_texts` SET `content_default`="No girl, Arthas is not here. Arthas is merely a presence within the Lich Kings mind. A dwindling presence." WHERE `entry` = "-1668009";
-UPDATE `script_texts` SET `content_default`="But Uther... If there is any hope of reaching Arthas, I... I must try." WHERE `entry` = "-1668010";
-UPDATE `script_texts` SET `content_default`="Jaina listen to me. You must destroy the Lich King! You cannot reason with him! He will kill you and your allies and raise you all as powerful soldiers of the scourge!" WHERE `entry` = "-1668011";
-UPDATE `script_texts` SET `content_default`="Aye, Aargh! He... He is coming! You... You must..." WHERE `entry` = "-1668035";
-
-DELETE FROM `script_texts` WHERE `entry`IN (-1594473, -1594474);
-INSERT INTO `script_texts` (`npc_entry`, `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES 
-('0', '-1594473', 'Foolish girl, you seek that which I killed long ago. He is merely a ghost now, a faint echo in my mind.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '17229', '0', '0', '0', 'LK HoR intro end, Alliance'),
-('0', '-1594474', 'I will not make the same mistake again Sylvanas, this time there will be no escape. You failed to serve me in undeath, now all that remains for you is oblivion.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '17228', '0', '0', '0', 'LK HoR intro end, Horde');
+-- Creature Text
+DELETE FROM `creature_text` WHERE `entry` IN (37221, 37225, 37223, 36954, 38112, 38113, 36955, 37554, 37226, 36723, 37182, 37183, 38177, 38173, 38176, 38175, 38172);
+INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES
+(37221, 0, 0, "The chill of this place... Brr... I can feel my blood freezing.", 14, 0, 10, 0, 0, 16631, "Jaina HoR Alliance Intro 1"),
+(37221, 1, 0, "What is that! Up ahead! Could it be? Heroes, at my side!", 14, 0, 10, 0, 0, 16632, "Jaina HoR Alliance Intro 2"),
+(37221, 2, 0, "Frostmourne: the blade that destroyed our kingdom...", 14, 0, 10, 0, 0, 16633, "Jaina HoR Alliance Intro 3"),
+(37221, 3, 0, "Stand back! Touch that blade and your soul will be scarred for all eternity! I must attempt to commune with the spirits locked away within Frostmourne. Give me space. Back up, please.", 14, 0, 10, 0, 0, 16634, "Jaina HoR Alliance Intro 4"),
+(37225, 0, 0, "Jaina! Could it truly be you?", 12, 0, 10, 0, 0, 16666, "Uther HoR Alliance Intro 5"),
+(37221, 4, 0, "Uther! Dear Uther! I... I'm so sorry.", 12, 0, 10, 0, 0, 16635, "Jaina HoR Alliance Intro 6"),
+(37225, 1, 0, "Jaina you haven't much time. The Lich King sees what the sword sees. He will be here shortly!", 12, 0, 10, 0, 0, 16667, "Uther HoR Alliance Intro 7"),
+(37221, 5, 0, "Arthas is here? Maybe I...", 12, 0, 10, 0, 0, 16636, "Jaina HoR Alliance Intro 8"),
+(37225, 2, 0, "No, girl. Arthas is not here. Arthas is merely a presence within the Lich King's mind. A dwindling presence...", 12, 0, 10, 0, 0, 16668, "Uther HoR Alliance Intro 9"),
+(37221, 6, 0, "But Uther, if there's any hope of reaching Arthas. I... I must try.", 12, 0, 10, 0, 0, 16637, "Jaina HoR Alliance Intro 10"),
+(37225, 3, 0, "Jaina, listen to me. You must destroy the Lich King. You cannot reason with him. He will kill you and your allies and raise you all as powerful soldiers of the Scourge.", 12, 0, 10, 0, 0, 16669, "Uther HoR Alliance Intro 11"),
+(37221, 7, 0, "Tell me how, Uther? How do I destroy my prince? My...", 12, 0, 10, 0, 0, 16638, "Jaina HoR Alliance Intro 12"),
+(37225, 4, 0, "Snap out of it, girl. You must destroy the Lich King at the place where he merged with Ner'zhul - atop the spire, at the Frozen Throne. It is the only way.", 12, 0, 10, 0, 0, 16670, "Uther HoR Alliance Intro 13"),
+(37221, 8, 0, "You're right, Uther. Forgive me. I... I don't know what got a hold of me. We will deliver this information to the King and the knights that battle the Scourge within Icecrown Citadel.", 12, 0, 10, 0, 0, 16639, "Jaina HoR Alliance Intro 14"),
+(37225, 5, 0, "There is... something else that you should know about the Lich King. Control over the Scourge must never be lost. Even if you were to strike down the Lich King, another would have to take his place. For without the control of its master, the Scourge would run rampant across the world - destroying all living things.", 12, 0, 10, 0, 0, 16671, "Uther HoR Alliance Intro 15"),
+(37225, 6, 0, "A grand sacrifice by a noble soul...", 12, 0, 10, 0, 0, 16672, "Uther HoR Alliance Intro 16"),
+(37221, 9, 0, "Who could bear such a burden?", 12, 0, 10, 0, 0, 16640, "Jaina HoR Alliance Intro 17"),
+(37225, 7, 0, "I do not know, Jaina. I suspect that the piece of Arthas that might be left inside the Lich King is all that holds the Scourge from annihilating Azeroth.", 12, 0, 10, 0, 0, 16673, "Uther HoR Alliance Intro 18"),
+(37221, 10, 0, "Then maybe there is still hope...", 12, 0, 10, 0, 0, 16641, "Jaina HoR Alliance Intro 19"),
+(37225, 8, 0, "No, Jaina! ARRRRRRGHHHH... He... He is coming. You... You must...", 12, 0, 10, 0, 0, 16674, "Uther HoR Alliance Intro 20"),
+(37223, 0, 0, "I... I don't believe it! Frostmourne stands before us, unguarded! Just as the Gnome claimed. Come, heroes!", 14, 0, 10, 0, 0, 17049, "Sylvanas HoR Horde Intro 1"),
+(37223, 1, 0, "Standing this close to the blade that ended my life... The pain... It is renewed.", 14, 0, 10, 0, 0, 17050, "Sylvanas HoR Horde Intro 2"),
+(37223, 2, 0, "I dare not touch it. Stand back! Stand back as I attempt to commune with the blade! Perhaps our salvation lies within...", 14, 0, 10, 0, 0, 17051, "Sylvanas HoR Horde Intro 3"),
+(37225, 9, 0, "Careful, girl. I've heard talk of that cursed blade saving us before. Look around you and see what has been born of Frostmourne.", 12, 0, 10, 0, 0, 16659, "Uther HoR Horde Intro 4"),
+(37223, 3, 0, "Uther...Uther the Lightbringer. How...", 12, 0, 10, 0, 0, 17052, "Sylvanas HoR Horde Intro 5"),
+(37225, 10, 0, "You haven't much time. The Lich King sees what the sword sees. He will be here shortly.", 12, 0, 10, 0, 0, 16660, "Uther HoR Horde Intro 6"),
+(37223, 4, 0, "The Lich King is here? Then my destiny shall be fulfilled today!", 12, 0, 10, 0, 0, 17053, "Sylvanas HoR Horde Intro 7"),
+(37225, 11, 0, "You cannot defeat the Lich King. Not here. You would be a fool to try. He will kill those who follow you and raise them as powerful servants of the Scourge. But for you, Sylvanas, his reward for you would be worse than the last.", 12, 0, 10, 0, 0, 16661, "Uther HoR Horde Intro 8"),
+(37223, 5, 0, "There must be a way... ", 12, 0, 10, 0, 0, 17054, "Sylvanas HoR Horde Intro 9"),
+(37225, 12, 0, "Perhaps, but know this: there must always be a Lich King. Even if you were to strike down Arthas, another would have to take his place, for without the control of the Lich King, the Scourge would wash over this world like locusts, destroying all that they touched.", 12, 0, 10, 0, 0, 16662, "Uther HoR Horde Intro 10"),
+(37223, 6, 0, "Who could bear such a burden?", 12, 0, 10, 0, 0, 17055, "Sylvanas HoR Horde Intro 11"),
+(37225, 13, 0, "I do not know, Banshee Queen. I suspect that the piece of Arthas that might be left inside the Lich King is all that holds the Scourge from annihilating Azeroth.", 12, 0, 10, 0, 0, 16663, "Uther HoR Horde Intro 12"),
+(37225, 14, 0, "Alas, the only way to defeat the Lich King is to destroy him at the place he was created.", 12, 0, 10, 0, 0, 16664, "Uther HoR Horde Intro 13"),
+(37223, 7, 0, "The Frozen Throne...", 12, 0, 10, 0, 0, 17056, "Sylvanas HoR Horde Intro 14"),
+(37225, 15, 0, "Aye. ARRRRRRGHHHH... He... He is coming. You... You must...", 12, 0, 10, 0, 0, 16665, "Uther HoR Horde Intro 15"),
+(36954, 0, 0, "SILENCE, PALADIN!", 14, 0, 10, 0, 0, 17225, "HoR Intro LK 1"),
+(36954, 1, 0, "So you wish to commune with the dead? You shall have your wish.", 14, 0, 10, 0, 0, 17226, "HoR Intro LK 2"),
+(36954, 2, 0, "Falric. Marwyn. Bring their corpses to my chamber when you are through.", 14, 0, 10, 0, 0, 17227, "HoR Intro LK 3"),
+(38112, 5, 0, "As you wish, my lord.", 14, 0, 10, 0, 0, 16717, "HoR Intro LK 4"),
+(38113, 5, 0, "As you wish, my lord.", 14, 0, 10, 0, 0, 16741, "HoR Intro LK 5"),
+(38112, 6, 0, "Soldiers of Lordaeron, rise to meet your master's call!", 14, 0, 10, 0, 0, 16714, "HoR Intro LK 6"),
+(37221, 11, 0, "You won't deny me this Arthas! I must know! I must find out!", 14, 0, 10, 0, 0, 16642, "HoR Alliance Intro 20"),
+(37223, 8, 0, "You will not escape me that easily, Arthas! I will have my vengeance!", 12, 0, 10, 0, 0, 17057, "Sylvanas HoR Horde Intro 16"),
+(36954, 3, 0, "Foolish girl, you seek that which I killed long ago. He is merely a ghost now, a faint echo in my mind.", 14, 0, 10, 0, 0, 17229, "HoR Intro LK 7 Alliance"),
+(36954, 4, 0, "I will not make the same mistake again Sylvanas, this time there will be no escape. You failed to serve me in undeath, now all that remains for you is oblivion.", 14, 0, 10, 0, 0, 17228, "HoR Intro LK 7 Horde"),
+(37226, 0, 0, "Your allies have arrived, Jaina, just as you promised. You will all become powerful agents of the Scourge.", 14, 0, 10, 0, 0, 17212, "HoR Escape Alliance 1"),
+(37226, 1, 0, "I will not make the same mistake again, Sylvanas. This time there will be no escape. You will all serve me in death!", 14, 0, 10, 0, 0, 17213, "HoR Escape Horde 1"),
+(36955, 0, 0, "He is too powerful, we must leave this place at once! My magic will hold him in place for only a short time! Come quickly, heroes!", 14, 0, 10, 0, 0, 16644, "HoR Escape Alliance 2"),
+(37554, 0, 0, "He's too powerful! Heroes, quickly, come to me! We must leave this place immediately! I will do what I can do hold him in place while we flee.", 14, 0, 10, 0, 0, 17058, "HoR Escape Horde 2"),
+(36955, 1, 0, "I will destroy this barrier. You must hold the undead back!", 14, 0, 10, 0, 0, 16607, "HoR Escape Alliance 3 Wall 1"),
+(37554, 1, 0, "No wall can hold the Banshee Queen! Keep the undead at bay, heroes! I will tear this barrier down!", 14, 0, 10, 0, 0, 17029, "HoR Escape Horde 3 Wall 1"),
+(37226, 2, 0, "Succumb to the chill of the grave.", 14, 0, 10, 0, 0, 17218, "HoR Escape 4 LK"),
+(36955, 2, 0, "Another ice wall! Keep the undead from interrupting my incantation so that I may bring this wall down!", 14, 0, 10, 0, 0, 16608, "HoR Escape Alliance 5 Wall 2"),
+(37554, 2, 0, "Another barrier? Stand strong, champions! I will bring the wall down!", 14, 0, 10, 0, 0, 17030, "HoR Escape Horde 5 Wall 2"),
+(37226, 3, 0, "Another dead end.", 14, 0, 10, 0, 0, 17219, "HoR Escape 6 LK"),
+(36955, 3, 0, "He's playing with us! I'll show him what happens to ice when it meets fire!", 14, 0, 10, 0, 0, 16609, "HoR Escape Alliance 7 Wall 3"),
+(37554, 3, 0, "I grow tired of these games, Arthas! Your walls can't stop me!", 14, 0, 10, 0, 0, 17031, "HoR Escape Horde 7 Wall 3"),
+(37226, 4, 0, "How long can you fight it?", 14, 0, 10, 0, 0, 17220, "HoR Escape 8 LK"),
+(36955, 4, 0, "Your barriers can't hold us back much longer, monster. I will shatter them all!", 14, 0, 10, 0, 0, 16610, "HoR Escape Alliance 9 Wall 4"),
+(37554, 4, 0, "You won't impede our escape, fiend. Keep the undead off me while I bring this barrier down!", 14, 0, 10, 0, 0, 17032, "HoR Escape Horde 9 Wall 4"),
+(36955, 5, 0, "There's an opening up ahead. GO NOW!", 14, 0, 10, 0, 0, 16645, "HoR Escape Alliance 10"),
+(37554, 5, 0, "There's an opening up ahead. GO NOW!", 14, 0, 10, 0, 0, 17059, "HoR Escape Horde 10"),
+(36955, 6, 0, "We're almost there... Don't give up!", 14, 0, 10, 0, 0, 16646, "HoR Escape Alliance 11"),
+(37554, 6, 0, "We're almost there... Don't give up!", 14, 0, 10, 0, 0, 17060, "HoR Escape Horde 11"),
+(36955, 7, 0, "It... It's a dead end. We have no choice but to fight. Steel yourself heroes, for this is our last stand!", 14, 0, 10, 0, 0, 16647, "HoR Escape Alliance 12"),
+(37554, 7, 0, "BLASTED DEAD END! So this is how it ends. Prepare yourselves, heroes, for today we make our final stand!", 14, 0, 10, 0, 0, 17061, "HoR Escape Horde 12"),
+(37182, 0, 0, "Fire! FIRE!", 14, 0, 10, 0, 0, 16721, "HoR Escape Alliance 14"),
+(37833, 0, 0, "Fire! FIRE!", 14, 0, 10, 0, 0, 16732, "HoR Escape Horde 14"),
+(37182, 1, 0, "Quickly, climb aboard! We mustn't tarry here! There's no telling when this whole mountainside will collapse.", 14, 0, 10, 0, 0, 16722, "HoR Escape Alliance 15"),
+(37833, 1, 0, "Get onboard, now! This whole mountainside could collapse at any moment.", 14, 0, 10, 0, 0, 16733, "HoR Escape Horde 15"),
+(36955, 8, 0, "Forgive me, heroes. I should have listened to Uther. I... I just had to see for myself. To look into his eyes one last time. I am sorry.", 14, 0, 10, 0, 0, 16648, "HoR Escape Alliance 16"),
+(37554, 8, 0, " We are safe, for now. His strength has increased ten-fold since our last battle! It will take a mighty army to destroy the Lich King, an army greater than even the Horde can rouse.", 14, 0, 10, 0, 0, 17062, "HoR Escape Horde 16"),
+(36955, 9, 0, "We now know what must be done. I will deliver this news to King Varian and Highlord Fordring.", 14, 0, 10, 0, 0, 16649, "HoR Escape Alliance 16"),
+(37226, 5, 0, "There is no escape!", 14, 0, 10, 0, 0, 17217, "boss_the_lich_king_hor 1"),
+(37226, 6, 0, "Succumb to the chill of the grave.", 14, 0, 10, 0, 0, 17218, "boss_the_lich_king_hor 2"),
+(37226, 7, 0, "Rise minions, do not left them us!", 14, 0, 10, 0, 0, 17216, "boss_the_lich_king_hor 3"),
+(37226, 8, 0, "Minions seize them.  Bring their corpses back to me!", 14, 0, 10, 0, 0, 17222, "boss_the_lich_king_hor 4"),
+(37226, 9, 0, "Death's cold embrace awaits.", 14, 0, 10, 0, 0, 17221, "boss_the_lich_king_hor 5"),
+(37226, 10, 0, "Nowhere to run! You're mine now...", 14, 0, 10, 0, 0, 17223, "boss_the_lich_king_hor 6"),
+(37226, 11, 0, "All is lost!", 14, 0, 10, 0, 0, 17215, "boss_the_lich_king_hor wipe"),
+(38112, 0, 0, "Men, women and children... None were spared the master's wrath. Your death will be no different.", 14, 0, 10, 0, 0, 16710, "HoR Falric Aggro"),
+(38112, 1, 0, "Sniveling maggot!", 14, 0, 10, 0, 0, 16711, "HoR Falric Slay 1"),
+(38112, 1, 1, "The children of Stratholme fought with more ferocity!", 14, 0, 10, 0, 0, 16712, "HoR Falric Slay 2"),
+(38112, 2, 0, "Despair... so delicious...", 14, 0, 10, 0, 0, 16715, "HoR Falric Impending Despair"),
+(38112, 3, 0, "Fear... so exhilarating...", 14, 0, 10, 0, 0, 16716, "HoR Falric Defiling Horor"),
+(38112, 4, 0, "Marwyn, finish them...", 14, 0, 10, 0, 0, 16713, "HoR Falric Death"),
+(38113, 0, 0, "Death is all that you will find here!", 14, 0, 10, 0, 0, 16734, "HoR Marwyn Aggro"),
+(38113, 1, 0, "I saw the same look in his eyes when he died. Terenas could hardly believe it. Hahahaha!", 14, 0, 10, 0, 0, 16735, "HoR Marwyn Slay 1"),
+(38113, 1, 1, "Choke on your suffering!", 14, 0, 10, 0, 0, 16736, "HoR Marwyn Slay 2"),
+(38113, 2, 0, "Your flesh has decayed before your very eyes!", 14, 0, 10, 0, 0, 16739, "HoR Marwyn Corrupted Flesh"),
+(38113, 3, 0, "Waste away into nothingness!", 14, 0, 10, 0, 0, 16734, "HoR Marwyn Well of Corruption"),
+(38113, 4, 0, "Yes... Run... Run to meet your destiny... Its bitter, cold embrace, awaits you.", 14, 0, 10, 0, 0, 16737, "HoR Marwyn Death"),
+(36723, 0, 0, "You are not worthy to face the Lich King!", 14, 0, 10, 0, 0, 16921, "HoR FrostSworn General Aggro"),
+(36723, 1, 0, "Master, I have failed...", 14, 0, 10, 0, 0, 16922, "HoR FrostSworn General Death"),
+(38177, 0, 0, 'This is not our final rest.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38173, 0, 0, 'This is not our final rest.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38176, 0, 0, 'This is not our final rest.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38175, 0, 0, 'This is not our final rest.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38172, 0, 0, 'This is not our final rest.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38177, 0, 1, 'All serve the master in death.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38173, 0, 1, 'All serve the master in death.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38176, 0, 1, 'All serve the master in death.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38175, 0, 1, 'All serve the master in death.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38172, 0, 1, 'All serve the master in death.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38177, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38173, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38176, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38175, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
+(38172, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death');

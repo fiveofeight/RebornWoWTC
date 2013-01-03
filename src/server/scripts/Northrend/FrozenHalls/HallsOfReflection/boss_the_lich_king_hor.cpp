@@ -28,38 +28,39 @@ EndScriptData */
 
 enum
 {
-   SPELL_WINTER                             = 69780,
-   SPELL_FURY_OF_FROSTMOURNE   = 70063,
-   SPELL_SOUL_REAPER                    = 73797,
-   SPELL_RAISE_DEAD                      = 69818,
-   SPELL_ICE_PRISON                       = 69708,
+   SPELL_WINTER                        = 69780,
+   SPELL_FURY_OF_FROSTMOURNE           = 70063,
+   SPELL_SOUL_REAPER                   = 73797,
+   SPELL_RAISE_DEAD                    = 69818,
+   SPELL_ICE_PRISON                    = 69708,
    SPELL_DARK_ARROW                    = 70194,
-   SPELL_HARVEST_SOUL                 = 70070,
+   SPELL_HARVEST_SOUL                  = 70070,
+   SPELL_PAIN_AND_SUFFERING            = 74115,
 
    //Raging gnoul
-   SPELL_EMERGE_VISUAL                = 50142,
-   SPELL_GHOUL_JUMP                   = 70150,
+   SPELL_EMERGE_VISUAL                 = 50142,
+   SPELL_GHOUL_JUMP                    = 70150,
 
    //Witch Doctor
-   SPELL_COURSE_OF_DOOM               = 70144,
-   H_SPELL_COURSE_OF_DOOM             = 70183,
-   SPELL_SHADOW_BOLT_VOLLEY           = 70145,
-   H_SPELL_SHADOW_BOLT_VOLLEY         = 70184,
-   SPELL_SHADOW_BOLT                  = 70080,
-   H_SPELL_SHADOW_BOLT                = 70182,
+   SPELL_COURSE_OF_DOOM                = 70144,
+   H_SPELL_COURSE_OF_DOOM              = 70183,
+   SPELL_SHADOW_BOLT_VOLLEY            = 70145,
+   H_SPELL_SHADOW_BOLT_VOLLEY          = 70184,
+   SPELL_SHADOW_BOLT                   = 70080,
+   H_SPELL_SHADOW_BOLT                 = 70182,
 
    //Lumbering Abomination
    SPELL_ABON_STRIKE                  = 40505,
    SPELL_VOMIT_SPRAY                  = 70176,
    H_SPELL_VOMIT_SPRAY                = 70181,
 
-   SAY_LICH_KING_WALL_01              = -1594486,
-   SAY_LICH_KING_WALL_02              = -1594491,
-   SAY_LICH_KING_GNOUL                = -1594482,
-   SAY_LICH_KING_ABON                 = -1594483,
-   SAY_LICH_KING_WINTER               = -1594481,
-   SAY_LICH_KING_END_DUN              = -1594504,
-   SAY_LICH_KING_WIN                  = -1594485,
+   SAY_LICH_KING_WALL_01              = 5,
+   SAY_LICH_KING_WALL_02              = 6,
+   SAY_LICH_KING_GNOUL                = 7,
+   SAY_LICH_KING_ABON                 = 8,
+   SAY_LICH_KING_WINTER               = 9,
+   SAY_LICH_KING_END_DUN              = 10,
+   SAY_LICH_KING_WIN                  = 11,
 };
 
 class boss_lich_king_hor : public CreatureScript
@@ -96,7 +97,7 @@ public:
            NonFight = false;
            StartEscort = false;
            WipedGroup = false;
-           walkSpeed = 1.0f;
+           walkSpeed = 0.8f;
            uiWall = 0;
        }
 
@@ -133,7 +134,7 @@ public:
                case 66:
                    SetEscortPaused(true);
                    pInstance->SetData(DATA_LICHKING_EVENT, SPECIAL);
-                   DoScriptText(SAY_LICH_KING_END_DUN, me);
+                   Talk(SAY_LICH_KING_END_DUN);
                    if(Creature* pLider = ((Creature*)Unit::GetUnit((*me), pInstance->GetData64(DATA_ESCAPE_LIDER))))
                        me->CastSpell(pLider, SPELL_HARVEST_SOUL, false);
                    me->setActive(false);
@@ -182,21 +183,22 @@ public:
            {
                case 0:
                    pInstance->SetData(DATA_SUMMONS, 3);
-                   DoScriptText(SAY_LICH_KING_WALL_01, me);
+                   Talk(SAY_LICH_KING_WALL_01);
                    StepTimer = 2000;
                    ++Step;
                    break;
                case 1:
                    DoCast(me, SPELL_RAISE_DEAD);
-                   DoScriptText(SAY_LICH_KING_GNOUL, me);
+                   Talk(SAY_LICH_KING_GNOUL);
                    StepTimer = 7000;
                    ++Step;
                    break;
                case 2:
                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE );
+                   // DoCast(me, SPELL_PAIN_AND_SUFFERING); Spell is currently broken, it also does damage to people in front of you.
                    DoCast(me, SPELL_WINTER);
-                   DoScriptText(SAY_LICH_KING_WINTER, me);
+                   Talk(SAY_LICH_KING_WINTER);
                    me->SetSpeed(MOVE_WALK, walkSpeed, true);
                    StepTimer = 1000;
                    ++Step;
@@ -222,7 +224,7 @@ public:
            {
                case 0:
                    pInstance->SetData(DATA_SUMMONS, 3);
-                   DoScriptText(SAY_LICH_KING_GNOUL, me);
+                   Talk(SAY_LICH_KING_GNOUL);
                    DoCast(me, SPELL_RAISE_DEAD);
                    StepTimer = 6000;
                    ++Step;
@@ -247,12 +249,12 @@ public:
                case 0:
                    pInstance->SetData(DATA_SUMMONS, 3);
                    DoCast(me, SPELL_RAISE_DEAD);
-                   DoScriptText(SAY_LICH_KING_GNOUL, me);
+                   Talk(SAY_LICH_KING_GNOUL);
                    StepTimer = 6000;
                    ++Step;
                    break;
                case 1:
-                   DoScriptText(SAY_LICH_KING_ABON, me);
+                   Talk(SAY_LICH_KING_ABON);
                    CallGuard(NPC_RISEN_WITCH_DOCTOR);
                    CallGuard(NPC_RISEN_WITCH_DOCTOR);
                    CallGuard(NPC_RISEN_WITCH_DOCTOR);
@@ -274,7 +276,7 @@ public:
                case 0:
                    pInstance->SetData(DATA_SUMMONS, 3);
                    DoCast(me, SPELL_RAISE_DEAD);
-                   DoScriptText(SAY_LICH_KING_GNOUL, me);
+                   Talk(SAY_LICH_KING_GNOUL);
                    StepTimer = 6000;
                    ++Step;
                    break;
@@ -288,7 +290,7 @@ public:
                    ++Step;
                    break;
                case 2:
-                   DoScriptText(SAY_LICH_KING_ABON, me);
+                   Talk(SAY_LICH_KING_ABON);
                    CallGuard(NPC_RISEN_WITCH_DOCTOR);
                    CallGuard(NPC_RISEN_WITCH_DOCTOR);
                    pInstance->SetData(DATA_ICE_WALL_4, DONE);
@@ -336,7 +338,7 @@ public:
                    me->setActive(false);
                    SetEscortPaused(true);
                    me->StopMoving();
-                   DoScriptText(SAY_LICH_KING_WIN, me);
+                   Talk(SAY_LICH_KING_WIN);
                    me->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE, TRIGGERED_NONE);
                    me->DealDamage(pLider, pLider->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false); // Probably a hack
                }
