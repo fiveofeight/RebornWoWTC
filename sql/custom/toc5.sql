@@ -166,7 +166,9 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (36558, 0, 0, 0, 1, 0, NULL);
 
 -- Texts
-
+DELETE FROM `creature_text` WHERE `entry` IN (35004, 35005, 34928, 35119, 35451, 34705, 34702, 34701, 34657, 34703, 35572, 35569, 35571, 35570, 35617);
+DELETE FROM `creature_text` WHERE `entry` = 34996 AND `groupid` > 16; -- Tirion
+DELETE FROM `creature_text` WHERE `entry` IN(34994, 34990, 34995, 34992) AND `groupid` > 9; -- Thrall, Varian, Garrosh, Jaina
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES
 (35004, 0, 0, "The Sunreavers are proud to present their representatives in this trial by combat.", 12, 0, 0, 2, 0, 0, "ToC5 - Horde Intro 1"),
 (35005, 0, 0, "The Silver Covenant is pleased to present their contenders for this event, Highlord.", 12, 0, 0, 2, 0, 0, "ToC5 - Alliance Intro 1"),
@@ -214,7 +216,7 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (35570, 0, 0, "Excellent work!", 12, 0, 0, 0, 0, 0, "ToC - Champion Defeated"),
 (34657, 0, 0, "Excellent work!", 12, 0, 0, 0, 0, 0, "ToC - Champion Defeated"),
 (35617, 0, 0, "Excellent work!", 12, 0, 0, 0, 0, 0, "ToC - Champion Defeated"),
-
+(34703, 0, 0, "Excellent work!", 12, 0, 0, 0, 0, 0, "ToC - Champion Defeated"),
 (34996, 19, 0, "Well fought! You next challenge comes from the Crusade's own ranks. You will be tested against their considerable prowess.", 12, 0, 0, 2, 0, 0, "ToC5 - Paletress Intro 1 Tirion"),
 (35004, 11, 0, "The next combatant is second to none in her passion for upholding the Light. I give you Argent Confessor Paletress!", 12, 0, 0, 2, 0, 0, "ToC5 - Paletress Horde Intro 2"),
 (35005, 11, 0, "The next combatant is second to none in her passion for upholding the Light. I give you Argent Confessor Paletress!", 12, 0, 0, 2, 0, 0, "ToC5 - Paletress Alliance Intro 2"),
@@ -492,7 +494,7 @@ INSERT INTO `creature_template_addon` (`entry`,`bytes2`,`auras`) VALUES
 UPDATE  `gameobject` SET  `state` =  '1' WHERE  `gameobject`.`guid` =150073;
 UPDATE  `gameobject` SET  `state` =  '1' WHERE  `gameobject`.`guid` =150074;
 
-DELETE FROM spell_script_names WHERE ABS(spell_id) = 66903;
+DELETE FROM spell_script_names WHERE `spell_id` IN (67680, 66903);
 INSERT INTO spell_script_names (spell_id, ScriptName) VALUES
 (67680, 'spell_eadric_hoj'), -- Eadric's Hammer of Justice
 (66903, 'spell_eadric_hoj'); 
