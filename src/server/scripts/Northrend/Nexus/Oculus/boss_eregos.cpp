@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,9 +34,12 @@ enum Events
 
 enum Says
 {
-    SAY_AGGRO = 0,
-    SAY_ENRAGE = 1,
-    SAY_DEATH = 2
+    SAY_SPAWN           = 0,
+    SAY_AGGRO           = 1,
+    SAY_ENRAGE          = 2,
+    SAY_KILL            = 3,
+    SAY_DEATH           = 4,
+    SAY_SHIELD          = 5,
 };
 
 enum Spells
@@ -99,6 +102,11 @@ public:
             _amberVoid = true;
 
             DoAction(ACTION_SET_NORMAL_EVENTS);
+        }
+
+        void KilledUnit(Unit* /*victim*/)
+        {
+            Talk(SAY_KILL);
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -176,6 +184,7 @@ public:
                 events.Reset();
                 _phase = (me->GetHealthPct() < 60.0f  && me->GetHealthPct() > 20.0f) ? PHASE_FIRST_PLANAR : PHASE_SECOND_PLANAR;
 
+                Talk(SAY_SHIELD);
                 DoCast(SPELL_PLANAR_SHIFT);
 
                 // not sure about the amount, and if we should despawn previous spawns (dragon trashs)

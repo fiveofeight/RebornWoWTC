@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,20 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: boss_grand_champions
-SD%Complete: 50 %
-SDComment: Is missing the ai to make the npcs look for a new mount and use it.
-SDCategory: Trial Of the Champion
-EndScriptData */
-
 #include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 #include "Vehicle.h"
 #include "trial_of_the_champion.h"
 #include "Player.h"
 
-enum eSpells
+enum Spells
 {
     //Vehicle
 	
@@ -80,17 +72,15 @@ enum eSpells
     // Achievement Credit
     SPELL_GRAND_CHAMPIONS_CREDIT    = 68572,
 };
-enum eEnums
+enum Talk
 {
-    SAY_START                       = -1999939,
-    SAY_START_1                     = -1999939,
-    SAY_START2                      = -1999937,
-    SAY_START_2                     = -1999937,
+    SAY_CHAMPION_DIED               = 0,
+    WARNING_WEAPONS                 = 1,
 };
 	
-enum eSeat
+enum Seat
 {
-    SEAT_ID_0                       = 0
+    SEAT_ID_0                       = 0,
 };
 
 /*
@@ -562,10 +552,9 @@ class boss_warrior_toc5 : public CreatureScript
             if (!bDone && GrandChampionsOutVehicle(me))
             {
                 bDone = true;
-
     			
- 		    DoScriptText(SAY_START2, me);
-                    me->RemoveAura(64723); // [DND] ReadyJoust Pose Effect	
+     		    Talk(WARNING_WEAPONS);
+                me->RemoveAura(64723); // [DND] ReadyJoust Pose Effect	
 
                 if (pInstance && me->GetGUID() == pInstance->GetData64(DATA_GRAND_CHAMPION_1))
                     me->SetHomePosition(739.678f,662.541f,413.395f,4.49f);
@@ -629,7 +618,13 @@ class boss_warrior_toc5 : public CreatureScript
         {
             if (damage >= me->GetHealth())
             {
-                DoScriptText(SAY_START, me);	
+                damage = 0;
+    	 	    hasBeenInCombat = false;	
+                Talk(SAY_CHAMPION_DIED);
+
+                if (pInstance)
+                    pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
+
                 // Instance encounter counting mechanics
                 if (!bCredit)
                 {
@@ -640,7 +635,8 @@ class boss_warrior_toc5 : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
                 me->GetMotionMaster()->MovePoint(0,746.843f, 695.68f, 412.339f);
-             }
+                me->DespawnOrUnsummon(5000);
+            }
         }
     	
         void JustDied(Unit* /*killer*/)
@@ -794,6 +790,13 @@ class boss_mage_toc5 : public CreatureScript
         {
             if (damage >= me->GetHealth())
             {
+                damage = 0;
+    	 	    hasBeenInCombat = false;	
+                Talk(SAY_CHAMPION_DIED);
+
+                if (pInstance)
+                    pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
+
                 // Instance encounter counting mechanics
                 if (!bCredit)
                 {
@@ -804,19 +807,9 @@ class boss_mage_toc5 : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
                 me->GetMotionMaster()->MovePoint(0,746.843f, 695.68f, 412.339f);
+                me->DespawnOrUnsummon(5000);
             }
-       }
-
-        void JustDied(Unit* /*killer*/)
-        {
-	 	    hasBeenInCombat = false;	
-		    DoScriptText(SAY_START, me);	
-            if (pInstance)
-                pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
         }
-
-
-
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -971,6 +964,13 @@ class boss_shaman_toc5 : public CreatureScript
         {
             if (damage >= me->GetHealth())
             {
+                damage = 0;
+    	 	    hasBeenInCombat = false;	
+                Talk(SAY_CHAMPION_DIED);
+
+                if (pInstance)
+                    pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
+
                 // Instance encounter counting mechanics
                 if (!bCredit)
                 {
@@ -981,21 +981,8 @@ class boss_shaman_toc5 : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
                 me->GetMotionMaster()->MovePoint(0,746.843f, 695.68f, 412.339f);
+                me->DespawnOrUnsummon(5000);
             }
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-	 	    hasBeenInCombat = false;	
-		    DoScriptText(SAY_START, me);	
-    			
-            if (pInstance)
-                pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
-
-		    //what a nonsense! -.-
-		    if (GameObject* pGO = GameObject::GetGameObject(*me, pInstance->GetData64(DATA_MAIN_GATE1)))
-                        pInstance->HandleGameObject(pGO->GetGUID(),true);   		
-
         }
     };
 
@@ -1200,6 +1187,13 @@ class boss_hunter_toc5 : public CreatureScript
         {
             if (damage >= me->GetHealth())
             {
+                damage = 0;
+    	 	    hasBeenInCombat = false;	
+                Talk(SAY_CHAMPION_DIED);
+
+                if (pInstance)
+                    pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
+
                 // Instance encounter counting mechanics
                 if (!bCredit)
                 {
@@ -1210,24 +1204,9 @@ class boss_hunter_toc5 : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
                 me->GetMotionMaster()->MovePoint(0,746.843f, 695.68f, 412.339f);
+                me->DespawnOrUnsummon(5000);
             }
         }
-
-        void JustDied(Unit* killer)
-        {
-	 	    hasBeenInCombat = false;	
-		    DoScriptText(SAY_START, me);	
-            if (pInstance)
-                pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
-
-		    //what a nonsense! -.-
-		    if (GameObject* pGO = GameObject::GetGameObject(*me, pInstance->GetData64(DATA_MAIN_GATE1)))
-                        pInstance->HandleGameObject(pGO->GetGUID(),true);
-        }
-    		
-    	
-
-    	
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -1385,6 +1364,13 @@ class boss_rouge_toc5 : public CreatureScript
         {
             if (damage >= me->GetHealth())
             {
+                damage = 0;
+    	 	    hasBeenInCombat = false;	
+                Talk(SAY_CHAMPION_DIED);
+
+                if (pInstance)
+                    pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
+
                 // Instance encounter counting mechanics
                 if (!bCredit)
                 {
@@ -1395,22 +1381,9 @@ class boss_rouge_toc5 : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 me->setFaction(35);
                 me->GetMotionMaster()->MovePoint(0,746.843f, 695.68f, 412.339f);
+                me->DespawnOrUnsummon(5000);
             }
         }
-
-        void JustDied(Unit* killer)
-        {
-		    hasBeenInCombat = false;
-		    DoScriptText(SAY_START, me);	
-            if (pInstance)
-                pInstance->SetData(BOSS_GRAND_CHAMPIONS, DONE);
-
-		    //where's the sense in that?
-		    if (GameObject* pGO = GameObject::GetGameObject(*me, pInstance->GetData64(DATA_MAIN_GATE1)))
-                        pInstance->HandleGameObject(pGO->GetGUID(),true);
-        }
-    	
-
     };
 
     CreatureAI* GetAI(Creature* creature) const

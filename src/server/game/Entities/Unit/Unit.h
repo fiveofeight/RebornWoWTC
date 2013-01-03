@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -253,6 +253,7 @@ enum UnitRename
 #define MAX_SPELL_CONTROL_BAR   10
 
 #define MAX_AGGRO_RESET_TIME 10 // in seconds
+#define MAX_AGGRO_RADIUS 45.0f  // yards
 
 enum Swing
 {
@@ -1096,12 +1097,12 @@ struct CharmInfo
         explicit CharmInfo(Unit* unit);
         ~CharmInfo();
         void RestoreState();
-        uint32 GetPetNumber() const { return m_petnumber; }
+        uint32 GetPetNumber() const { return _petnumber; }
         void SetPetNumber(uint32 petnumber, bool statwindow);
 
-        void SetCommandState(CommandStates st) { m_CommandState = st; }
-        CommandStates GetCommandState() const { return m_CommandState; }
-        bool HasCommandState(CommandStates state) const { return (m_CommandState == state); }
+        void SetCommandState(CommandStates st) { _CommandState = st; }
+        CommandStates GetCommandState() const { return _CommandState; }
+        bool HasCommandState(CommandStates state) const { return (_CommandState == state); }
 
         void InitPossessCreateSpells();
         void InitCharmCreateSpells();
@@ -1122,12 +1123,14 @@ struct CharmInfo
 
         void ToggleCreatureAutocast(SpellInfo const* spellInfo, bool apply);
 
-        CharmSpellInfo* GetCharmSpell(uint8 index) { return &(m_charmspells[index]); }
+        CharmSpellInfo* GetCharmSpell(uint8 index) { return &(_charmspells[index]); }
 
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
 
         void SetIsCommandAttack(bool val);
         bool IsCommandAttack();
+        void SetIsCommandFollow(bool val);
+        bool IsCommandFollow();
         void SetIsAtStay(bool val);
         bool IsAtStay();
         void SetIsFollowing(bool val);
@@ -1139,23 +1142,24 @@ struct CharmInfo
 
     private:
 
-        Unit* m_unit;
+        Unit* _unit;
         UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
-        CharmSpellInfo m_charmspells[4];
-        CommandStates   m_CommandState;
-        uint32          m_petnumber;
-        bool            m_barInit;
+        CharmSpellInfo _charmspells[4];
+        CommandStates _CommandState;
+        uint32 _petnumber;
+        bool _barInit;
 
         //for restoration after charmed
-        ReactStates     m_oldReactState;
+        ReactStates     _oldReactState;
 
-        bool m_isCommandAttack;
-        bool m_isAtStay;
-        bool m_isFollowing;
-        bool m_isReturning;
-        float m_stayX;
-        float m_stayY;
-        float m_stayZ;
+        bool _isCommandAttack;
+        bool _isCommandFollow;
+        bool _isAtStay;
+        bool _isFollowing;
+        bool _isReturning;
+        float _stayX;
+        float _stayY;
+        float _stayZ;
 
         GlobalCooldownMgr m_GlobalCooldownMgr;
 };
@@ -1199,10 +1203,18 @@ class Unit : public WorldObject
     public:
         typedef std::set<Unit*> AttackerSet;
         typedef std::set<Unit*> ControlList;
-        typedef std::pair<uint32, uint8> spellEffectPair;
+
         typedef std::multimap<uint32,  Aura*> AuraMap;
+        typedef std::pair<AuraMap::const_iterator, AuraMap::const_iterator> AuraMapBounds;
+        typedef std::pair<AuraMap::iterator, AuraMap::iterator> AuraMapBoundsNonConst;
+
         typedef std::multimap<uint32,  AuraApplication*> AuraApplicationMap;
+        typedef std::pair<AuraApplicationMap::const_iterator, AuraApplicationMap::const_iterator> AuraApplicationMapBounds;
+        typedef std::pair<AuraApplicationMap::iterator, AuraApplicationMap::iterator> AuraApplicationMapBoundsNonConst;
+
         typedef std::multimap<AuraStateType,  AuraApplication*> AuraStateAurasMap;
+        typedef std::pair<AuraStateAurasMap::const_iterator, AuraStateAurasMap::const_iterator> AuraStateAurasMapBounds;
+
         typedef std::list<AuraEffect*> AuraEffectList;
         typedef std::list<Aura*> AuraList;
         typedef std::list<AuraApplication *> AuraApplicationList;
@@ -1590,6 +1602,7 @@ class Unit : public WorldObject
         void SendSpellDamageImmune(Unit* target, uint32 spellId);
 
         void NearTeleportTo(float x, float y, float z, float orientation, bool casting = false);
+        void SendTeleportPacket(Position& pos);
         virtual bool UpdatePosition(float x, float y, float z, float ang, bool teleport = false);
         // returns true if unit's position really changed
         bool UpdatePosition(const Position &pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
@@ -1761,7 +1774,7 @@ class Unit : public WorldObject
         void RemoveAuraFromStack(uint32 spellId, uint64 casterGUID = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId, uint64 casterGUID, Unit* dispeller, uint8 chargesRemoved = 1);
         void RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit* stealer);
-        void RemoveAurasDueToItemSpell(Item* castItem, uint32 spellId);
+        void RemoveAurasDueToItemSpell(uint32 spellId, uint64 castItemGuid);
         void RemoveAurasByType(AuraType auraType, uint64 casterGUID = 0, Aura* except = NULL, bool negative = true, bool positive = true);
         void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0);
         void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0);

@@ -79,13 +79,13 @@ enum Phases
 };
 
 #define GOSSIP_SUMMON "Disturb the Stone and summon Lord Ahune.";
-
+// These positions are guessed, not sniffed.
 Position const SummonPositions[4] =
 {
-        {-97.084167, -205.559113, -1.198052}, // Ahune / Frozen-Core
-        {-90.891891, -243.488068, -1.116222}, // Hailstone
-        {-97.389175, -239.780701, -1.264044}, // Coldweave #1
-        {-85.160637, -236.127808, -1.572418}, // Coldweave #2
+        {-97.084167f, -205.559113f, -1.198052f, 1.47574f}, // Ahune / Frozen-Core
+        {-96.584648f, -212.704102f, -1.229972f, 1.621793f}, // Hailstone
+        {-87.471329f, -212.218582f, -1.284526f, 1.763164f}, // Coldweave #1
+        {-102.942009f, -211.860504f, -1.300179f, 1.555034f}, // Coldweave #2
 };
 
 class boss_ahune : public CreatureScript
@@ -157,21 +157,11 @@ public:
             {
                 case ACTION_START:
                     DoZoneInCombat();
-                    break;
+                    break;                    
             }
         }
 
-
-        void DamageTaken(Unit* pDoneBy, uint32 &damage)
-        {
-            if (damage >= me->GetHealth())
-            {
-                DoSummonLoot();
-                damage = me->GetHealth() - 1;
-            }
-        }
-
-        void DoSummonLoot()
+        void JustDied(Unit* /*killer*/)
         {
             DoCast(me, SPELL_LOOT_CHEST);
             DoCast(me, SPELL_AHUNE_ACHIEVEMENT);
@@ -284,16 +274,12 @@ class npc_frozen_core : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
             }
 
-            void DamageTaken(Unit* who, uint32& damage)
+            void JustDied(Unit* killer)
             {
                 if (me->isSummon())
-                {
-                    if (Unit* owner = me->GetOwner())
-                    {
-                        if (me->GetHealth() < damage)
-                            me->DealDamage(owner, owner->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                    }
-                }
+                    if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        if (owner && owner->isAlive())
+                            killer->Kill(owner);
             }
         
             void UpdateAI(const uint32 diff)

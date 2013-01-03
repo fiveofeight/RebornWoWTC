@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -206,11 +206,11 @@ class npc_zulaman_hostage : public CreatureScript
 
 enum
 {
-SAY_START = -1568079,
-SAY_AT_GONG = -1568080,
-SAY_OPENING_ENTRANCE = -1568081,
-SAY_OPEN_GATE = -1568082,
-SAY_INST_BEGIN = -1568068,
+SAY_START = 0,
+SAY_AT_GONG = 1,
+SAY_OPENING_ENTRANCE = 2,
+SAY_OPEN_GATE = 3,
+SAY_INST_BEGIN = 0,
 
 SPELL_BANGING_THE_GONG = 45222,
 
@@ -286,7 +286,7 @@ public:
             switch(uiPointId)
             {
                 case 1:
-                    DoScriptText(SAY_AT_GONG, me);
+                    Talk(SAY_AT_GONG);
     
                     if (GameObject* pEntranceDoor = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(DATA_GO_GONG)))
                         pEntranceDoor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
@@ -295,10 +295,10 @@ public:
                     me->CastSpell(me, SPELL_BANGING_THE_GONG, false);
                     break;
                 case 2:
-                    DoScriptText(SAY_OPENING_ENTRANCE, me);
+                    Talk(SAY_OPENING_ENTRANCE);
                     break;
                 case 3:
-                    DoScriptText(SAY_OPEN_GATE, me);
+                    Talk(SAY_OPEN_GATE);
                     // Todo: fix the escort pause and have players click the gong
                     me->RemoveAurasDueToSpell(SPELL_BANGING_THE_GONG);
                     DoPlaySoundToSet(me, SOUND_CELEBRATE);
@@ -321,7 +321,7 @@ public:
     //                ((Creature*)Guardian)->GetMotionMaster()->MoveChase(me);
                     SetEscortPaused(true);
                     if (Creature* HEXLORD = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_HEXLORDGUID)))
-                        DoScriptText(SAY_INST_BEGIN, HEXLORD);
+                        HEXLORD->AI()->Talk(SAY_INST_BEGIN);
                     break;
                     //TODO: Spawn group of Amani'shi Savage and make them run to entrance
                     //TODO: Add, and modify reseting of the event, reseting quote is missing
@@ -337,7 +337,7 @@ public:
     
         void StartEvent(Player* player)
         {
-            DoScriptText(SAY_START, me);
+            Talk(SAY_START);
             Start(true, false, player->GetGUID(), 0, false, true);
         }
     

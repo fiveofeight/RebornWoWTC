@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -51,7 +51,7 @@ void LFGMgr::_LoadFromDB(Field* fields, uint64 guid)
     if (!fields)
         return;
 
-    if (!IS_GROUP(guid))
+    if (!IS_GROUP_GUID(guid))
         return;
 
     SetLeader(guid, MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER));
@@ -77,7 +77,7 @@ void LFGMgr::_LoadFromDB(Field* fields, uint64 guid)
 
 void LFGMgr::_SaveToDB(uint64 guid, uint32 db_guid)
 {
-    if (!IS_GROUP(guid))
+    if (!IS_GROUP_GUID(guid))
         return;
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_LFG_DATA);
@@ -758,7 +758,7 @@ void LFGMgr::LeaveLfg(uint64 guid)
 {
     sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::LeaveLfg: [" UI64FMTD "]", guid);
 
-    uint64 gguid = IS_GROUP(guid) ? guid : GetGroup(guid);
+    uint64 gguid = IS_GROUP_GUID(guid) ? guid : GetGroup(guid);
     LfgState state = GetState(guid);
     switch (state)
     {
@@ -809,18 +809,12 @@ void LFGMgr::LeaveLfg(uint64 guid)
                 RemoveProposal(it, LFG_UPDATETYPE_PROPOSAL_DECLINED);
             break;
         }
-        case LFG_STATE_BOOT:
-            if (guid != gguid) // Player
-            {
-                UpdateBoot(guid); // Forcing LFG_ANSWER_PENDING (Removal of player)
-                SetState(guid, LFG_STATE_NONE);
-            }
-            break;
         case LFG_STATE_NONE:
         case LFG_STATE_RAIDBROWSER:
             break;
         case LFG_STATE_DUNGEON:
         case LFG_STATE_FINISHED_DUNGEON:
+        case LFG_STATE_BOOT:
             if (guid != gguid) // Player
                 SetState(guid, LFG_STATE_NONE);
             break;
@@ -1342,7 +1336,7 @@ void LFGMgr::InitBoot(uint64 gguid, uint64 kicker, uint64 victim, std::string co
    @param[in]     guid Player who has answered
    @param[in]     player answer
 */
-void LFGMgr::UpdateBoot(uint64 guid, LfgAnswer answer)
+void LFGMgr::UpdateBoot(uint64 guid, bool accept)
 {
     uint64 gguid = GetGroup(guid);
     if (!gguid)
@@ -1354,42 +1348,26 @@ void LFGMgr::UpdateBoot(uint64 guid, LfgAnswer answer)
 
     LfgPlayerBoot& boot = itBoot->second;
 
+    if (boot.votes[guid] != LFG_ANSWER_PENDING)    // Cheat check: Player can't vote twice
+        return;
+
+    boot.votes[guid] = LfgAnswer(accept);
+
     uint8 votesNum = 0;
     uint8 agreeNum = 0;
-
-    if (guid == boot.victim)
-        agreeNum = LFG_GROUP_KICK_VOTES_NEEDED + 1;        // +1 on purpose to skip kick code
-    else if (answer == LFG_ANSWER_PENDING)
+    for (LfgAnswerContainer::const_iterator itVotes = boot.votes.begin(); itVotes != boot.votes.end(); ++itVotes)
     {
-        boot.votes.erase(guid);
-        // If we don't have enough members - force boot fail
-        if (boot.votes.size() <= LFG_GROUP_KICK_VOTES_NEEDED)
+        if (itVotes->second != LFG_ANSWER_PENDING)
         {
-            agreeNum = 0;
-            votesNum = boot.votes.size();
+            ++votesNum;
+            if (itVotes->second == LFG_ANSWER_AGREE)
+                ++agreeNum;
         }
     }
-    else
-    {
-        if (boot.votes[guid] != LFG_ANSWER_PENDING)    // Cheat check: Player can't vote twice
-            return;
 
-        boot.votes[guid] = answer;
-
-        for (LfgAnswerContainer::const_iterator itVotes = boot.votes.begin(); itVotes != boot.votes.end(); ++itVotes)
-        {
-            if (itVotes->second != LFG_ANSWER_PENDING)
-            {
-                ++votesNum;
-                if (itVotes->second == LFG_ANSWER_AGREE)
-                    ++agreeNum;
-            }
-        }
-
-        // if we don't have enough votes (agree or deny) do nothing
-        if (agreeNum < LFG_GROUP_KICK_VOTES_NEEDED && (votesNum - agreeNum) < LFG_GROUP_KICK_VOTES_NEEDED)
-            return;
-    }
+    // if we don't have enough votes (agree or deny) do nothing
+    if (agreeNum < LFG_GROUP_KICK_VOTES_NEEDED && (votesNum - agreeNum) < LFG_GROUP_KICK_VOTES_NEEDED)
+        return;
 
     // Send update info to all players
     boot.inProgress = false;
@@ -1646,7 +1624,7 @@ LfgType LFGMgr::GetDungeonType(uint32 dungeonId)
 LfgState LFGMgr::GetState(uint64 guid)
 {
     LfgState state;
-    if (IS_GROUP(guid))
+    if (IS_GROUP_GUID(guid))
         state = GroupsStore[guid].GetState();
     else
         state = PlayersStore[guid].GetState();
@@ -1718,7 +1696,7 @@ uint8 LFGMgr::GetKicksLeft(uint64 guid)
 
 void LFGMgr::RestoreState(uint64 guid, char const *debugMsg)
 {
-    if (IS_GROUP(guid))
+    if (IS_GROUP_GUID(guid))
     {
         LfgGroupData& data = GroupsStore[guid];
         if (sLog->ShouldLog(LOG_FILTER_LFG, LOG_LEVEL_DEBUG))
@@ -1747,7 +1725,7 @@ void LFGMgr::RestoreState(uint64 guid, char const *debugMsg)
 
 void LFGMgr::SetState(uint64 guid, LfgState state)
 {
-    if (IS_GROUP(guid))
+    if (IS_GROUP_GUID(guid))
     {
         LfgGroupData& data = GroupsStore[guid];
         if (sLog->ShouldLog(LOG_FILTER_LFG, LOG_LEVEL_DEBUG))
@@ -1954,13 +1932,13 @@ void LFGMgr::SendLfgQueueStatus(uint64 guid, LfgQueueStatusData const& data)
 
 bool LFGMgr::IsLfgGroup(uint64 guid)
 {
-    return guid && IS_GROUP(guid) && GroupsStore[guid].IsLfgGroup();
+    return guid && IS_GROUP_GUID(guid) && GroupsStore[guid].IsLfgGroup();
 }
 
 LFGQueue& LFGMgr::GetQueue(uint64 guid)
 {
     uint8 queueId = 0;
-    if (IS_GROUP(guid))
+    if (IS_GROUP_GUID(guid))
     {
         const LfgGuidSet& players = GetPlayers(guid);
         uint64 pguid = players.empty() ? 0 : (*players.begin());

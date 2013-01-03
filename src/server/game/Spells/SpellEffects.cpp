@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -200,7 +200,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectApplyAreaAura,                            //128 SPELL_EFFECT_APPLY_AREA_AURA_FRIEND
     &Spell::EffectApplyAreaAura,                            //129 SPELL_EFFECT_APPLY_AREA_AURA_ENEMY
     &Spell::EffectRedirectThreat,                           //130 SPELL_EFFECT_REDIRECT_THREAT
-    &Spell::EffectPlayerNotification,                       //131 SPELL_EFFECT_PLAYER_NOTIFICATION      sound id in misc value (SoundEntries.dbc)
+    &Spell::EffectPlaySound,                                //131 SPELL_EFFECT_PLAY_SOUND               sound id in misc value (SoundEntries.dbc)
     &Spell::EffectPlayMusic,                                //132 SPELL_EFFECT_PLAY_MUSIC               sound id in misc value (SoundEntries.dbc)
     &Spell::EffectUnlearnSpecialization,                    //133 SPELL_EFFECT_UNLEARN_SPECIALIZATION   unlearn profession specialization
     &Spell::EffectKillCredit,                               //134 SPELL_EFFECT_KILL_CREDIT              misc value is creature entry
@@ -2356,6 +2356,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                 case SUMMON_TYPE_VEHICLE2:
                     summon = m_caster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_originalCaster, m_spellInfo->Id);
                     break;
+                case SUMMON_TYPE_LIGHTWELL:
                 case SUMMON_TYPE_TOTEM:
                 {
                     summon = m_caster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_originalCaster, m_spellInfo->Id);
@@ -4984,25 +4985,17 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
 
     Player* player = unitTarget->ToPlayer();
 
-    int32  rep_change = damage;
+    int32  repChange = damage;
 
-    uint32 faction_id = m_spellInfo->Effects[effIndex].MiscValue;
+    uint32 factionId = m_spellInfo->Effects[effIndex].MiscValue;
 
-    FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
-
+    FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
     if (!factionEntry)
         return;
 
-    if (RepRewardRate const* repData = sObjectMgr->GetRepRewardRate(faction_id))
-    {
-        rep_change = int32((float)rep_change * repData->spell_rate);
-    }
+    repChange = player->CalculateReputationGain(REPUTATION_SOURCE_SPELL, 0, repChange, factionId);
 
-    // Bonus from spells that increase reputation gain
-    float bonus = rep_change * player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN) / 100.0f; // 10%
-    rep_change += (int32)bonus;
-
-    player->GetReputationMgr().ModifyReputation(factionEntry, rep_change);
+    player->GetReputationMgr().ModifyReputation(factionEntry, repChange);
 }
 
 void Spell::EffectQuestComplete(SpellEffIndex effIndex)
@@ -6149,7 +6142,7 @@ void Spell::EffectActivateSpec(SpellEffIndex /*effIndex*/)
     unitTarget->ToPlayer()->ActivateSpec(damage-1);  // damage is 1 or 2, spec is 0 or 1
 }
 
-void Spell::EffectPlayerNotification(SpellEffIndex effIndex)
+void Spell::EffectPlaySound(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -6162,20 +6155,21 @@ void Spell::EffectPlayerNotification(SpellEffIndex effIndex)
         case 58730: // Restricted Flight Area
         case 58600: // Restricted Flight Area
             unitTarget->ToPlayer()->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
-            unitTarget->PlayDirectSound(9417); // Fel Reaver sound
+            break;
+        default:
             break;
     }
 
-    uint32 soundid = m_spellInfo->Effects[effIndex].MiscValue;
+    uint32 soundId = m_spellInfo->Effects[effIndex].MiscValue;
 
-    if (!sSoundEntriesStore.LookupEntry(soundid))
+    if (!sSoundEntriesStore.LookupEntry(soundId))
     {
-        sLog->outError(LOG_FILTER_SPELLS_AURAS, "EffectPlayerNotification: Sound (Id: %u) not exist in spell %u.", soundid, m_spellInfo->Id);
+        sLog->outError(LOG_FILTER_SPELLS_AURAS, "EffectPlayerSound: Sound (Id: %u) not exist in spell %u.", soundId, m_spellInfo->Id);
         return;
     }
 
     WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(soundid);
+    data << uint32(soundId);
     unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
 }
 
@@ -6273,51 +6267,38 @@ void Spell::EffectBind(SpellEffIndex effIndex)
 
     Player* player = unitTarget->ToPlayer();
 
-    uint32 area_id;
-    WorldLocation loc;
-    if (m_spellInfo->Effects[effIndex].TargetA.GetTarget() == TARGET_DEST_DB || m_spellInfo->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DB)
-    {
-        SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id);
-        if (!st)
-        {
-            sLog->outError(LOG_FILTER_SPELLS_AURAS, "Spell::EffectBind - unknown teleport coordinates for spell ID %u", m_spellInfo->Id);
-            return;
-        }
+    WorldLocation homeLoc;
+    uint32 areaId = player->GetAreaId();
 
-        loc.m_mapId       = st->target_mapId;
-        loc.m_positionX   = st->target_X;
-        loc.m_positionY   = st->target_Y;
-        loc.m_positionZ   = st->target_Z;
-        loc.m_orientation = st->target_Orientation;
-        area_id = player->GetAreaId();
-    }
+    if (m_spellInfo->Effects[effIndex].MiscValue)
+        areaId = m_spellInfo->Effects[effIndex].MiscValue;
+
+    if (m_targets.HasDst())
+        homeLoc.WorldRelocate(*destTarget);
     else
     {
-        player->GetPosition(&loc);
-        area_id = player->GetAreaId();
+        player->GetPosition(&homeLoc);
+        homeLoc.m_mapId = player->GetMapId();
     }
 
-    player->SetHomebind(loc, area_id);
+    player->SetHomebind(homeLoc, areaId);
 
     // binding
     WorldPacket data(SMSG_BINDPOINTUPDATE, (4+4+4+4+4));
-    data << float(loc.m_positionX);
-    data << float(loc.m_positionY);
-    data << float(loc.m_positionZ);
-    data << uint32(loc.m_mapId);
-    data << uint32(area_id);
+    data << float(homeLoc.GetPositionX());
+    data << float(homeLoc.GetPositionY());
+    data << float(homeLoc.GetPositionZ());
+    data << uint32(homeLoc.GetMapId());
+    data << uint32(areaId);
     player->SendDirectMessage(&data);
 
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "New homebind X      : %f", loc.m_positionX);
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "New homebind Y      : %f", loc.m_positionY);
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "New homebind Z      : %f", loc.m_positionZ);
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "New homebind MapId  : %u", loc.m_mapId);
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "New homebind AreaId : %u", area_id);
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "EffectBind: New homebind X: %f, Y: %f, Z: %f, MapId: %u, AreaId: %u",
+        homeLoc.GetPositionX(), homeLoc.GetPositionY(), homeLoc.GetPositionZ(), homeLoc.GetMapId(), areaId);
 
     // zone update
     data.Initialize(SMSG_PLAYERBOUND, 8+4);
     data << uint64(player->GetGUID());
-    data << uint32(area_id);
+    data << uint32(areaId);
     player->SendDirectMessage(&data);
 }
 

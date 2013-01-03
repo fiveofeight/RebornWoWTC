@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -46,7 +46,7 @@ enum ConditionTypes
     CONDITION_DRUNKENSTATE          = 10,                   // DrunkenState     0,             0                  true if player is drunk enough
     CONDITION_WORLD_STATE           = 11,                   // index            value          0                  true if world has the value for the index
     CONDITION_ACTIVE_EVENT          = 12,                   // event_id         0              0                  true if event is active
-    CONDITION_INSTANCE_DATA         = 13,                   // entry            data           0                  true if data is set in current instance
+    CONDITION_INSTANCE_INFO         = 13,                   // entry            data           type               true if the instance info defined by type (enum InstanceInfo) equals data.
     CONDITION_QUEST_NONE            = 14,                   // quest_id         0              0                  true if doesn't have quest saved
     CONDITION_CLASS                 = 15,                   // class            0              0                  true if player's class is equal to class
     CONDITION_RACE                  = 16,                   // race             0              0                  true if player's race is equal to race
@@ -127,7 +127,8 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK                = 20,
     CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
-    CONDITION_SOURCE_TYPE_MAX                            = 23  //MAX
+    CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
+    CONDITION_SOURCE_TYPE_MAX                            = 24  // MAX
 };
 
 enum ComparisionType
@@ -149,6 +150,13 @@ enum RelationType
     RELATION_PASSENGER_OF,
     RELATION_CREATED_BY,
     RELATION_MAX
+};
+
+enum InstanceInfo
+{
+    INSTANCE_INFO_DATA = 0,
+    INSTANCE_INFO_DATA64,
+    INSTANCE_INFO_BOSS_STATE
 };
 
 enum
@@ -215,6 +223,7 @@ typedef std::list<Condition*> ConditionList;
 typedef std::map<uint32, ConditionList> ConditionTypeContainer;
 typedef std::map<ConditionSourceType, ConditionTypeContainer> ConditionContainer;
 typedef std::map<uint32, ConditionTypeContainer> CreatureSpellConditionContainer;
+typedef std::map<uint32, ConditionTypeContainer> NpcVendorConditionContainer;
 typedef std::map<std::pair<int32, uint32 /*SAI source_type*/>, ConditionTypeContainer> SmartEventConditionContainer;
 
 typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used for references
@@ -242,6 +251,7 @@ class ConditionMgr
         ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
         ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
         ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
+        ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
 
     private:
         bool isSourceTypeValid(Condition* cond);
@@ -258,6 +268,7 @@ class ConditionMgr
         ConditionReferenceContainer       ConditionReferenceStore;
         CreatureSpellConditionContainer   VehicleSpellConditionStore;
         CreatureSpellConditionContainer   SpellClickEventConditionStore;
+        NpcVendorConditionContainer       NpcVendorConditionContainerStore;
         SmartEventConditionContainer      SmartEventConditionStore;
 };
 

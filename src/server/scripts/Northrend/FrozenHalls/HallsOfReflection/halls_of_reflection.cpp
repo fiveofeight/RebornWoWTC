@@ -27,91 +27,87 @@ enum Texts
 enum Yells
 {
     // Part one, Alliance
-    SAY_JAINA_INTRO_1                           = -1668001,
-    SAY_JAINA_INTRO_2                           = -1668002,
-    SAY_JAINA_INTRO_3                           = -1668003,
-    SAY_JAINA_INTRO_4                           = -1668004,
-    SAY_UTHER_INTRO_A2_1                        = -1668005,
-    SAY_JAINA_INTRO_5                           = -1668006,
-    SAY_UTHER_INTRO_A2_2                        = -1668007,
-    SAY_JAINA_INTRO_6                           = -1668008,
-    SAY_UTHER_INTRO_A2_3                        = -1668009,
-    SAY_JAINA_INTRO_7                           = -1668010,
-    SAY_UTHER_INTRO_A2_4                        = -1668011,
-    SAY_JAINA_INTRO_8                           = -1668012,
-    SAY_UTHER_INTRO_A2_5                        = -1668013,
-    SAY_JAINA_INTRO_9                           = -1668014,
-    SAY_UTHER_INTRO_A2_6                        = -1668015,
-    SAY_UTHER_INTRO_A2_7                        = -1668016,
-    SAY_JAINA_INTRO_10                          = -1668017,
-    SAY_UTHER_INTRO_A2_8                        = -1668018,
-    SAY_JAINA_INTRO_11                          = -1668019,
-    SAY_UTHER_INTRO_A2_9                        = -1668020,
+    SAY_JAINA_INTRO_1                           = 0,
+    SAY_JAINA_INTRO_2                           = 1,
+    SAY_JAINA_INTRO_3                           = 2,
+    SAY_JAINA_INTRO_4                           = 3,
+    SAY_UTHER_INTRO_A2_1                        = 0,
+    SAY_JAINA_INTRO_5                           = 4,
+    SAY_UTHER_INTRO_A2_2                        = 1,
+    SAY_JAINA_INTRO_6                           = 5,
+    SAY_UTHER_INTRO_A2_3                        = 2,
+    SAY_JAINA_INTRO_7                           = 6,
+    SAY_UTHER_INTRO_A2_4                        = 3,
+    SAY_JAINA_INTRO_8                           = 7,
+    SAY_UTHER_INTRO_A2_5                        = 4,
+    SAY_JAINA_INTRO_9                           = 8,
+    SAY_UTHER_INTRO_A2_6                        = 5,
+    SAY_UTHER_INTRO_A2_7                        = 6,
+    SAY_JAINA_INTRO_10                          = 9,
+    SAY_UTHER_INTRO_A2_8                        = 7,
+    SAY_JAINA_INTRO_11                          = 10,
+    SAY_UTHER_INTRO_A2_9                        = 8,
 
     // Part one, Horde
-    SAY_SYLVANAS_INTRO_1                        = -1668021,
-    SAY_SYLVANAS_INTRO_2                        = -1668022,
-    SAY_SYLVANAS_INTRO_3                        = -1668023,
-    SAY_UTHER_INTRO_H2_1                        = -1668024,
-    SAY_SYLVANAS_INTRO_4                        = -1668025,
-    SAY_UTHER_INTRO_H2_2                        = -1668026,
-    SAY_SYLVANAS_INTRO_5                        = -1668027,
-    SAY_UTHER_INTRO_H2_3                        = -1668028,
-    SAY_SYLVANAS_INTRO_6                        = -1668029,
-    SAY_UTHER_INTRO_H2_4                        = -1668030,
-    SAY_SYLVANAS_INTRO_7                        = -1668031,
-    SAY_UTHER_INTRO_H2_5                        = -1668032,
-    SAY_UTHER_INTRO_H2_6                        = -1668033,
-    SAY_SYLVANAS_INTRO_8                        = -1668034,
-    SAY_UTHER_INTRO_H2_7                        = -1668035,
+    SAY_SYLVANAS_INTRO_1                        = 0,
+    SAY_SYLVANAS_INTRO_2                        = 1,
+    SAY_SYLVANAS_INTRO_3                        = 2,
+    SAY_UTHER_INTRO_H2_1                        = 9,
+    SAY_SYLVANAS_INTRO_4                        = 3,
+    SAY_UTHER_INTRO_H2_2                        = 10,
+    SAY_SYLVANAS_INTRO_5                        = 4,
+    SAY_UTHER_INTRO_H2_3                        = 11,
+    SAY_SYLVANAS_INTRO_6                        = 5,
+    SAY_UTHER_INTRO_H2_4                        = 12,
+    SAY_SYLVANAS_INTRO_7                        = 6,
+    SAY_UTHER_INTRO_H2_5                        = 13,
+    SAY_UTHER_INTRO_H2_6                        = 14,
+    SAY_SYLVANAS_INTRO_8                        = 7,
+    SAY_UTHER_INTRO_H2_7                        = 15,
 
-    SAY_LK_INTRO_1                              = -1668036,
-    SAY_LK_INTRO_2                              = -1668037,
-    SAY_LK_INTRO_3                              = -1668038,
-    SAY_FALRIC_INTRO_1                          = -1668039,
-    SAY_MARWYN_INTRO_1                          = -1668040,
-    SAY_FALRIC_INTRO_2                          = -1668041,
+    SAY_LK_INTRO_1                              = 0,
+    SAY_LK_INTRO_2                              = 1,
+    SAY_LK_INTRO_3                              = 2,
+    SAY_FALRIC_INTRO_1                          = 5,
+    SAY_MARWYN_INTRO_1                          = 5,
+    SAY_FALRIC_INTRO_2                          = 6,
 
-    SAY_JAINA_INTRO_END                         = -1668042,
-    SAY_SYLVANAS_INTRO_END                      = -1668043,
-    SAY_LK_JAINA_INTRO_END                      = -1594473,
-    SAY_LK_SYLVANAS_INTRO_END                   = -1594474,
+    SAY_JAINA_INTRO_END                         = 11,
+    SAY_SYLVANAS_INTRO_END                      = 8,
+    SAY_LK_JAINA_INTRO_END                      = 3,
+    SAY_LK_SYLVANAS_INTRO_END                   = 4,
 
     /*INTRO - Pre Escape*/
-    SAY_LICH_KING_AGGRO_A              = -1594477,
-    SAY_LICH_KING_AGGRO_H              = -1594478,
-    SAY_JAINA_AGGRO                    = -1594479,
-    SAY_SYLVANA_AGGRO                  = -1594480,
+    SAY_LICH_KING_AGGRO_A              = 0,
+    SAY_LICH_KING_AGGRO_H              = 1,
+    SAY_JAINA_AGGRO                    = 0,
+    SAY_SYLVANA_AGGRO                  = 0,
 
     /*ESCAPE*/
-    SAY_JAINA_WALL_01                  = -1594487,
-    SAY_SYLVANA_WALL_01                = -1594488,
-    SAY_JAINA_WALL_02                  = -1594489,
-    SAY_SYLVANA_WALL_02                = -1594490,
-    SAY_LICH_KING_WALL_02              = -1594491,
-    SAY_LICH_KING_WALL_03              = -1594492,
-    SAY_LICH_KING_WALL_04              = -1594493,
-    SAY_JAINA_WALL_03                  = -1594494,
-    SAY_JAINA_WALL_04                  = -1594495,
-    SAY_SYLVANA_WALL_03                = -1594496,
-    SAY_SYLVANA_WALL_04                = -1594497,
-    SAY_JAINA_ESCAPE_01                = -1594498,
-    SAY_JAINA_ESCAPE_02                = -1594499,
-    SAY_SYLVANA_ESCAPE_01              = -1594500,
-    SAY_SYLVANA_ESCAPE_02              = -1594501,
-    SAY_JAINA_TRAP                     = -1594502,
-    SAY_SYLVANA_TRAP                   = -1594503,
-    SAY_MATHEAS_JAINA                  = -1594505,
-    SAY_JAINA_FIRE                     = -1594526,
-    SAY_SYLVANA_FIRE                   = -1594522,
-    SAY_SYLVANA_FINAL_1                = -1594523,
-    SAY_SYLVANA_FINAL_2                = -1594521,
-    SAY_JAINA_FINAL_1                  = -1594527,
-    SAY_JAINA_FINAL_2                  = -1594524,
-    SAY_JAINA_FINAL_3                  = -1594525,
-    SAY_LICH_KING_END_01               = -1594506,
-    SAY_LICH_KING_END_02               = -1594507,
-    SAY_LICH_KING_END_03               = -1594508,
+    SAY_JAINA_WALL_01                  = 1,
+    SAY_SYLVANA_WALL_01                = 1,
+    SAY_LICH_KING_WALL_02              = 2,
+    SAY_JAINA_WALL_02                  = 2,
+    SAY_SYLVANA_WALL_02                = 2,
+    SAY_LICH_KING_WALL_03              = 3,
+    SAY_JAINA_WALL_03                  = 3,
+    SAY_SYLVANA_WALL_03                = 3,
+    SAY_JAINA_WALL_04                  = 4,
+    SAY_SYLVANA_WALL_04                = 4,
+    SAY_LICH_KING_WALL_04              = 4,
+    SAY_JAINA_ESCAPE_01                = 5,
+    SAY_SYLVANA_ESCAPE_01              = 5,
+    SAY_JAINA_ESCAPE_02                = 6,
+    SAY_SYLVANA_ESCAPE_02              = 6,
+    SAY_JAINA_TRAP                     = 7,
+    SAY_SYLVANA_TRAP                   = 7,
+    SAY_ALLIANCE_FIRE                  = 0,
+    SAY_HORDE_FIRE                     = 0,
+    SAY_JAINA_FINAL_1                  = 1,
+    SAY_SYLVANA_FINAL_1                = 1,
+    SAY_JAINA_FINAL_2                  = 8,
+    SAY_SYLVANA_FINAL_2                = 8,
+    SAY_JAINA_FINAL_3                  = 9,
 };
 
 enum Events
@@ -351,12 +347,12 @@ public:
                     break;
 
                 case EVENT_PREINTRO_1:
-                        DoScriptText(SAY_JAINA_INTRO_1, me);
+                        Talk(SAY_JAINA_INTRO_1);
                         events.ScheduleEvent(EVENT_PREINTRO_2, 6000);
                     break;
 
                 case EVENT_PREINTRO_2:
-                        DoScriptText(SAY_JAINA_INTRO_2, me);
+                        Talk(SAY_JAINA_INTRO_2);
                         events.ScheduleEvent(EVENT_START_INTRO, 7000);
                     break;
 
@@ -372,11 +368,11 @@ public:
 
             // A2 Intro Events
                 case EVENT_INTRO_A2_1:
-                    DoScriptText(SAY_JAINA_INTRO_3, me);
+                    Talk(SAY_JAINA_INTRO_3);
                     events.ScheduleEvent(EVENT_INTRO_A2_2, 5000);
                     break;
                 case EVENT_INTRO_A2_2:
-                    DoScriptText(SAY_JAINA_INTRO_4, me);
+                    Talk(SAY_JAINA_INTRO_4);
                     events.ScheduleEvent(EVENT_INTRO_A2_3, 10000);
                     break;
                 case EVENT_INTRO_A2_3:
@@ -400,87 +396,87 @@ public:
                     break;
                 case EVENT_INTRO_A2_5:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_1, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_1);
                     events.ScheduleEvent(EVENT_INTRO_A2_6, 3000);
                     break;
                 case EVENT_INTRO_A2_6:
-                    DoScriptText(SAY_JAINA_INTRO_5, me);
+                    Talk(SAY_JAINA_INTRO_5);
                     events.ScheduleEvent(EVENT_INTRO_A2_7, 6000);
                     break;
                 case EVENT_INTRO_A2_7:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_2, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_2);
                     events.ScheduleEvent(EVENT_INTRO_A2_8, 6500);
                     break;
                 case EVENT_INTRO_A2_8:
-                    DoScriptText(SAY_JAINA_INTRO_6, me);
+                    Talk(SAY_JAINA_INTRO_6);
                     events.ScheduleEvent(EVENT_INTRO_A2_9, 2000);
                     break;
                 case EVENT_INTRO_A2_9:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_3, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_3);
                     events.ScheduleEvent(EVENT_INTRO_A2_10, 9000);
                     break;
                 case EVENT_INTRO_A2_10:
-                    DoScriptText(SAY_JAINA_INTRO_7, me);
+                    Talk(SAY_JAINA_INTRO_7);
                     events.ScheduleEvent(EVENT_INTRO_A2_11, 5000);
                     break;
                 case EVENT_INTRO_A2_11:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_4, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_4);
                     events.ScheduleEvent(EVENT_INTRO_A2_12, 11000);
                     break;
                 case EVENT_INTRO_A2_12:
-                    DoScriptText(SAY_JAINA_INTRO_8, me);
+                    Talk(SAY_JAINA_INTRO_8);
                     events.ScheduleEvent(EVENT_INTRO_A2_13, 4000);
                     break;
                 case EVENT_INTRO_A2_13:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_5, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_5);
                     events.ScheduleEvent(EVENT_INTRO_A2_14, 12500);
                     break;
                 case EVENT_INTRO_A2_14:
-                    DoScriptText(SAY_JAINA_INTRO_9, me);
+                    Talk(SAY_JAINA_INTRO_9);
                     events.ScheduleEvent(EVENT_INTRO_A2_15, 10000);
                     break;
                 case EVENT_INTRO_A2_15:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_6, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_6);
                     events.ScheduleEvent(EVENT_INTRO_A2_16, 22000);
                     break;
                 case EVENT_INTRO_A2_16:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_A2_7, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_7);
                     events.ScheduleEvent(EVENT_INTRO_A2_17, 4000);
                     break;
                 case EVENT_INTRO_A2_17:
-                    DoScriptText(SAY_JAINA_INTRO_10, me);
+                    Talk(SAY_JAINA_INTRO_10);
                     events.ScheduleEvent(EVENT_INTRO_A2_18, 2000);
                     break;
                 case EVENT_INTRO_A2_18:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
                     {
                         pUther->HandleEmoteCommand(EMOTE_ONESHOT_NO);
-                        DoScriptText(SAY_UTHER_INTRO_A2_8, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_A2_8);
                     }
                     events.ScheduleEvent(EVENT_INTRO_A2_19, 11000);
                     break;
                 case EVENT_INTRO_A2_19:
-                    DoScriptText(SAY_JAINA_INTRO_11, me);
+                    Talk(SAY_JAINA_INTRO_11);
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 2000);
                     break;
 
             // H2 Intro Events
                 case EVENT_INTRO_H2_1:
-                    DoScriptText(SAY_SYLVANAS_INTRO_1, me);
+                    Talk(SAY_SYLVANAS_INTRO_1);
                     events.ScheduleEvent(EVENT_INTRO_H2_2, 8000);
                     break;
                 case EVENT_INTRO_H2_2:
-                    DoScriptText(SAY_SYLVANAS_INTRO_2, me);
+                    Talk(SAY_SYLVANAS_INTRO_2);
                     events.ScheduleEvent(EVENT_INTRO_H2_3, 6000);
                     break;
                 case EVENT_INTRO_H2_3:
-                    DoScriptText(SAY_SYLVANAS_INTRO_3, me);
+                    Talk(SAY_SYLVANAS_INTRO_3);
                     DoCast(me, SPELL_CAST_VISUAL);
                     events.ScheduleEvent(EVENT_INTRO_H2_3_1, 2000);
                     break;
@@ -504,55 +500,55 @@ public:
                     break;
                 case EVENT_INTRO_H2_5:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_H2_1, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_1);
                     events.ScheduleEvent(EVENT_INTRO_H2_6, 11000);
                     break;
                 case EVENT_INTRO_H2_6:
-                    DoScriptText(SAY_SYLVANAS_INTRO_4, me);
+                    Talk(SAY_SYLVANAS_INTRO_4);
                     events.ScheduleEvent(EVENT_INTRO_H2_7, 3000);
                     break;
                 case EVENT_INTRO_H2_7:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_H2_2, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_2);
                     events.ScheduleEvent(EVENT_INTRO_H2_8, 6000);
                     break;
                 case EVENT_INTRO_H2_8:
-                    DoScriptText(SAY_SYLVANAS_INTRO_5, me);
+                    Talk(SAY_SYLVANAS_INTRO_5);
                     events.ScheduleEvent(EVENT_INTRO_H2_9, 5000);
                     break;
                 case EVENT_INTRO_H2_9:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_H2_3, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_3);
                     events.ScheduleEvent(EVENT_INTRO_H2_10, 19000);
                     break;
                 case EVENT_INTRO_H2_10:
-                    DoScriptText(SAY_SYLVANAS_INTRO_6, me);
+                    Talk(SAY_SYLVANAS_INTRO_6);
                     events.ScheduleEvent(EVENT_INTRO_H2_11, 1500);
                     break;
                 case EVENT_INTRO_H2_11:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_H2_4, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_4);
                     events.ScheduleEvent(EVENT_INTRO_H2_12, 19500);
                     break;
                 case EVENT_INTRO_H2_12:
-                    DoScriptText(SAY_SYLVANAS_INTRO_7, me);
+                    Talk(SAY_SYLVANAS_INTRO_7);
                     events.ScheduleEvent(EVENT_INTRO_H2_13, 2000);
                     break;
                 case EVENT_INTRO_H2_13:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
                     {
                         pUther->HandleEmoteCommand(EMOTE_ONESHOT_NO);
-                        DoScriptText(SAY_UTHER_INTRO_H2_5, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_5);
                     }
                     events.ScheduleEvent(EVENT_INTRO_H2_14, 12000);
                     break;
                 case EVENT_INTRO_H2_14:
                     if (Creature* pUther = me->GetCreature(*me, uiUther))
-                        DoScriptText(SAY_UTHER_INTRO_H2_6, pUther);
+                        pUther->AI()->Talk(SAY_UTHER_INTRO_H2_6);
                     events.ScheduleEvent(EVENT_INTRO_H2_15, 8000);
                     break;
                 case EVENT_INTRO_H2_15:
-                    DoScriptText(SAY_SYLVANAS_INTRO_8, me);
+                    Talk(SAY_SYLVANAS_INTRO_8);
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 2000);
                     break;
 
@@ -579,9 +575,9 @@ public:
                             pUther->SetOrientation(0.851610);
                         pUther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
                         if (instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                            DoScriptText(SAY_UTHER_INTRO_A2_9, pUther);
+                            pUther->AI()->Talk(SAY_UTHER_INTRO_A2_9);
                         else
-                            DoScriptText(SAY_UTHER_INTRO_H2_7, pUther);
+                            pUther->AI()->Talk(SAY_UTHER_INTRO_H2_7);
                     }
 
                     events.ScheduleEvent(EVENT_INTRO_LK_2, 11000);
@@ -589,7 +585,7 @@ public:
 
                 case EVENT_INTRO_LK_2:
                      if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
-                         DoScriptText(SAY_LK_INTRO_1, pLichKing);
+                         pLichKing->AI()->Talk(SAY_LK_INTRO_1);
                     if(GameObject* pGate = instance->instance->GetGameObject(instance->GetData64(DATA_FROSTWORN_DOOR)))
                         pGate->SetGoState(GO_STATE_READY);
                      events.ScheduleEvent(EVENT_INTRO_LK_3, 2000);
@@ -604,7 +600,7 @@ public:
 
                 case EVENT_INTRO_LK_4:
                       if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
-                          DoScriptText(SAY_LK_INTRO_2, pLichKing);
+                          pLichKing->AI()->Talk(SAY_LK_INTRO_2);
                      // He steps forward and removes the runeblade from the heap of skulls.
                       if (GameObject *pFrostmourne = me->FindNearestGameObject(GO_FROSTMOURNE, 11.0f))
                          pFrostmourne->SetPhaseMask(0,true);
@@ -640,14 +636,14 @@ public:
                     }
 
                     if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
-                        DoScriptText(SAY_LK_INTRO_3, pLichKing);
+                        pLichKing->AI()->Talk(SAY_LK_INTRO_3);
 
                     events.ScheduleEvent(EVENT_INTRO_LK_6, 8000);
                     break;
 
                 case EVENT_INTRO_LK_6:
                     if (Creature* pFalric = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
-                        DoScriptText(SAY_FALRIC_INTRO_1, pFalric);
+                        pFalric->AI()->Talk(SAY_FALRIC_INTRO_1);
 
                     events.ScheduleEvent(EVENT_INTRO_LK_7, 2000);
                     break;
@@ -655,7 +651,7 @@ public:
                 case EVENT_INTRO_LK_7:
                     if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
                     {
-                        DoScriptText(SAY_MARWYN_INTRO_1, pMarwyn);
+                        pMarwyn->AI()->Talk(SAY_MARWYN_INTRO_1);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                     }
                     if (Creature* pFalric = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
@@ -674,7 +670,7 @@ public:
 
                 case EVENT_INTRO_LK_8:
                     if (Creature* pFalric = me->GetCreature(*me, instance->GetData64(DATA_FALRIC)))
-                        DoScriptText(SAY_FALRIC_INTRO_2, pFalric);
+                        pFalric->AI()->Talk(SAY_FALRIC_INTRO_2);
 
                     instance->SetData(DATA_WAVE_STATE, SPECIAL);   // start first wave
                     events.ScheduleEvent(EVENT_INTRO_LK_9, 5000);
@@ -682,9 +678,9 @@ public:
 
                 case EVENT_INTRO_LK_9:
                     if (instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                        DoScriptText(SAY_JAINA_INTRO_END, me);
+                        Talk(SAY_JAINA_INTRO_END);
                     else
-                        DoScriptText(SAY_SYLVANAS_INTRO_END, me);
+                        Talk(SAY_SYLVANAS_INTRO_END);
 
                     me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos);
 
@@ -700,9 +696,9 @@ public:
                 case EVENT_INTRO_LK_10:
                      if (Creature* pLichKing = me->GetCreature(*me, uiLichKing))
                          if (instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                            DoScriptText(SAY_LK_JAINA_INTRO_END, pLichKing);
+                            pLichKing->AI()->Talk(SAY_LK_JAINA_INTRO_END);
                          else
-                             DoScriptText(SAY_LK_SYLVANAS_INTRO_END, pLichKing);
+                             pLichKing->AI()->Talk(SAY_LK_SYLVANAS_INTRO_END);
 
                      events.ScheduleEvent(EVENT_INTRO_END, 7000);
                      break;
@@ -822,7 +818,8 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            Talk(SAY_TRASH_DEATH);
+            if (roll_chance_i(5))
+                Talk(SAY_TRASH_DEATH);
         }
 
         void DoAction(const int32 actionId)
@@ -940,7 +937,8 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            Talk(SAY_TRASH_DEATH);
+            if (roll_chance_i(5))
+                Talk(SAY_TRASH_DEATH);
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -1074,7 +1072,8 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            Talk(SAY_TRASH_DEATH);
+            if (roll_chance_i(5))
+                Talk(SAY_TRASH_DEATH);
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -1180,7 +1179,8 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            Talk(SAY_TRASH_DEATH);
+            if (roll_chance_i(5))
+                Talk(SAY_TRASH_DEATH);
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -1278,7 +1278,8 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            Talk(SAY_TRASH_DEATH);
+            if (roll_chance_i(5))
+                Talk(SAY_TRASH_DEATH);
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -1343,21 +1344,21 @@ public:
 
 enum GENERAL_EVENT
 {
-    SAY_AGGRO                              = -1594519,
-    SAY_DEATH                               = -1594520,
+    SAY_GEN_AGGRO                         = 0,
+    SAY_GEN_DEATH                         = 1,
 
-    SPELL_SHIELD_THROWN            = 69222,
-    H_SPELL_SHIELD_THROWN         = 73076,
-    SPELL_SPIKE                             = 69184,
+    SPELL_SHIELD_THROWN                   = 69222,
+    H_SPELL_SHIELD_THROWN                 = 73076,
+    SPELL_SPIKE                           = 69184,
     H_SPELL_SPIKE                         = 70399,
-    SPELL_CLONE_NAME                  = 57507,
-    SPELL_CLONE_MODEL                = 45204,
+    SPELL_CLONE_NAME                      = 57507,
+    SPELL_CLONE_MODEL                     = 45204,
 
     // Reflection'Spells
-    SPELL_BALEFUL_STRIKE             = 69933,
-    SPELL_SPIRIT_BURST                = 69900,
-    H_SPELL_BALEFUL_STRIKE         = 70400,
-    H_SPELL_SPIRIT_BURST            = 73046,
+    SPELL_BALEFUL_STRIKE                  = 69933,
+    SPELL_SPIRIT_BURST                    = 69900,
+    H_SPELL_BALEFUL_STRIKE                = 70400,
+    H_SPELL_SPIRIT_BURST                  = 73046,
 };
 
 class npc_frostworn_general : public CreatureScript
@@ -1393,7 +1394,7 @@ public:
         {
             if (!instance)
                 return;
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_GEN_DEATH);
             instance->SetData(DATA_FROSWORN_EVENT, DONE);
         }
 
@@ -1421,7 +1422,7 @@ public:
         {
             if (!instance)
                 return;
-            DoScriptText(SAY_AGGRO, me);
+            Talk(SAY_GEN_AGGRO);
             instance->SetData(DATA_FROSWORN_EVENT, IN_PROGRESS);
         }
 
@@ -1697,9 +1698,9 @@ public:
                     break;
                 case 4:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_WALL_01, me);
+                        Talk(SAY_JAINA_WALL_01);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_WALL_01, me);
+                        Talk(SAY_SYLVANA_WALL_01);
                     CastTimer = 1000;
                     HoldTimer = 30000;
                     SetEscortPaused(true);
@@ -1725,9 +1726,9 @@ public:
                     break;
                 case 8:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_WALL_02, me);
+                        Talk(SAY_JAINA_WALL_02);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_WALL_02, me);
+                        Talk(SAY_SYLVANA_WALL_02);
                     CastTimer = 1000;
                     HoldTimer = 30000;
                     SetEscortPaused(true);
@@ -1742,9 +1743,9 @@ public:
                     break;
                 case 9:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_ESCAPE_01, me);
+                        Talk(SAY_JAINA_ESCAPE_01);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_ESCAPE_01, me);
+                        Talk(SAY_SYLVANA_ESCAPE_01);
                     break;
                 case 11:
                     m_pInstance->SetData(DATA_ICE_WALL_3, IN_PROGRESS);
@@ -1759,9 +1760,9 @@ public:
                     break;
                 case 12:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_WALL_03, me);
+                        Talk(SAY_JAINA_WALL_03);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_WALL_03, me);
+                        Talk(SAY_SYLVANA_WALL_03);
                     CastTimer = 1000;
                     HoldTimer = 30000;
                     SetEscortPaused(true);
@@ -1776,9 +1777,9 @@ public:
                     break;
                 case 13:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_ESCAPE_02, me);
+                        Talk(SAY_JAINA_ESCAPE_02);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_ESCAPE_02, me);
+                        Talk(SAY_SYLVANA_ESCAPE_02);
                     break;
                 case 15:
                     m_pInstance->SetData(DATA_ICE_WALL_4, IN_PROGRESS);
@@ -1793,9 +1794,9 @@ public:
                     break;
                 case 16:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_WALL_04, me);
+                        Talk(SAY_JAINA_WALL_04);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_WALL_04, me);
+                        Talk(SAY_SYLVANA_WALL_04);
                     CastTimer = 1000;
                     HoldTimer = 30000;
                     SetEscortPaused(true);
@@ -1810,9 +1811,9 @@ public:
                     break;
                 case 19:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
-                        DoScriptText(SAY_JAINA_TRAP, me);
+                        Talk(SAY_JAINA_TRAP);
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_TRAP, me);
+                        Talk(SAY_SYLVANA_TRAP);
                     break;
                 case 20:
                     if (Creature* pWallTarget = m_pInstance->instance->GetCreature(m_uipWallTargetGUID))
@@ -1899,9 +1900,9 @@ public:
                     if(pLichKing)
                     {
                         if(me->GetEntry() == NPC_JAINA_OUTRO)
-                            DoScriptText(SAY_LICH_KING_AGGRO_A, pLichKing);
+                            pLichKing->AI()->Talk(SAY_LICH_KING_AGGRO_A);
                         if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                            DoScriptText(SAY_LICH_KING_AGGRO_H, pLichKing);
+                            pLichKing->AI()->Talk(SAY_LICH_KING_AGGRO_H);
                         pLichKing->AI()->AttackStart(me);
                         me->AI()->AttackStart(pLichKing);
                     }
@@ -1968,11 +1969,11 @@ public:
                     if(me->GetEntry() == NPC_JAINA_OUTRO)
                     {
                         me->RemoveAurasDueToSpell(SPELL_ICE_BARRIER);
-                        DoScriptText(SAY_JAINA_AGGRO, me);
+                        Talk(SAY_JAINA_AGGRO);
                     }
 
                     if(me->GetEntry() == NPC_SYLVANA_OUTRO)
-                        DoScriptText(SAY_SYLVANA_AGGRO, me);
+                        Talk(SAY_SYLVANA_AGGRO);
 
                     JumpNextStep(3000);
                     break;
@@ -2012,7 +2013,7 @@ public:
 
                     if(Creature* pCaptain = me->SummonCreature(me->GetEntry() == NPC_JAINA_OUTRO? NPC_BARTLETT : NPC_KORM, 5251.17f, 1610.2f, 795.812f, 2.07997f))
                     {
-                        DoScriptText(me->GetEntry() == NPC_JAINA_OUTRO ? SAY_JAINA_FIRE : SAY_SYLVANA_FIRE, pCaptain);
+                        pCaptain->AI()->Talk(SAY_HORDE_FIRE);
                         uiCaptain = pCaptain->GetGUID();
                     }
                     if(GameObject* pCave = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(GO_CAVE)))
@@ -2047,16 +2048,23 @@ public:
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
                     m_pInstance->SetData(DATA_LICHKING_EVENT, DONE);
                     if(Creature* pCaptain = me->GetCreature(*me, uiCaptain))
-                        DoScriptText(me->GetEntry() == NPC_JAINA_OUTRO ? SAY_JAINA_FINAL_1 : SAY_SYLVANA_FINAL_1, pCaptain);
+                        pCaptain->AI()->Talk(SAY_JAINA_FINAL_1);
                     me->SummonGameObject(me->GetEntry() == NPC_JAINA_OUTRO ? GO_STAIRS_SKYBREAKER : GO_STAIRS_ORGRIM_HAMMER, 5247.45f, 1627.72f, 784.302f, 5.88208f, 0, 0, 0.199211f, -0.979957f, 1*DAY);
                     JumpNextStep(10000);
                     break;
                 case 14:
-                    DoScriptText(me->GetEntry() == NPC_JAINA_OUTRO ? SAY_JAINA_FINAL_2 : SAY_SYLVANA_FINAL_2, me);
+                    if (m_pInstance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
+                        Talk(SAY_JAINA_FINAL_2);
+
+                    else
+                        Talk(SAY_SYLVANA_FINAL_2);
+
                     JumpNextStep(20000);
                     break;
                 case 15:
-                    DoScriptText(me->GetEntry() == NPC_JAINA_OUTRO ? SAY_JAINA_FINAL_3 : 0, me);
+                    if (m_pInstance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
+                        Talk(SAY_JAINA_FINAL_3);
+
                     JumpNextStep(5000);
                     break;
                 case 16:
@@ -2136,7 +2144,7 @@ public:
                         {
                             pGate->SetGoState(GO_STATE_READY);
                             if(pLichKing && pLichKing->isAlive())
-                                DoScriptText(SAY_LICH_KING_WALL_02, pLichKing);
+                                pLichKing->AI()->Talk(SAY_LICH_KING_WALL_02);
                             m_uiIceWallGUID = pGate->GetGUID();
                         }
                         break;
@@ -2145,7 +2153,7 @@ public:
                         {
                             pGate->SetGoState(GO_STATE_READY);
                             if(pLichKing && pLichKing->isAlive())
-                                DoScriptText(SAY_LICH_KING_WALL_03, pLichKing);
+                                pLichKing->AI()->Talk(SAY_LICH_KING_WALL_03);
                             m_uiIceWallGUID = pGate->GetGUID();
                         }
                         break;
@@ -2154,7 +2162,7 @@ public:
                         {
                             pGate->SetGoState(GO_STATE_READY);
                             if(pLichKing && pLichKing->isAlive())
-                                DoScriptText(SAY_LICH_KING_WALL_04, pLichKing);
+                                pLichKing->AI()->Talk(SAY_LICH_KING_WALL_04);
                             m_uiIceWallGUID = pGate->GetGUID();
                         }
                         break;

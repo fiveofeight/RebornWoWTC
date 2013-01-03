@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -538,9 +538,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
 
         // special case at auto sell (sell all)
         if (count == 0)
-        {
             count = pItem->GetCount();
-        }
         else
         {
             // prevent sell more items that exist in stack (possible only not from client)
@@ -778,6 +776,13 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
                 if (!_player->isGameMaster() && !leftInStock)
                     continue;
+
+                ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
+                if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
+                {
+                    sLog->outDebug(LOG_FILTER_CONDITIONSYS, "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+                    continue;
+                }
 
                 ++count;
 
