@@ -918,9 +918,11 @@ class spell_gen_reflective_shield : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_reflective_shield_AuraScript);
 
-            bool Validate(SpellEntry const * /*spellEntry*/)
+            bool Validate(SpellInfo const* /*spell*/)
             {
-                return sSpellStore.LookupEntry(SPELL_REFLECTIVE_SHIELD_TRIGGERED);
+                if (!sSpellMgr->GetSpellInfo(SPELL_REFLECTIVE_SHIELD_TRIGGERED)) // Is this correct?  I honestly don't know anything about AuraScript, so I took this from class spell_blood_queen_pact_of_the_darkfallen_dmg 
+                    return false;
+                return true;
             }
 
             void Trigger(AuraEffect * aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
