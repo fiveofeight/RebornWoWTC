@@ -344,7 +344,6 @@ class instance_zulaman : public InstanceMapScript
                     case DATA_GO_GONG:       return StrangeGongGUID;
                     case DATA_HARRISON:      return HarrisonGUID;
                     case DATA_HEXLORDGUID:   return HexlordGUID;
-                    default:                 return 0;
                 }
 
                 return 0;
