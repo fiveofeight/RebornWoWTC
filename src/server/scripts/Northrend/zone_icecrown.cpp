@@ -665,13 +665,17 @@ public:
 
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
-            if (type == DATA_TYPE)
-                return GetCustomType();
-
-            if (type == DATA_DEFEATED)
-                return bDefeated ? 1 : 0;
+            switch (type)
+            {
+                case DATA_TYPE:
+                    return GetCustomType();
+                case DATA_DEFEATED:
+                    return bDefeated ? 1 : 0;
+                default:
+                    break;
+            }
 
             return 0;
         }
@@ -720,7 +724,7 @@ public:
 
         }
 
-        uint32 GetCustomType()
+        uint32 GetCustomType() const
         {
             switch (me->GetEntry())
             {
