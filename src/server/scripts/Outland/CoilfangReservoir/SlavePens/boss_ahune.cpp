@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "LFGMgr.h"
+#include "Group.h"
 
 enum Spells
 {
