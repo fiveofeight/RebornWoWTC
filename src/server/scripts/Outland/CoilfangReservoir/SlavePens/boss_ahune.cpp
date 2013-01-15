@@ -18,6 +18,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "LFGMgr.h"
+#include "Group.h"
 
 enum Spells
 {
@@ -168,10 +169,7 @@ public:
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty())
-                for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                    if (Player* player = i->getSource())
-                        if (player->IsAtGroupRewardDistance(me))
-                            sLFGMgr->RewardDungeonDoneFor(286, player);
+                sLFGMgr->FinishDungeon(players.begin()->getSource()->GetGroup()->GetGUID(), 286);
         }
 
         void UpdateAI(const uint32 diff)

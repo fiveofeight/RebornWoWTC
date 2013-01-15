@@ -6523,8 +6523,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     RemoveAura(57934);
                     if (!redirectTarget)
                         break;
-                    CastSpell(this,59628,true);
-                    CastSpell(redirectTarget,57933,true);
+                    CastSpell(this, 59628, true);
+                    CastSpell(redirectTarget, 57933, true);
                     break;
                 }
             }
@@ -6717,7 +6717,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                 if (triggered_spell_id && beaconTarget)
                 {
-                    victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura);
+                    victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true);
                     return true;
                 }
 
@@ -15258,7 +15258,7 @@ void Unit::UpdateAuraForGroup(uint8 slot)
     }
 }
 
-float Unit::CalculateDefaultCoefficient(SpellInfo const *spellInfo, DamageEffectType damagetype) const
+float Unit::CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype) const
 {
     // Damage over Time spells bonus calculation
     float DotFactor = 1.0f;

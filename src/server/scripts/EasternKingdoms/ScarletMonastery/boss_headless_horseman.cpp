@@ -22,6 +22,7 @@
 #include "scarlet_monastery.h"
 #include "LFGMgr.h"
 #include "Player.h"
+#include "Group.h"
 #include "SpellInfo.h"
 
 enum Yells
@@ -186,12 +187,9 @@ class boss_headless_horseman : public CreatureScript
                 Talk(SAY_DEATH);
                 _summons.DespawnAll();
 
-			    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                        if (Player* player = i->getSource())
-                            if (player->IsAtGroupRewardDistance(me))
-                                sLFGMgr->RewardDungeonDoneFor(285, player);
+                    sLFGMgr->FinishDungeon(players.begin()->getSource()->GetGroup()->GetGUID(), 285);
 
                 DoCast(me, SPELL_BURNING, true);
                 me->SummonCreature(NPC_SIR_THOMAS, 1762.863f, 1345.217f, 17.9f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60*IN_MILLISECONDS);

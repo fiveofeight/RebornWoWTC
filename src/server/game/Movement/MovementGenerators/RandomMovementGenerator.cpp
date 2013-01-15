@@ -166,7 +166,7 @@ bool RandomMovementGenerator<Creature>::GetResetPos(Creature* creature, float& x
 
     // use current if in range
     if (creature->IsWithinDist2d(x,y,radius))
-        creature->GetPosition(x,y,z);
+        creature->GetPosition(x, y, z);
 
     return true;
 }

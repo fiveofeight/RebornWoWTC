@@ -68,6 +68,7 @@ void FleeingMovementGenerator<T>::_getPoint(T* owner, float &x, float &y, float 
         dist_from_caster = fright->GetDistance(owner);
         if (dist_from_caster > 0.2f)
             angle_to_caster = fright->GetAngle(owner);
+
         else
             angle_to_caster = frand(0, 2 * static_cast<float>(M_PI));
     }
