@@ -380,3 +380,8 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (38176, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
 (38175, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death'),
 (38172, 0, 2, 'Our souls will never be freed.', 12, 0, 10, 0, 0, 0, 'HoR Trash death');
+
+UPDATE creature_template SET equipment_id=14 WHERE entry IN (38563); -- HoR Ghost priest
+UPDATE creature_template SET equipment_id=1218 WHERE entry IN (38564); -- HoR shadowy_mercenary
+UPDATE creature_template SET equipment_id=107 WHERE entry IN (38525); -- HoR spectral_footman
+UPDATE creature_template SET equipment_id=2435 WHERE entry IN (38544); -- HoR tortured_rifleman
