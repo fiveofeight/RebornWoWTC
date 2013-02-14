@@ -94,9 +94,12 @@ class boss_ahune : public CreatureScript
 public:
     boss_ahune() : CreatureScript("boss_ahune") { }
 
-    struct boss_ahuneAI : public Scripted_NoMovementAI
+    struct boss_ahuneAI : public ScriptedAI
     {
-        boss_ahuneAI(Creature* creature) : Scripted_NoMovementAI(creature), summons(me) { }
+        boss_ahuneAI(Creature* creature) : ScriptedAI(creature), summons(me) 
+            {
+                SetCombatMovement(false);   
+            }
 
         uint64 frozenCoreGUID;
 

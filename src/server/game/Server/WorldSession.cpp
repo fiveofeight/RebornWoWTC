@@ -21,6 +21,7 @@
 */
 
 #include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
+#include "Config.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -95,17 +96,29 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter):
-m_muteTime(mute_time), m_timeOutTime(0), _player(NULL), m_Socket(sock),
-_security(sec), _accountId(id), m_expansion(expansion), _logoutTime(0),
-m_inQueue(false), m_playerLoading(false), m_playerLogout(false),
-m_playerRecentlyLogout(false), m_playerSave(false),
-m_sessionDbcLocale(sWorld->GetAvailableDbcLocale(locale)),
-m_sessionDbLocaleIndex(locale),
-m_latency(0), m_TutorialsChanged(false), recruiterId(recruiter),
-isRecruiter(isARecruiter), timeLastWhoCommand(0)
+    m_muteTime(mute_time),
+    m_timeOutTime(0),
+    _player(NULL),
+    m_Socket(sock),
+    _security(sec),
+    _accountId(id),
+    m_expansion(expansion),
+    _warden(NULL),
+    _logoutTime(0),
+    m_inQueue(false),
+    m_playerLoading(false),
+    m_playerLogout(false),
+    m_playerRecentlyLogout(false),
+    m_playerSave(false),
+    m_sessionDbcLocale(sWorld->GetAvailableDbcLocale(locale)),
+    m_sessionDbLocaleIndex(locale),
+    m_latency(0),
+    m_TutorialsChanged(false),
+    recruiterId(recruiter),
+    isRecruiter(isARecruiter),
+    timeLastWhoCommand(0),
+    _RBACData(NULL)
 {
-    _warden = NULL;
-
     if (sock)
     {
         m_Address = sock->GetRemoteAddress();
@@ -132,8 +145,8 @@ WorldSession::~WorldSession()
         m_Socket = NULL;
     }
 
-    if (_warden)
-        delete _warden;
+    delete _warden;
+    delete _RBACData;
 
     ///- empty incoming packet queue
     WorldPacket* packet = NULL;
@@ -719,8 +732,8 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
 
 void WorldSession::SendAccountDataTimes(uint32 mask)
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 4 + 1 + 4 + 8 * 4); // changed in WotLK
-    data << uint32(time(NULL));                             // unix time of something
+    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 4 + 1 + 4 + NUM_ACCOUNT_DATA_TYPES * 4);
+    data << uint32(time(NULL));                             // Server time
     data << uint8(1);
     data << uint32(mask);                                   // type mask
     for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
@@ -942,7 +955,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
     ByteBuffer addonInfo;
     addonInfo.resize(size);
 
-    if (uncompress(const_cast<uint8*>(addonInfo.contents()), &uSize, const_cast<uint8*>(data.contents() + pos), data.size() - pos) == Z_OK)
+    if (uncompress(addonInfo.contents(), &uSize, data.contents() + pos, data.size() - pos) == Z_OK)
     {
         uint32 addonsCount;
         addonInfo >> addonsCount;                         // addons count
@@ -1180,4 +1193,25 @@ void WorldSession::InitWarden(BigNumber* k, std::string const& os)
         // _warden = new WardenMac();
         // _warden->Init(this, k);
     }
+}
+
+void WorldSession::LoadPermissions()
+{
+    uint32 id = GetAccountId();
+    std::string name;
+    int32 realmId = ConfigMgr::GetIntDefault("RealmID", 0);
+    AccountMgr::GetName(id, name);
+
+    _RBACData = new RBACData(id, name, realmId);
+    _RBACData->LoadFromDB();
+}
+
+RBACData* WorldSession::GetRBACData()
+{
+    return _RBACData;
+}
+
+bool WorldSession::HasPermission(uint32 permission)
+{
+    return _RBACData->HasPermission(permission);
 }
