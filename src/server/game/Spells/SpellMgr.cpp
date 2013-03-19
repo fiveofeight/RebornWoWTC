@@ -3660,13 +3660,6 @@ void SpellMgr::LoadDbcDataCorrections()
            case 52212: // Death Knight: Death and Decay trigger spell
                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
                break;
-            // OCULUS SPELLS
-            // The spells below are here, because their effect 1 is giving warning, because the triggered spell is not found in dbc and is missing from encounter sniff.
-            case 49462: // Call Ruby Drake
-            case 49461: // Call Amber Drake
-            case 49345: // Call Emerald Drake
-                spellInfo->Effect[1] = 0;
-                break;
             case 62012: // Turkey Caller
                 spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_0_YARDS;    // 0yd
                 break;

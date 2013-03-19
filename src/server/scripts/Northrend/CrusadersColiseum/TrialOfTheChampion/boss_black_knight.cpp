@@ -582,7 +582,7 @@ public:
             uiAttackTimer = 3500;
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;

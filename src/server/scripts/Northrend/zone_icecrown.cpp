@@ -32,13 +32,10 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "Player.h"
-<<<<<<< HEAD
 #include "Vehicle.h"
 #include "SpellScript.h"
-=======
 #include "TemporarySummon.h"
 #include "CombatAI.h"
->>>>>>> upstream/master
 
 /*######
 ## npc_arete
