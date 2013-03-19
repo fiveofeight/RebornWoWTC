@@ -84,7 +84,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 Diff)
+        void UpdateAI(uint32 Diff)
         {
             if (work == true)
                 me->HandleEmoteCommand(EMOTE_ONESHOT_WORK_CHOPWOOD);
@@ -183,7 +183,7 @@ class npc_tiger_matriarch_credit : public CreatureScript
                events.ScheduleEvent(EVENT_CHECK_SUMMON_AURA, 2000);
            }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff)
             {
                 events.Update(diff);
 
@@ -295,7 +295,7 @@ class npc_tiger_matriarch : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;
@@ -342,7 +342,7 @@ class npc_tiger_matriarch : public CreatureScript
 };
 
 // These models was found in sniff.
-// TODO: generalize these models with race from dbc
+/// @todo generalize these models with race from dbc
 uint32 const trollmodel[] =
 {11665, 11734, 11750, 12037, 12038, 12042, 12049, 12849, 13529, 14759, 15570, 15701,
 15702, 1882, 1897, 1976, 2025, 27286, 2734, 2735, 4084, 4085, 4087, 4089, 4231, 4357,

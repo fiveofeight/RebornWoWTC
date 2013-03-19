@@ -166,7 +166,7 @@ public:
             Talk(SAY_EVENT_START);
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             switch (phase)
             {
@@ -457,7 +457,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
             {
@@ -493,7 +493,7 @@ public:
                 }
             }
 
-            // TODO: spells
+            /// @todo spells
 
             CombatAI::UpdateAI(uiDiff);
         }
@@ -542,7 +542,7 @@ public:
             TargetGUID = 0;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!Intro || !TargetGUID)
                 return;
@@ -758,7 +758,7 @@ public:
                         if (CAST_PLR(owner)->GetQuestStatus(12698) == QUEST_STATUS_INCOMPLETE)
                             CAST_CRE(who)->CastSpell(owner, 52517, true);
 
-                        //Todo: Creatures must not be removed, but, must instead
+                        /// @todo Creatures must not be removed, but, must instead
                         //      stand next to Gothik and be commanded into the pit
                         //      and dig into the ground.
                         CAST_CRE(who)->DespawnOrUnsummon();
@@ -814,7 +814,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/)
         {
             if (!me->isInCombat())
             {
@@ -888,7 +888,7 @@ public:
             minerGUID = guid;
         }
 
-        void DoAction(const int32 /*param*/)
+        void DoAction(int32 /*param*/)
         {
             if (Creature* miner = Unit::GetCreature(*me, minerGUID))
             {
@@ -1022,7 +1022,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (IntroPhase)
             {

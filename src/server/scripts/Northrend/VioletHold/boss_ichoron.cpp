@@ -55,7 +55,7 @@ enum Actions
     ACTION_WATER_ELEMENT_KILLED                 = 2,
 };
 
-// TODO get those positions from spawn of creature 29326
+/// @todo get those positions from spawn of creature 29326
 #define MAX_SPAWN_LOC 5
 static Position SpawnLoc[MAX_SPAWN_LOC]=
 {
@@ -151,7 +151,7 @@ public:
             }
         }
 
-        void DoAction(const int32 param)
+        void DoAction(int32 param)
         {
             if (!me->isAlive())
                 return;
@@ -205,7 +205,7 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) {}
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (!UpdateVictim())
                 return;
@@ -362,7 +362,7 @@ public:
             return;
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if (uiRangeCheck_Timer < uiDiff)
             {

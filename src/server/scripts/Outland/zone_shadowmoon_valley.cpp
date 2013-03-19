@@ -126,7 +126,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (bCanEat || bIsEating)
             {
@@ -280,7 +280,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
             {
@@ -385,7 +385,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (PoisonTimer)
             {
@@ -962,7 +962,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!ConversationTimer)
                 return;
@@ -1125,14 +1125,14 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
 
             if (!UpdateVictim())
                 return;
 
-            //TODO: add more abilities
+            /// @todo add more abilities
             if (!HealthAbovePct(30))
             {
                 if (m_uiHealingTimer <= uiDiff)
@@ -1326,7 +1326,7 @@ public:
             ++AnimationCount;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (AnimationTimer)
             {
@@ -1514,7 +1514,7 @@ public:
                 Announced = false;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!PlayerGUID || !EventStarted)
                 return;
@@ -1581,7 +1581,7 @@ public:
                     CAST_AI(npc_lord_illidan_stormrage::npc_lord_illidan_stormrageAI, LordIllidan->AI())->LiveCounter();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
@@ -1891,16 +1891,11 @@ class spell_unlocking_zuluheds_chains : public SpellScriptLoader
         {
             PrepareSpellScript(spell_unlocking_zuluheds_chains_SpellScript);
 
-            bool Load()
-            {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
             void HandleAfterHit()
             {
-                Player* caster = GetCaster()->ToPlayer();
-                if (caster->GetQuestStatus(QUEST_ZULUHED) == QUEST_STATUS_INCOMPLETE)
-                    caster->KilledMonsterCredit(NPC_KARYNAKU, 0);
+                if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                    if (Creature* karynaku = GetCaster()->FindNearestCreature(NPC_KARYNAKU, 15.0f))
+                        GetCaster()->ToPlayer()->CastedCreatureOrGO(NPC_KARYNAKU, karynaku->GetGUID(), GetSpellInfo()->Id);
             }
 
             void Register()
@@ -1975,7 +1970,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 diff)
         {
             if (tapped)
             {

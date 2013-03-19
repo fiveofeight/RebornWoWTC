@@ -26,7 +26,7 @@
 /* ScriptData
 SDName: boss_kologarn
 SD%Complete: 90
-SDComment: TODO: Achievements
+SDComment: @todo Achievements
 SDCategory: Ulduar
 EndScriptData */
 
@@ -242,7 +242,7 @@ class boss_kologarn : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff)
             {
                 if (!UpdateVictim())
                     return;

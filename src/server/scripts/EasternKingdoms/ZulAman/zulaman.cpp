@@ -149,7 +149,7 @@ class npc_zulaman_hostage : public CreatureScript
                     player->SendLoot(me->GetGUID(), LOOT_CORPSE);
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/)
             {
                 if (IsLoot)
                     DoCast(me, 7, false);
@@ -322,7 +322,7 @@ class npc_harrison_jones : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 diff)
             {
                 if (_gongEvent)
                 {

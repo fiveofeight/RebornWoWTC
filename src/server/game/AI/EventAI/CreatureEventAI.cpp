@@ -840,7 +840,7 @@ void CreatureEventAI::Reset()
                 break;
             }
             default:
-                //TODO: enable below code line / verify this is correct to enable events previously disabled (ex. aggro yell), instead of enable this in void EnterCombat()
+                /// @todo enable below code line / verify this is correct to enable events previously disabled (ex. aggro yell), instead of enable this in void EnterCombat()
                 //(*i).Enabled = true;
                 //(*i).Time = 0;
                 break;
@@ -1012,7 +1012,7 @@ void CreatureEventAI::SpellHit(Unit* unit, const SpellInfo* spell)
                     ProcessEvent(*i, unit);
 }
 
-void CreatureEventAI::UpdateAI(const uint32 diff)
+void CreatureEventAI::UpdateAI(uint32 diff)
 {
     //Check if we are in combat (also updates calls threat update code)
     bool Combat = UpdateVictim();
