@@ -239,13 +239,11 @@ const Position LichKingSpawnPos      = {5362.917480f, 2062.307129f, 707.695374f,
 const Position LichKingMoveThronePos = {5312.080566f, 2009.172119f, 709.341431f, 3.973301f}; // Lich King walks to throne
 const Position LichKingMoveAwayPos   = {5400.069824f, 2102.7131689f, 707.69525f, 0.843803f}; // Lich King walks away
 
+
 class npc_jaina_or_sylvanas_hor : public CreatureScript
 {
-private:
-    bool m_isSylvana;
-
-public:
-    npc_jaina_or_sylvanas_hor(bool isSylvana, const char* name) : CreatureScript(name), m_isSylvana(isSylvana) { }
+    public:
+        npc_jaina_or_sylvanas_hor() : CreatureScript("npc_jaina_or_sylvanas_hor") { }
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
     {
@@ -274,13 +272,8 @@ public:
         if (creature->isQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        QuestStatus status = player->GetQuestStatus(m_isSylvana ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
-        if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             player->ADD_GOSSIP_ITEM( 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        // once last quest is completed, she offers this shortcut of the starting event
-        QuestStatus status2 = player->GetQuestStatus(m_isSylvana ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
-        if (status2 == QUEST_STATUS_COMPLETE || status2 == QUEST_STATUS_REWARDED)
             player->ADD_GOSSIP_ITEM( 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
@@ -318,9 +311,9 @@ public:
             me->SetVisible(true);
         }
 
-        void DoAction(int32 actionId)
+        void DoAction(int32 actionID)
         {
-            switch (actionId)
+            switch (actionID)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_START_PREINTRO, 0);
@@ -823,9 +816,9 @@ public:
                 Talk(SAY_TRASH_DEATH);
         }
 
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionID)
         {
-            switch (actionId)
+            switch (actionID)
             {
                 case ACTION_TRASH_ACTIVATE:
                     events.SetPhase(PHASE_INTRO);
@@ -836,7 +829,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
+            if (!UpdateVictim() && !events.IsInPhase(PHASE_INTRO))
                 return;
 
             events.Update(diff);
@@ -925,9 +918,9 @@ public:
             instance->SetData(DATA_WAVE_STATE, FAIL);
         }
 
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionID)
         {
-            switch (actionId)
+            switch (actionID)
             {
                 case ACTION_TRASH_ACTIVATE:
                     events.SetPhase(PHASE_INTRO);
@@ -953,7 +946,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
+            if (!UpdateVictim() && !events.IsInPhase(PHASE_INTRO))
                 return;
 
             events.Update(diff);
@@ -1060,9 +1053,9 @@ public:
             instance->SetData(DATA_WAVE_STATE, FAIL);
         }
         
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionID)
         {
-            switch (actionId)
+            switch (actionID)
             {
                 case ACTION_TRASH_ACTIVATE:
                     events.SetPhase(PHASE_INTRO);
@@ -1087,7 +1080,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
+            if (!UpdateVictim() && !events.IsInPhase(PHASE_INTRO))
                 return;
 
             events.Update(diff);
@@ -1167,9 +1160,9 @@ public:
             instance->SetData(DATA_WAVE_STATE, FAIL);
         }
 
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionID)
         {
-            switch (actionId)
+            switch (actionID)
             {
                 case ACTION_TRASH_ACTIVATE:
                     events.SetPhase(PHASE_INTRO);
@@ -1193,7 +1186,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
+            if (!UpdateVictim() && !events.IsInPhase(PHASE_INTRO))
                 return;
 
             events.Update(diff);
@@ -1266,9 +1259,9 @@ public:
             instance->SetData(DATA_WAVE_STATE, FAIL);
         }
         
-        void DoAction(const int32 actionId)
+        void DoAction(int32 actionID)
         {
-            switch (actionId)
+            switch (actionID)
             {
                 case ACTION_TRASH_ACTIVATE:
                     events.SetPhase(PHASE_INTRO);
@@ -1293,7 +1286,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK))
+            if (!UpdateVictim() && !events.IsInPhase(PHASE_INTRO))
                 return;
 
             events.Update(diff);
@@ -2246,8 +2239,7 @@ public:
 
 void AddSC_halls_of_reflection()
 {
-    new npc_jaina_or_sylvanas_hor(true, "npc_sylvanas_hor_part1");
-    new npc_jaina_or_sylvanas_hor(false, "npc_jaina_hor_part1");
+    new npc_jaina_or_sylvanas_hor();
     new npc_jaina_and_sylvana_hor_part2();
     new npc_ghostly_priest();
     new npc_phantom_mage();
