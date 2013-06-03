@@ -621,7 +621,7 @@ public:
                 {
                     VehicleCheckPredicate pred;
                     summons.DoAction(ACTION_DELAYED_DESPAWN, pred);
-                    summons.remove_if(pred);
+                    summons.DespawnIf(pred);
                     summons.DespawnAll();
                 }
                 else if (_phase == PHASE_THREE)
@@ -754,7 +754,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim() && _phase != PHASE_NOT_STARTED && _phase != PHASE_TWO)
+            if (!instance || (!UpdateVictim() && _phase != PHASE_NOT_STARTED && _phase != PHASE_TWO))
                 return;
 
             events.Update(diff);
@@ -854,7 +854,7 @@ public:
                             }
                         }
 
-                        if (_arcaneReinforcements && instance)
+                        if (_arcaneReinforcements)
                         {
                             for (uint8 rangeDisks = 0; rangeDisks < (GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 5); rangeDisks++)
                             {

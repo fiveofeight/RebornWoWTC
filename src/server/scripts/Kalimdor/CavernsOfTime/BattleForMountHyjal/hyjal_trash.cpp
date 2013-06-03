@@ -191,7 +191,7 @@ hyjal_trashAI::hyjal_trashAI(Creature* creature) : npc_escortAI(creature)
 
 void hyjal_trashAI::DamageTaken(Unit* done_by, uint32 &damage)
 {
-    if (done_by->GetTypeId() == TYPEID_PLAYER || (done_by->GetTypeId() == TYPEID_UNIT && CAST_CRE(done_by)->isPet()))
+    if (done_by->GetTypeId() == TYPEID_PLAYER || done_by->isPet())
     {
         damageTaken += damage;
         if (instance)
@@ -773,7 +773,7 @@ public:
         void JustSummoned(Creature* summon)
         {
             Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true);
-            if (target && summon)
+            if (target)
                 summon->Attack(target, false);
             summons.Summon(summon);
         }

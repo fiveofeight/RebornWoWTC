@@ -303,15 +303,15 @@ public:
                 me->setFaction(14);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+        void DamageTaken(Unit* doneby, uint32& uiDamage)
         {
-            if (uiDamage >= me->GetHealth() && pDoneBy->GetTypeId() == TYPEID_PLAYER)
+            if (uiDamage >= me->GetHealth() && doneby->GetTypeId() == TYPEID_PLAYER)
             {
                 uiDamage = 0;
                 if (me->GetEntry() == NPC_ARGENT_VALIANT)
-                    pDoneBy->CastSpell(pDoneBy, NPC_ARGENT_VALIANT_CREDIT, true);
+                    doneby->CastSpell(doneby, NPC_ARGENT_VALIANT_CREDIT, true);
                 if (me->GetEntry() == NPC_ARGENT_CHAMPION)
-                    CAST_PLR(pDoneBy)->KilledMonsterCredit(NPC_ARGENT_CHAMPION_CREDIT, 0);
+                    doneby->CastSpell(doneby, NPC_ARGENT_CHAMPION_CREDIT, true);
                 me->setFaction(35);
                 me->DespawnOrUnsummon(5000);
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
@@ -1981,7 +1981,7 @@ class npc_frostbrood_skytalon : public CreatureScript
                 if (id == POINT_GRAB_DECOY)
                     if (TempSummon* summon = me->ToTempSummon())
                         if (Unit* summoner = summon->GetSummoner())
-                            DoCast(summoner, SPELL_GRAB); 
+                            DoCast(summoner, SPELL_GRAB);
             }
 
             void UpdateAI(uint32 diff)

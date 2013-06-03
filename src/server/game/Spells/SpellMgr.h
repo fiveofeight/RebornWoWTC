@@ -22,9 +22,15 @@
 // For static or at-server-startup loaded spell data
 
 #include <ace/Singleton.h>
-#include "Common.h"
+
+#include "DBCStructure.h"
 #include "SharedDefines.h"
-#include "Unit.h"
+#include "UnorderedMap.h"
+#include "Util.h"
+
+#include <map>
+#include <set>
+#include <vector>
 
 class SpellInfo;
 class Player;
@@ -371,6 +377,8 @@ struct SpellTargetPosition
     float  target_Orientation;
 };
 
+typedef std::map<std::pair<uint32 /*spell_id*/, SpellEffIndex /*effIndex*/>, SpellTargetPosition> SpellTargetPositionMap;
+
 // Enum with EffectRadiusIndex and their actual radius
 enum EffectRadiusIndex
 {
@@ -433,8 +441,6 @@ enum EffectRadiusIndex
     EFFECT_RADIUS_80_YARDS_2    = 65
 };
 
-typedef UNORDERED_MAP<uint32, SpellTargetPosition> SpellTargetPositionMap;
-
 // Spell pet auras
 class PetAura
 {
@@ -442,10 +448,7 @@ class PetAura
         typedef UNORDERED_MAP<uint32, uint32> PetAuraMap;
 
     public:
-        PetAura() : removeOnChangePet(false), damage(0)
-        {
-            auras.clear();
-        }
+        PetAura() : removeOnChangePet(false), damage(0) { }
 
         PetAura(uint32 petEntry, uint32 aura, bool _removeOnChangePet, int _damage) :
         removeOnChangePet(_removeOnChangePet), damage(_damage)
@@ -638,7 +641,7 @@ class SpellMgr
         bool IsSpellLearnToSpell(uint32 spell_id1, uint32 spell_id2) const;
 
         // Spell target coordinates
-        SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id) const;
+        SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
 
         // Spell Groups table
         SpellSpellGroupMapBounds GetSpellSpellGroupMapBounds(uint32 spell_id) const;

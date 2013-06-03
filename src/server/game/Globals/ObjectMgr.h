@@ -683,8 +683,8 @@ class ObjectMgr
         CreatureTemplateContainer const* GetCreatureTemplates() const { return &_creatureTemplateStore; }
         CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId);
         CreatureModelInfo const* GetCreatureModelRandomGender(uint32* displayID);
-        static uint32 ChooseDisplayId(uint32 team, const CreatureTemplate* cinfo, const CreatureData* data = NULL);
-        static void ChooseCreatureFlags(const CreatureTemplate* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, const CreatureData* data = NULL);
+        static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = NULL);
+        static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = NULL);
         EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
         CreatureAddon const* GetCreatureAddon(uint32 lowguid);
         CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
@@ -839,13 +839,13 @@ class ObjectMgr
         void LoadQuests();
         void LoadQuestRelations()
         {
-            sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading GO Start Quest Data...");
+            TC_LOG_INFO(LOG_FILTER_SERVER_LOADING, "Loading GO Start Quest Data...");
             LoadGameobjectQuestRelations();
-            sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading GO End Quest Data...");
+            TC_LOG_INFO(LOG_FILTER_SERVER_LOADING, "Loading GO End Quest Data...");
             LoadGameobjectInvolvedRelations();
-            sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature Start Quest Data...");
+            TC_LOG_INFO(LOG_FILTER_SERVER_LOADING, "Loading Creature Start Quest Data...");
             LoadCreatureQuestRelations();
-            sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature End Quest Data...");
+            TC_LOG_INFO(LOG_FILTER_SERVER_LOADING, "Loading Creature End Quest Data...");
             LoadCreatureInvolvedRelations();
         }
         void LoadGameobjectQuestRelations();

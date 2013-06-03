@@ -211,7 +211,7 @@ public:
                     {
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, NPC_GRIMSTONE, me);
                         instance->SetData(TYPE_RING_OF_LAW, DONE);
-                        sLog->outDebug(LOG_FILTER_TSCR, "npc_grimstone: event reached end and set complete.");
+                        TC_LOG_DEBUG(LOG_FILTER_TSCR, "npc_grimstone: event reached end and set complete.");
                     }
                     break;
             }
@@ -981,9 +981,9 @@ public:
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
 
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (Player* player = who->ToPlayer())
             {
-                if (CAST_PLR(who)->GetQuestStatus(4322) == QUEST_STATUS_INCOMPLETE)
+                if (player->GetQuestStatus(4322) == QUEST_STATUS_INCOMPLETE)
                 {
                     float Radius = 10.0f;
                     if (me->IsWithinDistInMap(who, Radius))
