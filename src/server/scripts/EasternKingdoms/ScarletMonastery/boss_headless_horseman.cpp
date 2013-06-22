@@ -159,8 +159,8 @@ class boss_headless_horseman : public CreatureScript
                     me->RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
                     DoZoneInCombat(me, 100.0f);
 
-                    if (me->getVictim())
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                    if (me->GetVictim())
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                 }
             }
 
@@ -189,7 +189,7 @@ class boss_headless_horseman : public CreatureScript
 
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (!players.isEmpty())
-                    sLFGMgr->FinishDungeon(players.begin()->getSource()->GetGroup()->GetGUID(), 285);
+                    sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285);
 
                 DoCast(me, SPELL_BURNING, true);
                 me->SummonCreature(NPC_SIR_THOMAS, 1762.863f, 1345.217f, 17.9f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60*IN_MILLISECONDS);
@@ -359,6 +359,7 @@ class boss_headless_horseman : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
+
             return new boss_headless_horsemanAI(creature);
         }
 };
@@ -380,6 +381,7 @@ class npc_horseman_head : public CreatureScript
                 DoCast(me, SPELL_HEAD_LANDS, true);
                 Talk(SAY_LOST_HEAD);
                 _despawn = false;
+
             }
 
             void SetData(uint32 /*type*/, uint32 data)
@@ -497,7 +499,7 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (!who || !me->IsValidAttackTarget(who) || me->getVictim())
+            if (!who || !me->IsValidAttackTarget(who) || me->GetVictim())
                 return;
         }
 

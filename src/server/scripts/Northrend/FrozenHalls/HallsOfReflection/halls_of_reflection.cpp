@@ -269,7 +269,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
             player->ADD_GOSSIP_ITEM( 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
@@ -551,7 +551,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
                     // Spawn LK in front of door, and make him move to the sword.
                     if (Creature* pLichKing = me->SummonCreature(NPC_LICH_KING_EVENT, LichKingSpawnPos, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        pLichKing->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                        pLichKing->SetWalk(true);
                         pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos);
                         pLichKing->SetReactState(REACT_PASSIVE);
                         uiLichKing = pLichKing->GetGUID();
@@ -617,7 +617,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
                         pFalric->CastSpell(pFalric, SPELL_BOSS_SPAWN_AURA, true);
                         pFalric->SetVisible(true);
                         pFalric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pFalric->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                        pFalric->SetWalk(true);
                         pFalric->GetMotionMaster()->MovePoint(0, 5283.309f, 2031.173f, 709.319f);
                     }
                     if (Creature* pMarwyn = me->GetCreature(*me, instance->GetData64(DATA_MARWYN)))
@@ -625,7 +625,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
                         pMarwyn->CastSpell(pMarwyn, SPELL_BOSS_SPAWN_AURA, true);
                         pMarwyn->SetVisible(true);
                         pMarwyn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        pMarwyn->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                        pMarwyn->SetWalk(true);
                         pMarwyn->GetMotionMaster()->MovePoint(0, 5335.585f, 1981.439f, 709.319f);
                     }
 
@@ -655,7 +655,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
                     {
                         if(GameObject* pGate = instance->instance->GetGameObject(instance->GetData64(DATA_FROSTWORN_DOOR)))
                             pGate->SetGoState(GO_STATE_ACTIVE);
-                        pLichKing->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                        pLichKing->SetWalk(true);
                         pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos);
                     }
 
@@ -716,7 +716,7 @@ class npc_jaina_or_sylvanas_hor : public CreatureScript
                    // Spawn LK in front of door, and make him move to the sword.
                     if (Creature* pLichKing = me->SummonCreature(NPC_LICH_KING_EVENT, LichKingSpawnPos, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        pLichKing->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+                        pLichKing->SetWalk(true);
                         pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos);
                         pLichKing->SetReactState(REACT_PASSIVE);
                         uiLichKing = pLichKing->GetGUID();
@@ -1107,7 +1107,7 @@ public:
                         events.ScheduleEvent(EVENT_SHADOW_STEP, 8000, 0, PHASE_ONE);
                         return;
                     case EVENT_DEADLY_POISON:
-                        DoCast(me->getVictim(), SPELL_DEADLY_POISON);
+                        DoCast(me->GetVictim(), SPELL_DEADLY_POISON);
                         events.ScheduleEvent(EVENT_DEADLY_POISON, 10000, 0, PHASE_ONE);
                         return;
                     case EVENT_ENVENOMED_DAGGER_THROW:
@@ -1116,7 +1116,7 @@ public:
                         events.ScheduleEvent(EVENT_ENVENOMED_DAGGER_THROW, 15000, 0, PHASE_ONE);
                         return;
                     case EVENT_KIDNEY_SHOT:
-                        DoCast(me->getVictim(), SPELL_KIDNEY_SHOT);
+                        DoCast(me->GetVictim(), SPELL_KIDNEY_SHOT);
                         events.ScheduleEvent(EVENT_KIDNEY_SHOT, 20000, 0, PHASE_ONE);
                         return;
                 }
@@ -1209,11 +1209,11 @@ public:
                         DoZoneInCombat();
                         return;
                     case EVENT_SPECTRAL_STRIKE:
-                        DoCast(me->getVictim(), SPELL_SPECTRAL_STRIKE);
+                        DoCast(me->GetVictim(), SPELL_SPECTRAL_STRIKE);
                         events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000, 0, PHASE_ONE);
                         return;
                     case EVENT_SHIELD_BASH:
-                        DoCast(me->getVictim(), SPELL_SHIELD_BASH);
+                        DoCast(me->GetVictim(), SPELL_SHIELD_BASH);
                         events.ScheduleEvent(EVENT_SHIELD_BASH, 5000, 0, PHASE_ONE);
                         return;
                     case EVENT_TORTURED_ENRAGE:
@@ -1397,7 +1397,7 @@ public:
             if (!instance)
                 return;
 
-            if (me->getVictim())
+            if (me->GetVictim())
                 return;
 
             if (who->GetTypeId() != TYPEID_PLAYER
@@ -1406,7 +1406,7 @@ public:
                 ) return;
 
             if (Player* player = (Player*)who)
-                if (player->isGameMaster())
+                if (player->IsGameMaster())
                     return;
 
             AttackStart(who);
@@ -1589,7 +1589,7 @@ public:
         if(m_pInstance->GetData(DATA_LICHKING_EVENT) == DONE)
             return false;
 
-        if(creature->isQuestGiver())
+        if(creature->IsQuestGiver())
            player->PrepareQuestMenu( creature->GetGUID());
 
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
@@ -1711,7 +1711,7 @@ public:
                     m_pInstance->SetData(DATA_ICE_WALL_2, IN_PROGRESS);
                     if (Creature* pWallTarget = m_pInstance->instance->GetCreature(m_uipWallTargetGUID))
                     {
-                        if(pWallTarget->isAlive())
+                        if(pWallTarget->IsAlive())
                         {
                             pWallTarget->DespawnOrUnsummon();
                             m_uipWallTargetGUID = 0;
@@ -1745,7 +1745,7 @@ public:
                     m_pInstance->SetData(DATA_ICE_WALL_3, IN_PROGRESS);
                     if (Creature* pWallTarget = m_pInstance->instance->GetCreature(m_uipWallTargetGUID))
                     {
-                        if(pWallTarget->isAlive())
+                        if(pWallTarget->IsAlive())
                         {
                             pWallTarget->DespawnOrUnsummon();
                             m_uipWallTargetGUID = 0;
@@ -1779,7 +1779,7 @@ public:
                     m_pInstance->SetData(DATA_ICE_WALL_4, IN_PROGRESS);
                     if (Creature* pWallTarget = m_pInstance->instance->GetCreature(m_uipWallTargetGUID))
                     {
-                        if(pWallTarget->isAlive())
+                        if(pWallTarget->IsAlive())
                         {
                             pWallTarget->DespawnOrUnsummon();
                             m_uipWallTargetGUID = 0;
@@ -1812,7 +1812,7 @@ public:
                 case 20:
                     if (Creature* pWallTarget = m_pInstance->instance->GetCreature(m_uipWallTargetGUID))
                     {
-                        if(pWallTarget->isAlive())
+                        if(pWallTarget->IsAlive())
                         {
                             pWallTarget->DespawnOrUnsummon();
                             m_uipWallTargetGUID = 0;
@@ -2076,7 +2076,7 @@ public:
             {
                 Map::PlayerList const &PlayerList = m_pInstance->instance->GetPlayers();
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    i->getSource()->KilledMonsterCredit(killCredit, 0);
+                    i->GetSource()->KilledMonsterCredit(killCredit, 0);
             }
         }
 
@@ -2123,7 +2123,7 @@ public:
             else
                 CastTimer -= diff;
 
-            if (WallCast == true && HoldTimer < 10000 && ( m_pInstance->GetData(DATA_SUMMONS) == 0 || !me->isInCombat()))
+            if (WallCast == true && HoldTimer < 10000 && ( m_pInstance->GetData(DATA_SUMMONS) == 0 || !me->IsInCombat()))
             {
                 WallCast = false;
                 me->InterruptNonMeleeSpells(false);
@@ -2137,7 +2137,7 @@ public:
                         if(GameObject* pGate = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(GO_ICE_WALL_2)))
                         {
                             pGate->SetGoState(GO_STATE_READY);
-                            if(pLichKing && pLichKing->isAlive())
+                            if(pLichKing && pLichKing->IsAlive())
                                 pLichKing->AI()->Talk(SAY_LICH_KING_WALL_02);
                             m_uiIceWallGUID = pGate->GetGUID();
                         }
@@ -2146,7 +2146,7 @@ public:
                         if(GameObject* pGate = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(GO_ICE_WALL_3)))
                         {
                             pGate->SetGoState(GO_STATE_READY);
-                            if(pLichKing && pLichKing->isAlive())
+                            if(pLichKing && pLichKing->IsAlive())
                                 pLichKing->AI()->Talk(SAY_LICH_KING_WALL_03);
                             m_uiIceWallGUID = pGate->GetGUID();
                         }
@@ -2155,13 +2155,13 @@ public:
                         if(GameObject* pGate = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(GO_ICE_WALL_4)))
                         {
                             pGate->SetGoState(GO_STATE_READY);
-                            if(pLichKing && pLichKing->isAlive())
+                            if(pLichKing && pLichKing->IsAlive())
                                 pLichKing->AI()->Talk(SAY_LICH_KING_WALL_04);
                             m_uiIceWallGUID = pGate->GetGUID();
                         }
                         break;
                     case 5:
-                        if(pLichKing && pLichKing->isAlive())
+                        if(pLichKing && pLichKing->IsAlive())
                         {
                             pLichKing->RemoveAurasDueToSpell(SPELL_WINTER);
                             pLichKing->SetSpeed(MOVE_WALK, 2.5f, true);

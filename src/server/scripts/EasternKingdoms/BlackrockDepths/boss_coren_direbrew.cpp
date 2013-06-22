@@ -180,7 +180,7 @@ public:
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty())
-                sLFGMgr->FinishDungeon(players.begin()->getSource()->GetGroup()->GetGUID(), 287);
+                sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 287);
             
             if (instance)
                 instance->SetData(DATA_COREN, DONE);

@@ -499,10 +499,10 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
  * @param [in, out] unit The passenger to remove.
  */
 
-void Vehicle::RemovePassenger(Unit* unit)
+Vehicle* Vehicle::RemovePassenger(Unit* unit)
 {
     if (unit->GetVehicle() != this)
-        return;
+        return NULL;
 
     SeatMap::iterator seat = GetSeatIteratorForPassenger(unit);
     ASSERT(seat != Seats.end());
@@ -522,9 +522,7 @@ void Vehicle::RemovePassenger(Unit* unit)
     if (_me->IsInWorld())
     {
         unit->RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-        unit->m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
-        unit->m_movementInfo.t_time = 0;
-        unit->m_movementInfo.t_seat = 0;
+        unit->m_movementInfo.transport.Reset();
     }
 
     // only for flyable vehicles
@@ -536,6 +534,9 @@ void Vehicle::RemovePassenger(Unit* unit)
 
     if (GetBase()->GetTypeId() == TYPEID_UNIT)
         sScriptMgr->OnRemovePassenger(this, unit);
+
+    unit->SetVehicle(NULL);
+    return this;
 }
 
 /**
@@ -559,7 +560,7 @@ void Vehicle::RelocatePassengers()
             ASSERT(passenger->IsInWorld());
 
             float px, py, pz, po;
-            passenger->m_movementInfo.t_pos.GetPosition(px, py, pz, po);
+            passenger->m_movementInfo.transport.pos.GetPosition(px, py, pz, po);
             CalculatePassengerPosition(px, py, pz, &po);
             passenger->UpdatePosition(px, py, pz, po);
         }
@@ -806,7 +807,7 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 
     Target->RemovePendingEventsForSeat(Seat->first);
 
-    Passenger->m_vehicle = Target;
+    Passenger->SetVehicle(Target);
     Seat->second.Passenger = Passenger->GetGUID();
     if (Seat->second.SeatInfo->CanEnterOrExit())
     {
@@ -842,10 +843,10 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
 
     Passenger->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
     VehicleSeatEntry const* veSeat = Seat->second.SeatInfo;
-    Passenger->m_movementInfo.t_pos.Relocate(veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ);
-    Passenger->m_movementInfo.t_time = 0; // 1 for player
-    Passenger->m_movementInfo.t_seat = Seat->first;
-    Passenger->m_movementInfo.t_guid = Target->GetBase()->GetGUID();
+    Passenger->m_movementInfo.transport.pos.Relocate(veSeat->m_attachmentOffsetX, veSeat->m_attachmentOffsetY, veSeat->m_attachmentOffsetZ);
+    Passenger->m_movementInfo.transport.time = 0;
+    Passenger->m_movementInfo.transport.seat = Seat->first;
+    Passenger->m_movementInfo.transport.guid = Target->GetBase()->GetGUID();
 
     if (Target->GetBase()->GetTypeId() == TYPEID_UNIT && Passenger->GetTypeId() == TYPEID_PLAYER &&
         Seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)

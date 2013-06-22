@@ -231,7 +231,7 @@ public:
                     if (temp)
                     {
                         // Let all remaining ghouls explode
-                        if ((temp->GetEntry() == 35590 || temp->GetEntry() == 12444) && temp->isAlive())
+                        if ((temp->GetEntry() == 35590 || temp->GetEntry() == 12444) && temp->IsAlive())
                         {
                             me->CastSpell(temp, SPELL_GHOUL_EXPLODE, true);
                         }
@@ -381,8 +381,9 @@ public:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
-                            if (target->isAlive())
+                            if (target->IsAlive())
                                 DoCast(target, SPELL_DESECRATION);
+
                         }
                         uiDesecrationTimer = urand(15000,16000);
                     } else uiDesecrationTimer -= uiDiff;
@@ -400,7 +401,7 @@ public:
                                         // Let all remaining ghouls explode
                                         if (temp->GetEntry() == 35590 || temp->GetEntry() == 12444)
                                         {
-                                            if (temp->isAlive())
+                                            if (temp->IsAlive())
                                             {
                                                 me->CastSpell(temp, SPELL_GHOUL_EXPLODE, true);
                                                 break;
@@ -438,7 +439,7 @@ public:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
-                            if (target && target->isAlive())
+                            if (target && target->IsAlive())
                             DoCast(target, SPELL_DEATH_RESPITE);
                         }
                         uiDeathRespiteTimer = urand(15000, 16000);
@@ -459,7 +460,7 @@ public:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
-                            if (target && target->isAlive())
+                            if (target && target->IsAlive())
                                 DoCast(target, SPELL_MARKED_DEATH);
                         }
                         uiMarkedDeathTimer = urand (10000, 12000);
@@ -591,7 +592,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, DUNGEON_MODE(SPELL_LEAP, SPELL_LEAP_H));
                 }
                 uiAttackTimer = 3500;
@@ -636,7 +637,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, DUNGEON_MODE(SPELL_LEAP, SPELL_LEAP_H));
                 }
                 uiLeapTimer = 10000;
