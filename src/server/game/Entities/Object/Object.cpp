@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -50,6 +50,7 @@
 #include "Group.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "Chat.h"
 
 uint32 GuidHigh2TypeId(uint32 guid_hi)
 {
@@ -91,7 +92,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            TC_LOG_FATAL(LOG_FILTER_GENERAL, "Object::~Object Corpse guid="UI64FMTD", type=%d, entry=%u deleted but still in map!!",
+            TC_LOG_FATAL("misc", "Object::~Object Corpse guid=" UI64FMTD ", type=%d, entry=%u deleted but still in map!!",
                 GetGUID(), ((Corpse*)this)->GetType(), GetEntry());
             ASSERT(false);
         }
@@ -103,16 +104,16 @@ Object::~Object()
 {
     if (IsInWorld())
     {
-        TC_LOG_FATAL(LOG_FILTER_GENERAL, "Object::~Object - guid="UI64FMTD", typeid=%d, entry=%u deleted but still in world!!", GetGUID(), GetTypeId(), GetEntry());
+        TC_LOG_FATAL("misc", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID(), GetTypeId(), GetEntry());
         if (isType(TYPEMASK_ITEM))
-            TC_LOG_FATAL(LOG_FILTER_GENERAL, "Item slot %u", ((Item*)this)->GetSlot());
+            TC_LOG_FATAL("misc", "Item slot %u", ((Item*)this)->GetSlot());
         ASSERT(false);
         RemoveFromWorld();
     }
 
     if (m_objectUpdated)
     {
-        TC_LOG_FATAL(LOG_FILTER_GENERAL, "Object::~Object - guid="UI64FMTD", typeid=%d, entry=%u deleted but still in update list!!", GetGUID(), GetTypeId(), GetEntry());
+        TC_LOG_FATAL("misc", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in update list!!", GetGUID(), GetTypeId(), GetEntry());
         ASSERT(false);
         sObjectAccessor->RemoveUpdateObject(this);
     }
@@ -137,20 +138,7 @@ void Object::_Create(uint32 guidlow, uint32 entry, HighGuid guidhigh)
 
     uint64 guid = MAKE_NEW_GUID(guidlow, entry, guidhigh);
     SetUInt64Value(OBJECT_FIELD_GUID, guid);
-    uint32 type = 0;
-    switch (m_objectType)
-    {
-        //case TYPEID_ITEM:       type = 3; break;
-        //case TYPEID_CONTAINER:  type = 7; break;   //+4
-        //case TYPEID_UNIT:       type = 9; break;   //+2
-        //case TYPEID_PLAYER:     type = 25; break;  //+16
-        //case TYPEID_GAMEOBJECT: type = 33; break;  //+8
-        case TYPEID_DYNAMICOBJECT: type = 65; break;  //+32
-        //case TYPEID_CORPSE:     type = 129; break;  //+64
-        default: type = m_objectType; break;
-    }
-    SetUInt32Value(OBJECT_FIELD_TYPE, type);
-    //SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
+    SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
     m_PackGUID.wpos(0);
     m_PackGUID.appendPackGUID(GetGUID());
 }
@@ -231,9 +219,6 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
                 case GAMEOBJECT_TYPE_FLAGSTAND:
                 case GAMEOBJECT_TYPE_FLAGDROP:
                     updateType = UPDATETYPE_CREATE_OBJECT2;
-                    break;
-                case GAMEOBJECT_TYPE_TRANSPORT:
-                    flags |= UPDATEFLAG_TRANSPORT;
                     break;
                 default:
                     break;
@@ -365,6 +350,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     // 0x20
     if (flags & UPDATEFLAG_LIVING)
     {
+        ASSERT(unit);
         unit->BuildMovementPacket(data);
 
         *data << unit->GetSpeed(MOVE_WALK)
@@ -385,6 +371,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     {
         if (flags & UPDATEFLAG_POSITION)
         {
+            ASSERT(object);
             Transport* transport = object->GetTransport();
 
             if (transport)
@@ -427,13 +414,11 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             // 0x40
             if (flags & UPDATEFLAG_STATIONARY_POSITION)
             {
-                *data << object->GetPositionX();
-                *data << object->GetPositionY();
-                if (isType(TYPEMASK_UNIT))
-                    *data << unit->GetPositionZMinusOffset();
-                else
-                    *data << object->GetPositionZ();
-                *data << object->GetOrientation();
+                ASSERT(object);
+                *data << object->GetStationaryX();
+                *data << object->GetStationaryY();
+                *data << object->GetStationaryZ();
+                *data << object->GetStationaryO();
             }
         }
     }
@@ -477,6 +462,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     // 0x4
     if (flags & UPDATEFLAG_HAS_TARGET)
     {
+        ASSERT(unit);
         if (Unit* victim = unit->GetVictim())
             data->append(victim->GetPackGUID());
         else
@@ -486,15 +472,30 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     // 0x2
     if (flags & UPDATEFLAG_TRANSPORT)
     {
-        *data << uint32(getMSTime());                       // Unknown - getMSTime is wrong.
+        GameObject const* go = ToGameObject();
+        /** @TODO Use IsTransport() to also handle type 11 (TRANSPORT)
+            Currently grid objects are not updated if there are no nearby players,
+            this causes clients to receive different PathProgress
+            resulting in players seeing the object in a different position
+        */
+        if (go && go->ToTransport())
+            *data << uint32(go->GetGOValue()->Transport.PathProgress);
+        else
+            *data << uint32(getMSTime());
     }
 
     // 0x80
     if (flags & UPDATEFLAG_VEHICLE)
     {
         /// @todo Allow players to aquire this updateflag.
+        ASSERT(unit);
+        ASSERT(unit->GetVehicleKit());
+        ASSERT(unit->GetVehicleKit()->GetVehicleInfo());
         *data << uint32(unit->GetVehicleKit()->GetVehicleInfo()->m_ID);
-        *data << float(unit->GetOrientation());
+        if (unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+            *data << float(unit->GetTransOffsetO());
+        else
+            *data << float(unit->GetOrientation());
     }
 
     // 0x200
@@ -750,9 +751,9 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 {
     ASSERT(index < m_valuesCount || PrintIndexError(index, true));
 
-    if (offset > 4)
+    if (offset > 3)
     {
-        TC_LOG_ERROR(LOG_FILTER_GENERAL, "Object::SetByteValue: wrong offset %u", offset);
+        TC_LOG_ERROR("misc", "Object::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -774,9 +775,9 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 {
     ASSERT(index < m_valuesCount || PrintIndexError(index, true));
 
-    if (offset > 2)
+    if (offset > 1)
     {
-        TC_LOG_ERROR(LOG_FILTER_GENERAL, "Object::SetUInt16Value: wrong offset %u", offset);
+        TC_LOG_ERROR("misc", "Object::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 
@@ -914,9 +915,9 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 {
     ASSERT(index < m_valuesCount || PrintIndexError(index, true));
 
-    if (offset > 4)
+    if (offset > 3)
     {
-        TC_LOG_ERROR(LOG_FILTER_GENERAL, "Object::SetByteFlag: wrong offset %u", offset);
+        TC_LOG_ERROR("misc", "Object::SetByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -937,9 +938,9 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 {
     ASSERT(index < m_valuesCount || PrintIndexError(index, true));
 
-    if (offset > 4)
+    if (offset > 3)
     {
-        TC_LOG_ERROR(LOG_FILTER_GENERAL, "Object::RemoveByteFlag: wrong offset %u", offset);
+        TC_LOG_ERROR("misc", "Object::RemoveByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -1006,7 +1007,7 @@ void Object::ApplyModFlag64(uint16 index, uint64 flag, bool apply)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    TC_LOG_ERROR(LOG_FILTER_GENERAL, "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
+    TC_LOG_ERROR("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
     return false;
@@ -1069,35 +1070,35 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 
 void MovementInfo::OutDebug()
 {
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "MOVEMENT INFO");
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "guid " UI64FMTD, guid);
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "flags %u", flags);
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "flags2 %u", flags2);
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "time %u current time " UI64FMTD "", flags2, uint64(::time(NULL)));
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "position: `%s`", pos.ToString().c_str());
+    TC_LOG_INFO("misc", "MOVEMENT INFO");
+    TC_LOG_INFO("misc", "guid " UI64FMTD, guid);
+    TC_LOG_INFO("misc", "flags %u", flags);
+    TC_LOG_INFO("misc", "flags2 %u", flags2);
+    TC_LOG_INFO("misc", "time %u current time " UI64FMTD "", flags2, uint64(::time(NULL)));
+    TC_LOG_INFO("misc", "position: `%s`", pos.ToString().c_str());
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "TRANSPORT:");
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "guid: " UI64FMTD, transport.guid);
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "position: `%s`", transport.pos.ToString().c_str());
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "seat: %i", transport.seat);
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "time: %u", transport.time);
+        TC_LOG_INFO("misc", "TRANSPORT:");
+        TC_LOG_INFO("misc", "guid: " UI64FMTD, transport.guid);
+        TC_LOG_INFO("misc", "position: `%s`", transport.pos.ToString().c_str());
+        TC_LOG_INFO("misc", "seat: %i", transport.seat);
+        TC_LOG_INFO("misc", "time: %u", transport.time);
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            TC_LOG_INFO(LOG_FILTER_GENERAL, "time2: %u", transport.time2);
+            TC_LOG_INFO("misc", "time2: %u", transport.time2);
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "pitch: %f", pitch);
+        TC_LOG_INFO("misc", "pitch: %f", pitch);
 
-    TC_LOG_INFO(LOG_FILTER_GENERAL, "fallTime: %u", fallTime);
+    TC_LOG_INFO("misc", "fallTime: %u", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        TC_LOG_INFO("misc", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        TC_LOG_INFO(LOG_FILTER_GENERAL, "splineElevation: %f", splineElevation);
+        TC_LOG_INFO("misc", "splineElevation: %f", splineElevation);
 }
 
-WorldObject::WorldObject(bool isWorldObject): WorldLocation(),
+WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID(0),
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
 m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
@@ -1563,13 +1564,17 @@ void WorldObject::GetRandomPoint(const Position &srcPos, float distance, Positio
 
 void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
-    float new_z = GetBaseMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+    float new_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z + 2.0f, true);
     if (new_z > INVALID_HEIGHT)
-        z = new_z+ 0.05f;                                   // just to be sure that we are not a few pixel under the surface
+        z = new_z + 0.05f;                                   // just to be sure that we are not a few pixel under the surface
 }
 
 void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
 {
+    // TODO: Allow transports to be part of dynamic vmap tree
+    if (GetTransport())
+        return;
+
     switch (GetTypeId())
     {
         case TYPEID_UNIT:
@@ -1581,8 +1586,8 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
                 bool canSwim = ToCreature()->CanSwim();
                 float ground_z = z;
                 float max_z = canSwim
-                    ? GetBaseMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
-                    : ((ground_z = GetBaseMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
+                    ? GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
+                    : ((ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
                 if (max_z > INVALID_HEIGHT)
                 {
                     if (z > max_z)
@@ -1593,7 +1598,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             }
             else
             {
-                float ground_z = GetBaseMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+                float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
                 if (z < ground_z)
                     z = ground_z;
             }
@@ -1605,7 +1610,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             if (!ToPlayer()->CanFly())
             {
                 float ground_z = z;
-                float max_z = GetBaseMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
+                float max_z = GetMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
                 if (max_z > INVALID_HEIGHT)
                 {
                     if (z > max_z)
@@ -1616,7 +1621,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             }
             else
             {
-                float ground_z = GetBaseMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+                float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
                 if (z < ground_z)
                     z = ground_z;
             }
@@ -1624,7 +1629,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
         }
         default:
         {
-            float ground_z = GetBaseMap()->GetHeight(GetPhaseMask(), x, y, z, true);
+            float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
             if (ground_z > INVALID_HEIGHT)
                 z = ground_z;
             break;
@@ -1895,180 +1900,142 @@ namespace Trinity
     class MonsterChatBuilder
     {
         public:
-            MonsterChatBuilder(WorldObject const& obj, ChatMsg msgtype, int32 textId, uint32 language, uint64 targetGUID)
-                : i_object(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_targetGUID(targetGUID) {}
+            MonsterChatBuilder(WorldObject const* obj, ChatMsg msgtype, int32 textId, uint32 language, WorldObject const* target)
+                : i_object(obj), i_msgtype(msgtype), i_textId(textId), i_language(Language(language)), i_target(target) { }
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
                 char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
-
-                /// @todo i_object.GetName() also must be localized?
-                i_object.BuildMonsterChat(&data, i_msgtype, text, i_language, i_object.GetNameForLocaleIdx(loc_idx), i_targetGUID);
+                ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
             }
 
         private:
-            WorldObject const& i_object;
+            WorldObject const* i_object;
             ChatMsg i_msgtype;
             int32 i_textId;
-            uint32 i_language;
-            uint64 i_targetGUID;
+            Language i_language;
+            WorldObject const* i_target;
     };
 
     class MonsterCustomChatBuilder
     {
         public:
-            MonsterCustomChatBuilder(WorldObject const& obj, ChatMsg msgtype, const char* text, uint32 language, uint64 targetGUID)
-                : i_object(obj), i_msgtype(msgtype), i_text(text), i_language(language), i_targetGUID(targetGUID) {}
+            MonsterCustomChatBuilder(WorldObject const* obj, ChatMsg msgtype, const char* text, uint32 language, WorldObject const* target)
+                : i_object(obj), i_msgtype(msgtype), i_text(text), i_language(Language(language)), i_target(target)
+            {}
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                /// @todo i_object.GetName() also must be localized?
-                i_object.BuildMonsterChat(&data, i_msgtype, i_text, i_language, i_object.GetNameForLocaleIdx(loc_idx), i_targetGUID);
+                ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, i_text, 0, "", loc_idx);
             }
 
         private:
-            WorldObject const& i_object;
+            WorldObject const* i_object;
             ChatMsg i_msgtype;
             const char* i_text;
-            uint32 i_language;
-            uint64 i_targetGUID;
+            Language i_language;
+            WorldObject const* i_target;
     };
 }                                                           // namespace Trinity
 
-void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGuid)
+void WorldObject::MonsterSay(const char* text, uint32 language, WorldObject const* target)
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::MonsterCustomChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, text, language, TargetGuid);
+    Trinity::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, text, language, target);
     Trinity::LocalizedPacketDo<Trinity::MonsterCustomChatBuilder> say_do(say_build);
     Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
     TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
-void WorldObject::MonsterSay(int32 textId, uint32 language, uint64 TargetGuid)
+void WorldObject::MonsterSay(int32 textId, uint32 language, WorldObject const* target)
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, textId, language, TargetGuid);
+    Trinity::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_SAY, textId, language, target);
     Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> say_do(say_build);
     Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
     TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
-void WorldObject::MonsterYell(const char* text, uint32 language, uint64 TargetGuid)
+void WorldObject::MonsterYell(const char* text, uint32 language, WorldObject const* target)
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::MonsterCustomChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, text, language, TargetGuid);
+    Trinity::MonsterCustomChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, text, language, target);
     Trinity::LocalizedPacketDo<Trinity::MonsterCustomChatBuilder> say_do(say_build);
     Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
     TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
-void WorldObject::MonsterYell(int32 textId, uint32 language, uint64 TargetGuid)
+void WorldObject::MonsterYell(int32 textId, uint32 language, WorldObject const* target)
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, TargetGuid);
+    Trinity::MonsterChatBuilder say_build(this, CHAT_MSG_MONSTER_YELL, textId, language, target);
     Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> say_do(say_build);
     Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
     TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
-void WorldObject::MonsterYellToZone(int32 textId, uint32 language, uint64 TargetGuid)
+void WorldObject::MonsterTextEmote(const char* text, WorldObject const* target, bool IsBossEmote)
 {
-    Trinity::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, TargetGuid);
-    Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> say_do(say_build);
-
-    uint32 zoneid = GetZoneId();
-
-    Map::PlayerList const& pList = GetMap()->GetPlayers();
-    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-        if (itr->GetSource()->GetZoneId() == zoneid)
-            say_do(itr->GetSource());
-}
-
-void WorldObject::MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote)
-{
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, text, LANG_UNIVERSAL, GetName(), TargetGuid);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL,
+                                 this, target, text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true);
 }
 
-void WorldObject::MonsterTextEmote(int32 textId, uint64 TargetGuid, bool IsBossEmote)
+void WorldObject::MonsterTextEmote(int32 textId, WorldObject const* target, bool IsBossEmote)
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::MonsterChatBuilder say_build(*this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, TargetGuid);
+    Trinity::MonsterChatBuilder say_build(this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, target);
     Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> say_do(say_build);
     Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), say_do);
     TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 }
 
-void WorldObject::MonsterWhisper(const char* text, uint64 receiver, bool IsBossWhisper)
+void WorldObject::MonsterWhisper(const char* text, Player const* target, bool IsBossWhisper)
 {
-    Player* player = ObjectAccessor::FindPlayer(receiver);
-    if (!player || !player->GetSession())
+    if (!target)
         return;
 
-    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
-
-    player->GetSession()->SendPacket(&data);
+    LocaleConstant loc_idx = target->GetSession()->GetSessionDbLocaleIndex();
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, text, 0, "", loc_idx);
+    target->GetSession()->SendPacket(&data);
 }
 
-void WorldObject::MonsterWhisper(int32 textId, uint64 receiver, bool IsBossWhisper)
+void WorldObject::MonsterWhisper(int32 textId, Player const* target, bool IsBossWhisper)
 {
-    Player* player = ObjectAccessor::FindPlayer(receiver);
-    if (!player || !player->GetSession())
+    if (!target)
         return;
 
-    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+    LocaleConstant loc_idx = target->GetSession()->GetSessionDbLocaleIndex();
     char const* text = sObjectMgr->GetTrinityString(textId, loc_idx);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, text, 0, "", loc_idx);
 
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
-
-    player->GetSession()->SendPacket(&data);
-}
-
-void WorldObject::BuildMonsterChat(WorldPacket* data, uint8 msgtype, char const* text, uint32 language, std::string const &name, uint64 targetGuid) const
-{
-    *data << (uint8)msgtype;
-    *data << (uint32)language;
-    *data << (uint64)GetGUID();
-    *data << (uint32)0;                                     // 2.1.0
-    *data << (uint32)(name.size()+1);
-    *data << name;
-    *data << (uint64)targetGuid;                            // Unit Target
-    if (targetGuid && !IS_PLAYER_GUID(targetGuid))
-    {
-        *data << (uint32)1;                                 // target name length
-        *data << (uint8)0;                                  // target name
-    }
-    *data << (uint32)(strlen(text)+1);
-    *data << text;
-    *data << (uint8)0;                                      // ChatTag
+    target->GetSession()->SendPacket(&data);
 }
 
 void Unit::BuildHeartBeatMsg(WorldPacket* data) const
@@ -2111,7 +2078,7 @@ void WorldObject::SetMap(Map* map)
         return;
     if (m_currMap)
     {
-        TC_LOG_FATAL(LOG_FILTER_GENERAL, "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        TC_LOG_FATAL("misc", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ASSERT(false);
     }
     m_currMap = map;
@@ -2146,7 +2113,7 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        TC_LOG_ERROR(LOG_FILTER_GENERAL, "Object (TypeId: %u Entry: %u GUID: %u) at attempt add to move list not have valid map (Id: %u).", GetTypeId(), GetEntry(), GetGUIDLow(), GetMapId());
+        TC_LOG_ERROR("misc", "Object (TypeId: %u Entry: %u GUID: %u) at attempt add to move list not have valid map (Id: %u).", GetTypeId(), GetEntry(), GetGUIDLow(), GetMapId());
         return;
     }
 
@@ -2230,8 +2197,6 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
         case UNIT_MASK_MINION:
             summon = new Minion(properties, summoner, false);
             break;
-        default:
-            return NULL;
     }
 
     if (!summon->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), this, phase, entry, vehId, team, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
@@ -2322,7 +2287,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        TC_LOG_ERROR(LOG_FILTER_SQL, "Gameobject template %u not found in database!", entry);
+        TC_LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
         return NULL;
     }
 
@@ -2443,10 +2408,10 @@ namespace Trinity
     {
         public:
             NearUsedPosDo(WorldObject const& obj, WorldObject const* searcher, float angle, ObjectPosSelector& selector)
-                : i_object(obj), i_searcher(searcher), i_angle(angle), i_selector(selector) {}
+                : i_object(obj), i_searcher(searcher), i_angle(angle), i_selector(selector) { }
 
-            void operator()(Corpse*) const {}
-            void operator()(DynamicObject*) const {}
+            void operator()(Corpse*) const { }
+            void operator()(DynamicObject*) const { }
 
             void operator()(Creature* c) const
             {
@@ -2524,125 +2489,36 @@ void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float 
 {
     GetNearPoint2D(x, y, distance2d+searcher_size, absAngle);
     z = GetPositionZ();
+    // Should "searcher" be used instead of "this" when updating z coordinate ?
     UpdateAllowedPositionZ(x, y, z);
 
-    /*
     // if detection disabled, return first point
-    if (!sWorld->getIntConfig(CONFIG_DETECT_POS_COLLISION))
-    {
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
+    if (!sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION))
         return;
-    }
 
-    // or remember first point
+    // return if the point is already in LoS
+    if (IsWithinLOS(x, y, z))
+        return;
+
+    // remember first point
     float first_x = x;
     float first_y = y;
-    bool first_los_conflict = false;                        // first point LOS problems
+    float first_z = z;
 
-    // prepare selector for work
-    ObjectPosSelector selector(GetPositionX(), GetPositionY(), GetObjectSize(), distance2d+searcher_size);
-
-    // adding used positions around object
+    // loop in a circle to look for a point in LoS using small steps
+    for (float angle = M_PI / 8; angle < M_PI * 2; angle += M_PI / 8)
     {
-        CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-        cell.SetNoCreate();
-
-        Trinity::NearUsedPosDo u_do(*this, searcher, absAngle, selector);
-        Trinity::WorldObjectWorker<Trinity::NearUsedPosDo> worker(this, u_do);
-
-        TypeContainerVisitor<Trinity::WorldObjectWorker<Trinity::NearUsedPosDo>, GridTypeMapContainer  > grid_obj_worker(worker);
-        TypeContainerVisitor<Trinity::WorldObjectWorker<Trinity::NearUsedPosDo>, WorldTypeMapContainer > world_obj_worker(worker);
-
-        CellLock<GridReadGuard> cell_lock(cell, p);
-        cell_lock->Visit(cell_lock, grid_obj_worker,  *GetMap(), *this, distance2d);
-        cell_lock->Visit(cell_lock, world_obj_worker, *GetMap(), *this, distance2d);
-    }
-
-    // maybe can just place in primary position
-    if (selector.CheckOriginal())
-    {
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-
-        first_los_conflict = true;                          // first point have LOS problems
-    }
-
-    float angle;                                            // candidate of angle for free pos
-
-    // special case when one from list empty and then empty side preferred
-    if (selector.FirstAngle(angle))
-    {
-        GetNearPoint2D(x, y, distance2d, absAngle+angle);
+        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle);
         z = GetPositionZ();
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
+        UpdateAllowedPositionZ(x, y, z);
         if (IsWithinLOS(x, y, z))
             return;
     }
 
-    // set first used pos in lists
-    selector.InitializeAngle();
-
-    // select in positions after current nodes (selection one by one)
-    while (selector.NextAngle(angle))                        // angle for free pos
-    {
-        GetNearPoint2D(x, y, distance2d, absAngle+angle);
-        z = GetPositionZ();
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-    }
-
-    // BAD NEWS: not free pos (or used or have LOS problems)
-    // Attempt find _used_ pos without LOS problem
-
-    if (!first_los_conflict)
-    {
-        x = first_x;
-        y = first_y;
-
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-        return;
-    }
-
-    // special case when one from list empty and then empty side preferred
-    if (selector.IsNonBalanced())
-    {
-        if (!selector.FirstAngle(angle))                     // _used_ pos
-        {
-            GetNearPoint2D(x, y, distance2d, absAngle+angle);
-            z = GetPositionZ();
-            UpdateGroundPositionZ(x, y, z);                   // update to LOS height if available
-
-            if (IsWithinLOS(x, y, z))
-                return;
-        }
-    }
-
-    // set first used pos in lists
-    selector.InitializeAngle();
-
-    // select in positions after current nodes (selection one by one)
-    while (selector.NextUsedAngle(angle))                    // angle for used pos but maybe without LOS problem
-    {
-        GetNearPoint2D(x, y, distance2d, absAngle+angle);
-        z = GetPositionZ();
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-    }
-
-    // BAD BAD NEWS: all found pos (free and used) have LOS problem :(
+    // still not in LoS, give up and return first position found
     x = first_x;
     y = first_y;
-
-    UpdateGroundPositionZ(x, y, z);                           // update to LOS height if available
-    */
+    z = first_z;
 }
 
 void WorldObject::GetClosePoint(float &x, float &y, float &z, float size, float distance2d /*= 0*/, float angle /*= 0*/) const
@@ -2690,7 +2566,8 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!Trinity::IsValidMapCoord(destx, desty, pos.m_positionZ))
     {
-        TC_LOG_FATAL(LOG_FILTER_GENERAL, "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        TC_LOG_FATAL("misc", "WorldObject::MovePosition: Object (TypeId: %u Entry: %u GUID: %u) has invalid coordinates X: %f and Y: %f were passed!",
+            GetTypeId(), GetEntry(), GetGUIDLow(), destx, desty);
         return;
     }
 
@@ -2736,7 +2613,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     // Prevent invalid coordinates here, position is unchanged
     if (!Trinity::IsValidMapCoord(destx, desty))
     {
-        TC_LOG_FATAL(LOG_FILTER_GENERAL, "WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        TC_LOG_FATAL("misc", "WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
     }
 
@@ -2866,7 +2743,7 @@ struct WorldObjectChangeAccumulator
     UpdateDataMapType& i_updateDatas;
     WorldObject& i_object;
     std::set<uint64> plr_list;
-    WorldObjectChangeAccumulator(WorldObject &obj, UpdateDataMapType &d) : i_updateDatas(d), i_object(obj) {}
+    WorldObjectChangeAccumulator(WorldObject &obj, UpdateDataMapType &d) : i_updateDatas(d), i_object(obj) { }
     void Visit(PlayerMapType &m)
     {
         Player* source = NULL;
@@ -2928,7 +2805,7 @@ struct WorldObjectChangeAccumulator
         }
     }
 
-    template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+    template<class SKIP> void Visit(GridRefManager<SKIP> &) { }
 };
 
 void WorldObject::BuildUpdate(UpdateDataMapType& data_map)

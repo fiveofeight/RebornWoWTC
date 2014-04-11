@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,7 +26,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-enum eEnums
+enum Spells
 {
     //Dathrohan spells
     SPELL_CRUSADERSHAMMER           = 17286,                //AOE stun
@@ -41,8 +41,11 @@ enum eEnums
     SPELL_MINDBLAST                 = 17287,
     SPELL_PSYCHICSCREAM             = 13704,
     SPELL_SLEEP                     = 12098,
-    SPELL_MINDCONTROL               = 15690,
+    SPELL_MINDCONTROL               = 15690
+};
 
+enum Creatures
+{
     NPC_DATHROHAN                   = 10812,
     NPC_BALNAZZAR                   = 10813,
     NPC_ZOMBIE                      = 10698                 //probably incorrect
@@ -71,14 +74,14 @@ class boss_dathrohan_balnazzar : public CreatureScript
 public:
     boss_dathrohan_balnazzar() : CreatureScript("boss_dathrohan_balnazzar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_dathrohan_balnazzarAI (creature);
+        return new boss_dathrohan_balnazzarAI(creature);
     }
 
     struct boss_dathrohan_balnazzarAI : public ScriptedAI
     {
-        boss_dathrohan_balnazzarAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_dathrohan_balnazzarAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 m_uiCrusadersHammer_Timer;
         uint32 m_uiCrusaderStrike_Timer;
@@ -90,7 +93,7 @@ public:
         uint32 m_uiMindControl_Timer;
         bool m_bTransformed;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             m_uiCrusadersHammer_Timer = 8000;
             m_uiCrusaderStrike_Timer = 12000;
@@ -106,7 +109,7 @@ public:
                 me->UpdateEntry(NPC_DATHROHAN);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             static uint32 uiCount = sizeof(m_aSummonPoint)/sizeof(SummonDef);
 
@@ -116,11 +119,11 @@ public:
                 TEMPSUMMON_TIMED_DESPAWN, HOUR*IN_MILLISECONDS);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -159,7 +162,7 @@ public:
                 //BalnazzarTransform
                 if (HealthBelowPct(40))
                 {
-                    if (me->IsNonMeleeSpellCasted(false))
+                    if (me->IsNonMeleeSpellCast(false))
                         me->InterruptNonMeleeSpells(false);
 
                     //restore hp, mana and stun

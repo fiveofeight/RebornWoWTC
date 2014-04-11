@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ public:
 
     struct boss_galvangarAI : public ScriptedAI
     {
-        boss_galvangarAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_galvangarAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 CleaveTimer;
         uint32 FrighteningShoutTimer;
@@ -49,7 +49,7 @@ public:
         uint32 MortalStrikeTimer;
         uint32 ResetTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             CleaveTimer                     = urand(1 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
             FrighteningShoutTimer           = urand(2 * IN_MILLISECONDS, 19 * IN_MILLISECONDS);
@@ -59,17 +59,17 @@ public:
             ResetTimer                      = 5 * IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() OVERRIDE
         {
             Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -119,7 +119,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new boss_galvangarAI(creature);
     }

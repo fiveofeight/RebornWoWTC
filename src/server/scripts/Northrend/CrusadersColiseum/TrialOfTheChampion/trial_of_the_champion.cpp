@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Script updated by Fiveofeight
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -291,7 +291,7 @@ class npc_herald_toc5 : public CreatureScript
             }
         }
 
-        void SetData(uint32 uiType, uint32 /*uiData*/)
+        void SetData(uint32 uiType, uint32 /*uiData*/) OVERRIDE
         {
             switch (uiType)
             {
@@ -353,16 +353,13 @@ class npc_herald_toc5 : public CreatureScript
             }
         }
 
-        void MovementInform(uint32 uiType, uint32 uiPointId)
+        void MovementInform(uint32 uiType, uint32 uiPointId) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
 
             if (uiPointId == 1)
-            {
-                me->SetOrientation(ORIENTATION);
-                me->SendMovementFlagUpdate();
-            }
+                me->SetFacingTo(ORIENTATION);
         }
 
         void JustSummoned(Creature* summon)
@@ -590,9 +587,6 @@ class npc_herald_toc5 : public CreatureScript
 
         void StartEncounter()
         {
-            if (!instance)
-                return;
-
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 if (GameObject* pGO = GameObject::GetGameObject(*me, instance->GetData64(DATA_MAIN_GATE1)))
                         instance->HandleGameObject(pGO->GetGUID(),false);
@@ -794,7 +788,7 @@ class npc_herald_toc5 : public CreatureScript
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_herald_toc5AI (creature);
     };

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -275,7 +275,7 @@ class npc_highlord_darion_mograine : public CreatureScript
 public:
     npc_highlord_darion_mograine() : CreatureScript("npc_highlord_darion_mograine") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
         switch (action)
@@ -289,7 +289,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) OVERRIDE
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -302,7 +302,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_highlord_darion_mograineAI(creature);
     }
@@ -311,6 +311,23 @@ public:
     {
         npc_highlord_darion_mograineAI(Creature* creature) : npc_escortAI(creature)
         {
+            uiTirionGUID = 0;
+            uiKorfaxGUID = 0;
+            uiMaxwellGUID = 0;
+            uiEligorGUID = 0;
+            uiRayneGUID = 0;
+            uiKoltiraGUID = 0;
+            uiOrbazGUID = 0;
+            uiThassarianGUID = 0;
+            uiLichKingGUID = 0;
+
+            memset(uiDefenderGUID, 0, sizeof(uiDefenderGUID));
+            memset(uiEarthshatterGUID, 0, sizeof(uiEarthshatterGUID));
+            memset(uiAbominationGUID, 0, sizeof(uiAbominationGUID));
+            memset(uiBehemothGUID, 0, sizeof(uiBehemothGUID));
+            memset(uiGhoulGUID, 0, sizeof(uiGhoulGUID));
+            memset(uiWarriorGUID, 0, sizeof(uiWarriorGUID));
+
             Reset();
         }
 
@@ -353,7 +370,7 @@ public:
         uint64 uiGhoulGUID[ENCOUNTER_GHOUL_NUMBER];
         uint64 uiWarriorGUID[ENCOUNTER_WARRIOR_NUMBER];
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -453,7 +470,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -470,7 +487,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             if (!who)
                 return;
@@ -485,7 +503,7 @@ public:
             SetEscortPaused(bOnHold);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             switch (waypointId)
             {
@@ -600,13 +618,13 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() OVERRIDE
         {
             if (!bIsBattle)//do not reset self if we are in battle
                 npc_escortAI::EnterEvadeMode();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -1652,18 +1670,18 @@ class npc_the_lich_king_tirion_dawn : public CreatureScript
 public:
     npc_the_lich_king_tirion_dawn() : CreatureScript("npc_the_lich_king_tirion_dawn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new npc_the_lich_king_tirion_dawnAI (creature);
+        return new npc_the_lich_king_tirion_dawnAI(creature);
     }
 
     struct npc_the_lich_king_tirion_dawnAI : public ScriptedAI
     {
         npc_the_lich_king_tirion_dawnAI(Creature* creature) : ScriptedAI(creature) { Reset(); }
-        void Reset() {}
-        void AttackStart(Unit* /*who*/) {} // very sample, just don't make them aggreesive
-        void UpdateAI(uint32 /*diff*/) {}
-        void JustDied(Unit* /*killer*/) {}
+        void Reset() OVERRIDE { }
+        void AttackStart(Unit* /*who*/) { } // very sample, just don't make them aggreesive OVERRIDE
+        void UpdateAI(uint32 /*diff*/) OVERRIDE { }
+        void JustDied(Unit* /*killer*/) OVERRIDE { }
     };
 
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -69,9 +69,9 @@ class boss_nightbane : public CreatureScript
 public:
     boss_nightbane() : CreatureScript("boss_nightbane") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_nightbaneAI (creature);
+        return GetInstanceAI<boss_nightbaneAI>(creature);
     }
 
     struct boss_nightbaneAI : public ScriptedAI
@@ -109,7 +109,7 @@ public:
         uint32 WaitTimer;
         uint32 MovePhase;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             BellowingRoarTimer = 30000;
             CharredEarthTimer = 15000;
@@ -131,13 +131,10 @@ public:
             me->SetWalk(false);
             me->setActive(true);
 
-            if (instance)
-            {
-                if (instance->GetData(TYPE_NIGHTBANE) == DONE || instance->GetData(TYPE_NIGHTBANE) == IN_PROGRESS)
-                    me->DisappearAndDie();
-                else
-                    instance->SetData(TYPE_NIGHTBANE, NOT_STARTED);
-            }
+            if (instance->GetData(TYPE_NIGHTBANE) == DONE || instance->GetData(TYPE_NIGHTBANE) == IN_PROGRESS)
+                me->DisappearAndDie();
+            else
+                instance->SetData(TYPE_NIGHTBANE, NOT_STARTED);
 
             HandleTerraceDoors(true);
 
@@ -153,43 +150,39 @@ public:
 
         void HandleTerraceDoors(bool open)
         {
-            if (instance)
-            {
-                instance->HandleGameObject(instance->GetData64(DATA_MASTERS_TERRACE_DOOR_1), open);
-                instance->HandleGameObject(instance->GetData64(DATA_MASTERS_TERRACE_DOOR_2), open);
-            }
+            instance->HandleGameObject(instance->GetData64(DATA_MASTERS_TERRACE_DOOR_1), open);
+            instance->HandleGameObject(instance->GetData64(DATA_MASTERS_TERRACE_DOOR_2), open);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
-            if (instance)
-                instance->SetData(TYPE_NIGHTBANE, IN_PROGRESS);
+            instance->SetData(TYPE_NIGHTBANE, IN_PROGRESS);
 
             HandleTerraceDoors(false);
            Talk(YELL_AGGRO);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) OVERRIDE
         {
             if (!Intro && !Flying)
                 ScriptedAI::AttackStart(who);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
-            if (instance)
-                instance->SetData(TYPE_NIGHTBANE, DONE);
+            instance->SetData(TYPE_NIGHTBANE, DONE);
 
             HandleTerraceDoors(true);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             if (!Intro && !Flying)
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) OVERRIDE
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -235,7 +228,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             summoned->AI()->AttackStart(me->GetVictim());
         }
@@ -260,7 +253,7 @@ public:
             Skeletons = false;
          }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             /* The timer for this was never setup apparently, not sure if the code works properly:
             if (WaitTimer <= diff)

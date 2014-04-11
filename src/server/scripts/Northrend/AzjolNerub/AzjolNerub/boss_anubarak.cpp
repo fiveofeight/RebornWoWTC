@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -52,7 +52,7 @@ enum Yells
     SAY_INTRO                                     = 5
 };
 
-enum
+enum Misc
 {
     ACHIEV_TIMED_START_EVENT                      = 20381,
 };
@@ -113,7 +113,7 @@ public:
 
         SummonList Summons;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             CarrionBeetlesTimer = 8*IN_MILLISECONDS;
             LeechingSwarmTimer = 20*IN_MILLISECONDS;
@@ -130,11 +130,8 @@ public:
 
             Summons.DespawnAll();
 
-            if (instance)
-            {
-                instance->SetData(DATA_ANUBARAK_EVENT, NOT_STARTED);
-                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-            }
+            instance->SetBossState(DATA_ANUBARAK, NOT_STARTED);
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         }
 
         Creature* DoSummonImpaleTarget(Unit* target)
@@ -154,21 +151,19 @@ public:
             return NULL;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             Talk(SAY_AGGRO);
             DelayTimer = 0;
-            if (instance)
-                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         }
 
         void DelayEventStart()
         {
-            if (instance)
-                instance->SetData(DATA_ANUBARAK_EVENT, IN_PROGRESS);
+            instance->SetBossState(DATA_ANUBARAK, IN_PROGRESS);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -331,15 +326,14 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             Talk(SAY_DEATH);
             Summons.DespawnAll();
-            if (instance)
-                instance->SetData(DATA_ANUBARAK_EVENT, DONE);
+            instance->SetBossState(DATA_ANUBARAK, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) OVERRIDE
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -347,15 +341,15 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) OVERRIDE
         {
             Summons.Summon(summon);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_anub_arakAI(creature);
+        return GetInstanceAI<boss_anub_arakAI>(creature);
     }
 };
 

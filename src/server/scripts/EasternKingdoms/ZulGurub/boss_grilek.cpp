@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -41,30 +41,30 @@ enum Events
 
 class boss_grilek : public CreatureScript // grilek
 {
-    public: boss_grilek() : CreatureScript("boss_grilek") {}
+    public: boss_grilek() : CreatureScript("boss_grilek") { }
 
         struct boss_grilekAI : public BossAI
         {
-            boss_grilekAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) {}
+            boss_grilekAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) { }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _Reset();
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_AVATAR, urand(15000, 25000));
                 events.ScheduleEvent(EVENT_GROUND_TREMOR, urand(15000, 25000));
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -103,7 +103,7 @@ class boss_grilek : public CreatureScript // grilek
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_grilekAI(creature);
         }

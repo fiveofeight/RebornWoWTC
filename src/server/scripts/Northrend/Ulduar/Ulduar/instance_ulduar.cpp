@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,15 +24,21 @@
 
 static DoorData const doorData[] =
 {
-    {GO_LEVIATHAN_DOOR,                 BOSS_LEVIATHAN,  DOOR_TYPE_ROOM,         BOUNDARY_S      },
-    {GO_XT_002_DOOR,                    BOSS_XT002,      DOOR_TYPE_ROOM,         BOUNDARY_S      },
-    {GO_YOGG_SARON_DOOR,                BOSS_YOGG_SARON, DOOR_TYPE_ROOM,         BOUNDARY_S      },
-    {GO_DOODAD_UL_SIGILDOOR_03,         BOSS_ALGALON,    DOOR_TYPE_ROOM,         BOUNDARY_W      },
-    {GO_DOODAD_UL_UNIVERSEFLOOR_01,     BOSS_ALGALON,    DOOR_TYPE_ROOM,         BOUNDARY_NONE   },
-    {GO_DOODAD_UL_UNIVERSEFLOOR_02,     BOSS_ALGALON,    DOOR_TYPE_SPAWN_HOLE,   BOUNDARY_NONE   },
-    {GO_DOODAD_UL_UNIVERSEGLOBE01,      BOSS_ALGALON,    DOOR_TYPE_SPAWN_HOLE,   BOUNDARY_NONE   },
-    {GO_DOODAD_UL_ULDUAR_TRAPDOOR_03,   BOSS_ALGALON,    DOOR_TYPE_SPAWN_HOLE,   BOUNDARY_NONE   },
-    {0,                                 0,               DOOR_TYPE_ROOM,         BOUNDARY_NONE   },
+    { GO_LEVIATHAN_DOOR,                BOSS_LEVIATHAN,         DOOR_TYPE_ROOM,         BOUNDARY_S      },
+    { GO_XT_002_DOOR,                   BOSS_XT002,             DOOR_TYPE_ROOM,         BOUNDARY_S      },
+    { GO_IRON_COUNCIL_DOOR,             BOSS_ASSEMBLY_OF_IRON,  DOOR_TYPE_ROOM,         BOUNDARY_N      },
+    { GO_ARCHIVUM_DOOR,                 BOSS_ASSEMBLY_OF_IRON,  DOOR_TYPE_PASSAGE,      BOUNDARY_S      },
+    { GO_HODIR_ENTRANCE,                BOSS_HODIR,             DOOR_TYPE_ROOM,         BOUNDARY_E      },
+    { GO_HODIR_DOOR,                    BOSS_HODIR,             DOOR_TYPE_PASSAGE,      BOUNDARY_NONE   },
+    { GO_HODIR_ICE_DOOR,                BOSS_HODIR,             DOOR_TYPE_PASSAGE,      BOUNDARY_W      },
+    { GO_VEZAX_DOOR,                    BOSS_VEZAX,             DOOR_TYPE_PASSAGE,      BOUNDARY_E      },
+    { GO_YOGG_SARON_DOOR,               BOSS_YOGG_SARON,        DOOR_TYPE_ROOM,         BOUNDARY_S      },
+    { GO_DOODAD_UL_SIGILDOOR_03,        BOSS_ALGALON,           DOOR_TYPE_ROOM,         BOUNDARY_W      },
+    { GO_DOODAD_UL_UNIVERSEFLOOR_01,    BOSS_ALGALON,           DOOR_TYPE_ROOM,         BOUNDARY_NONE   },
+    { GO_DOODAD_UL_UNIVERSEFLOOR_02,    BOSS_ALGALON,           DOOR_TYPE_SPAWN_HOLE,   BOUNDARY_NONE   },
+    { GO_DOODAD_UL_UNIVERSEGLOBE01,     BOSS_ALGALON,           DOOR_TYPE_SPAWN_HOLE,   BOUNDARY_NONE   },
+    { GO_DOODAD_UL_ULDUAR_TRAPDOOR_03,  BOSS_ALGALON,           DOOR_TYPE_SPAWN_HOLE,   BOUNDARY_NONE   },
+    { 0,                                0,                      DOOR_TYPE_ROOM,         BOUNDARY_NONE   },
 };
 
 MinionData const minionData[] =
@@ -46,7 +52,7 @@ MinionData const minionData[] =
 class instance_ulduar : public InstanceMapScript
 {
     public:
-        instance_ulduar() : InstanceMapScript("instance_ulduar", 603) { }
+        instance_ulduar() : InstanceMapScript(UlduarScriptName, 603) { }
 
         struct instance_ulduar_InstanceMapScript : public InstanceScript
         {
@@ -73,6 +79,7 @@ class instance_ulduar : public InstanceMapScript
             uint64 VoiceOfYoggSaronGUID;
             uint64 SaraGUID;
             uint64 BrainOfYoggSaronGUID;
+            uint64 KeeperGUIDs[4];
             uint64 AlgalonGUID;
             uint64 BrannBronzebeardAlgGUID;
 
@@ -81,16 +88,10 @@ class instance_ulduar : public InstanceMapScript
             uint64 RazorHarpoonGUIDs[4];
             uint64 KologarnChestGUID;
             uint64 KologarnBridgeGUID;
-            uint64 KologarnDoorGUID;
             uint64 ThorimChestGUID;
             uint64 HodirRareCacheGUID;
             uint64 HodirChestGUID;
-            uint64 HodirDoorGUID;
-            uint64 HodirIceDoorGUID;
-            uint64 ArchivumDoorGUID;
-            uint64 VezaxDoorGUID;
             uint64 BrainRoomDoorGUIDs[3];
-            uint64 KeeperGUIDs[4];
             uint64 AlgalonSigilDoorGUID[3];
             uint64 AlgalonFloorGUID[2];
             uint64 AlgalonUniverseGUID;
@@ -110,11 +111,12 @@ class instance_ulduar : public InstanceMapScript
 
             std::set<uint64> mRubbleSpawns;
 
-            void Initialize()
+            void Initialize() OVERRIDE
             {
                 SetBossNumber(MAX_ENCOUNTER);
                 LoadDoorData(doorData);
                 LoadMinionData(minionData);
+                LeviathanGUID                    = 0;
                 IgnisGUID                        = 0;
                 RazorscaleGUID                   = 0;
                 RazorscaleController             = 0;
@@ -138,10 +140,6 @@ class instance_ulduar : public InstanceMapScript
                 HodirRareCacheGUID               = 0;
                 HodirChestGUID                   = 0;
                 LeviathanGateGUID                = 0;
-                VezaxDoorGUID                    = 0;
-                HodirDoorGUID                    = 0;
-                HodirIceDoorGUID                 = 0;
-                ArchivumDoorGUID                 = 0;
                 AlgalonUniverseGUID              = 0;
                 AlgalonTrapdoorGUID              = 0;
                 BrannBronzebeardAlgGUID          = 0;
@@ -157,6 +155,7 @@ class instance_ulduar : public InstanceMapScript
                 keepersCount                     = 0;
                 conSpeedAtory                    = false;
                 Unbroken                         = true;
+                IsDriveMeCrazyEligible           = true;
                 _algalonSummoned                 = false;
                 _summonAlgalon                   = false;
 
@@ -172,13 +171,13 @@ class instance_ulduar : public InstanceMapScript
                 memset(_summonYSKeeper, false, sizeof(_summonYSKeeper));
             }
 
-            void FillInitialWorldStates(WorldPacket& packet)
+            void FillInitialWorldStates(WorldPacket& packet) OVERRIDE
             {
                 packet << uint32(WORLD_STATE_ALGALON_TIMER_ENABLED) << uint32(_algalonTimer && _algalonTimer <= 60);
                 packet << uint32(WORLD_STATE_ALGALON_DESPAWN_TIMER) << uint32(std::min<uint32>(_algalonTimer, 60));
             }
 
-            void OnPlayerEnter(Player* player)
+            void OnPlayerEnter(Player* player) OVERRIDE
             {
                 if (!TeamInInstance)
                     TeamInInstance = player->GetTeam();
@@ -226,7 +225,7 @@ class instance_ulduar : public InstanceMapScript
                     instance->SummonCreature(NPC_MIMIRON_YS, YSKeepersPos[3]);
             }
 
-            void OnCreatureCreate(Creature* creature)
+            void OnCreatureCreate(Creature* creature) OVERRIDE
             {
                 if (!TeamInInstance)
                 {
@@ -419,7 +418,7 @@ class instance_ulduar : public InstanceMapScript
                 }
             }
 
-            void OnCreatureRemove(Creature* creature)
+            void OnCreatureRemove(Creature* creature) OVERRIDE
             {
                 switch (creature->GetEntry())
                 {
@@ -458,9 +457,6 @@ class instance_ulduar : public InstanceMapScript
                         if (GetBossState(BOSS_KOLOGARN) == DONE)
                             HandleGameObject(0, false, gameObject);
                         break;
-                    case GO_KOLOGARN_DOOR:
-                        KologarnDoorGUID = gameObject->GetGUID();
-                        break;
                     case GO_THORIM_CHEST_HERO:
                     case GO_THORIM_CHEST:
                         ThorimChestGUID = gameObject->GetGUID();
@@ -473,20 +469,21 @@ class instance_ulduar : public InstanceMapScript
                     case GO_HODIR_CHEST:
                         HodirChestGUID = gameObject->GetGUID();
                         break;
-                    case GO_LEVIATHAN_DOOR:
-                        AddDoor(gameObject, true);
-                        break;
                     case GO_LEVIATHAN_GATE:
                         LeviathanGateGUID = gameObject->GetGUID();
                         if (GetBossState(BOSS_LEVIATHAN) == DONE)
                             gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                         break;
+                    case GO_LEVIATHAN_DOOR:
                     case GO_XT_002_DOOR:
-                        AddDoor(gameObject, true);
-                        break;
+                    case GO_IRON_COUNCIL_DOOR:
+                    case GO_ARCHIVUM_DOOR:
+                    case GO_HODIR_ENTRANCE:
+                    case GO_HODIR_DOOR:
+                    case GO_HODIR_ICE_DOOR:
                     case GO_VEZAX_DOOR:
-                        VezaxDoorGUID = gameObject->GetGUID();
-                        HandleGameObject(0, false, gameObject);
+                    case GO_YOGG_SARON_DOOR:
+                        AddDoor(gameObject, true);
                         break;
                     case GO_RAZOR_HARPOON_1:
                         RazorHarpoonGUIDs[0] = gameObject->GetGUID();
@@ -503,19 +500,6 @@ class instance_ulduar : public InstanceMapScript
                     case GO_MOLE_MACHINE:
                         if (GetBossState(BOSS_RAZORSCALE) == IN_PROGRESS)
                             gameObject->SetGoState(GO_STATE_ACTIVE);
-                    case GO_HODIR_DOOR:
-                        HodirDoorGUID = gameObject->GetGUID();
-                        break;
-                    case GO_HODIR_ICE_DOOR:
-                        HodirIceDoorGUID = gameObject->GetGUID();
-                        break;
-                    case GO_ARCHIVUM_DOOR:
-                        ArchivumDoorGUID = gameObject->GetGUID();
-                        if (GetBossState(BOSS_ASSEMBLY_OF_IRON) != DONE)
-                            HandleGameObject(ArchivumDoorGUID, false);
-                        break;
-                    case GO_YOGG_SARON_DOOR:
-                        AddDoor(gameObject, true);
                         break;
                     case GO_BRAIN_ROOM_DOOR_1:
                         BrainRoomDoorGUIDs[0] = gameObject->GetGUID();
@@ -565,15 +549,24 @@ class instance_ulduar : public InstanceMapScript
                     case GO_GIFT_OF_THE_OBSERVER_25:
                         GiftOfTheObserverGUID = gameObject->GetGUID();
                         break;
+                    default:
+                        break;
                 }
             }
 
-            void OnGameObjectRemove(GameObject* gameObject)
+            void OnGameObjectRemove(GameObject* gameObject) OVERRIDE
             {
                 switch (gameObject->GetEntry())
                 {
                     case GO_LEVIATHAN_DOOR:
                     case GO_XT_002_DOOR:
+                    case GO_IRON_COUNCIL_DOOR:
+                    case GO_ARCHIVUM_DOOR:
+                    case GO_HODIR_ENTRANCE:
+                    case GO_HODIR_DOOR:
+                    case GO_HODIR_ICE_DOOR:
+                    case GO_VEZAX_DOOR:
+                    case GO_YOGG_SARON_DOOR:
                     case GO_DOODAD_UL_SIGILDOOR_03:
                     case GO_DOODAD_UL_UNIVERSEFLOOR_01:
                     case GO_DOODAD_UL_UNIVERSEFLOOR_02:
@@ -586,7 +579,7 @@ class instance_ulduar : public InstanceMapScript
                 }
             }
 
-            void OnUnitDeath(Unit* unit)
+            void OnUnitDeath(Unit* unit) OVERRIDE
             {
                 Creature* creature = unit->ToCreature();
                 if (!creature)
@@ -613,7 +606,7 @@ class instance_ulduar : public InstanceMapScript
                 }
             }
 
-            void ProcessEvent(WorldObject* /*gameObject*/, uint32 eventId)
+            void ProcessEvent(WorldObject* /*gameObject*/, uint32 eventId) OVERRIDE
             {
                 // Flame Leviathan's Tower Event triggers
                 Creature* FlameLeviathan = instance->GetCreature(LeviathanGUID);
@@ -647,7 +640,7 @@ class instance_ulduar : public InstanceMapScript
                 }
             }
 
-            bool SetBossState(uint32 type, EncounterState state)
+            bool SetBossState(uint32 type, EncounterState state) OVERRIDE
             {
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
@@ -658,7 +651,10 @@ class instance_ulduar : public InstanceMapScript
                     case BOSS_IGNIS:
                     case BOSS_RAZORSCALE:
                     case BOSS_XT002:
+                    case BOSS_ASSEMBLY_OF_IRON:
                     case BOSS_AURIAYA:
+                    case BOSS_VEZAX:
+                    case BOSS_YOGG_SARON:
                         break;
                     case BOSS_MIMIRON:
                         if (state == DONE)
@@ -667,16 +663,6 @@ class instance_ulduar : public InstanceMapScript
                     case BOSS_FREYA:
                         if (state == DONE)
                             instance->SummonCreature(NPC_FREYA_OBSERVATION_RING, ObservationRingKeepersPos[0]);
-                        break;
-                    case BOSS_ASSEMBLY_OF_IRON:
-                        if (state == DONE)
-                            HandleGameObject(ArchivumDoorGUID, true);
-                        break;
-                    case BOSS_VEZAX:
-                        if (state == DONE)
-                            HandleGameObject(VezaxDoorGUID, true);
-                        break;
-                    case BOSS_YOGG_SARON:
                         break;
                     case BOSS_KOLOGARN:
                         if (state == DONE)
@@ -697,8 +683,6 @@ class instance_ulduar : public InstanceMapScript
                                     HodirRareCache->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                             if (GameObject* HodirChest = instance->GetGameObject(HodirChestGUID))
                                 HodirChest->SetRespawnTime(HodirChest->GetRespawnDelay());
-                            HandleGameObject(HodirDoorGUID, true);
-                            HandleGameObject(HodirIceDoorGUID, true);
 
                             instance->SummonCreature(NPC_HODIR_OBSERVATION_RING, ObservationRingKeepersPos[1]);
                         }
@@ -763,7 +747,7 @@ class instance_ulduar : public InstanceMapScript
                 return true;
             }
 
-            void SetData(uint32 type, uint32 data)
+            void SetData(uint32 type, uint32 data) OVERRIDE
             {
                 switch (type)
                 {
@@ -811,11 +795,11 @@ class instance_ulduar : public InstanceMapScript
                 }
             }
 
-            void SetData64(uint32 /*type*/, uint64 /*data*/)
+            void SetData64(uint32 /*type*/, uint64 /*data*/) OVERRIDE
             {
             }
 
-            uint64 GetData64(uint32 data) const
+            uint64 GetData64(uint32 data) const OVERRIDE
             {
                 switch (data)
                 {
@@ -929,7 +913,7 @@ class instance_ulduar : public InstanceMapScript
                 return 0;
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32 type) const OVERRIDE
             {
                 switch (type)
                 {
@@ -950,7 +934,7 @@ class instance_ulduar : public InstanceMapScript
                 return 0;
             }
 
-            bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const*, Unit const* /* = NULL */, uint32 /* = 0 */)
+            bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const*, Unit const* /* = NULL */, uint32 /* = 0 */) OVERRIDE
             {
                 switch (criteriaId)
                 {
@@ -985,7 +969,7 @@ class instance_ulduar : public InstanceMapScript
                 return false;
             }
 
-            std::string GetSaveData()
+            std::string GetSaveData() OVERRIDE
             {
                 OUT_SAVE_INST_DATA;
 
@@ -999,7 +983,7 @@ class instance_ulduar : public InstanceMapScript
                 return saveStream.str();
             }
 
-            void Load(char const* strIn)
+            void Load(char const* strIn) OVERRIDE
             {
                 if (!strIn)
                 {
@@ -1065,7 +1049,7 @@ class instance_ulduar : public InstanceMapScript
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
 
-            void Update(uint32 diff)
+            void Update(uint32 diff) OVERRIDE
             {
                 if (_events.Empty())
                     return;
@@ -1104,7 +1088,7 @@ class instance_ulduar : public InstanceMapScript
             uint32 _maxWeaponItemLevel;
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
         {
             return new instance_ulduar_InstanceMapScript(map);
         }

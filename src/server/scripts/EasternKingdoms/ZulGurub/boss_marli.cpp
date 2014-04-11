@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -64,38 +64,35 @@ enum Phases
     PHASE_THREE               = 3
 };
 
-enum ModelId
-{
-    MODEL_MARLI               = 15220
-};
-
 class boss_marli : public CreatureScript
 {
-    public: boss_marli() : CreatureScript("boss_marli") {}
+    public: boss_marli() : CreatureScript("boss_marli") { }
 
         struct boss_marliAI : public BossAI
         {
-            boss_marliAI(Creature* creature) : BossAI(creature, DATA_MARLI) {}
+            boss_marliAI(Creature* creature) : BossAI(creature, DATA_MARLI) { }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
+                if (events.IsInPhase(PHASE_THREE))
+                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
                 _Reset();
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 _JustDied();
                 Talk(SAY_DEATH);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_SPAWN_START_SPIDERS, 1000, 0, PHASE_ONE);
                 Talk(SAY_AGGRO);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -155,11 +152,14 @@ class boss_marli : public CreatureScript
                         case EVENT_TRANSFORM:
                         {
                             Talk(SAY_TRANSFORM);
-                            DoCast(me, SPELL_SPIDER_FORM);
+                            DoCast(me, SPELL_SPIDER_FORM); // SPELL_AURA_TRANSFORM
+                            /*
                             CreatureTemplate const* cinfo = me->GetCreatureTemplate();
                             me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
                             me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
                             me->UpdateDamagePhysical(BASE_ATTACK);
+                            */
+                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
                             DoCastVictim(SPELL_ENVOLWINGWEB);
                             if (DoGetThreat(me->GetVictim()))
                                 DoModifyThreatPercent(me->GetVictim(), -100);
@@ -188,11 +188,14 @@ class boss_marli : public CreatureScript
                         }
                         case EVENT_TRANSFORM_BACK:
                         {
-                            me->SetDisplayId(MODEL_MARLI);
+                            me->RemoveAura(SPELL_SPIDER_FORM);
+                            /*
                             CreatureTemplate const* cinfo = me->GetCreatureTemplate();
                             me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 1)));
                             me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 1)));
                             me->UpdateDamagePhysical(BASE_ATTACK);
+                            */
+                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
                             events.ScheduleEvent(EVENT_ASPECT_OF_MARLI, 12000, 0, PHASE_TWO);
                             events.ScheduleEvent(EVENT_TRANSFORM, 45000, 0, PHASE_TWO);
                             events.ScheduleEvent(EVENT_POISON_VOLLEY, 15000);
@@ -210,33 +213,33 @@ class boss_marli : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new boss_marliAI(creature);
         }
 };
 
 // Spawn of Marli
-class mob_spawn_of_marli : public CreatureScript
+class npc_spawn_of_marli : public CreatureScript
 {
-    public: mob_spawn_of_marli() : CreatureScript("mob_spawn_of_marli") {}
+    public: npc_spawn_of_marli() : CreatureScript("npc_spawn_of_marli") { }
 
-        struct mob_spawn_of_marliAI : public ScriptedAI
+        struct npc_spawn_of_marliAI : public ScriptedAI
         {
-            mob_spawn_of_marliAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_spawn_of_marliAI(Creature* creature) : ScriptedAI(creature) { }
 
             uint32 LevelUp_Timer;
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 LevelUp_Timer = 3000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 //Return since we have no target
                 if (!UpdateVictim())
@@ -253,14 +256,14 @@ class mob_spawn_of_marli : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
-            return new mob_spawn_of_marliAI(creature);
+            return new npc_spawn_of_marliAI(creature);
         }
 };
 
 void AddSC_boss_marli()
 {
     new boss_marli();
-    new mob_spawn_of_marli();
+    new npc_spawn_of_marli();
 }

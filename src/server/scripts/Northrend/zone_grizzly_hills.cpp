@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,7 +20,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
-#include "SpellInfo.h"
+#include "SpellScript.h"
 #include "CreatureTextMgr.h"
 
 /*######
@@ -64,7 +64,7 @@ public:
     {
         npc_emilyAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) OVERRIDE
         {
             if (Creature* Mrfloppy = GetClosestCreatureWithEntry(me, NPC_MRFLOPPY, 50.0f))
                 summoned->AI()->AttackStart(Mrfloppy);
@@ -72,7 +72,7 @@ public:
                 summoned->AI()->AttackStart(me->GetVictim());
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) OVERRIDE
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -158,7 +158,7 @@ public:
                     if (player)
                     {
                         player->GroupEventHappens(QUEST_PERILOUS_ADVENTURE, me);
-                        Talk(SAY_QUEST_COMPLETE, player->GetGUID());
+                        Talk(SAY_QUEST_COMPLETE, player);
                     }
                     me->SetWalk(false);
                     break;
@@ -173,12 +173,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*Who*/)
+        void EnterCombat(Unit* /*Who*/) OVERRIDE
         {
             Talk(SAY_RANDOMAGGRO);
         }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             _mrfloppyGUID     = 0;
             _RavenousworgGUID = 0;
@@ -189,7 +189,7 @@ public:
             uint64   _mrfloppyGUID;
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) OVERRIDE
     {
         if (quest->GetQuestId() == QUEST_PERILOUS_ADVENTURE)
         {
@@ -203,7 +203,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_emilyAI(creature);
     }
@@ -217,11 +217,11 @@ public:
 
     struct npc_mrfloppyAI : public ScriptedAI
     {
-        npc_mrfloppyAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_mrfloppyAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() {}
+        void Reset() OVERRIDE { }
 
-        void EnterCombat(Unit* Who)
+        void EnterCombat(Unit* Who) OVERRIDE
         {
             if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
             {
@@ -239,18 +239,19 @@ public:
             }
         }
 
-        void EnterEvadeMode() {}
+        void EnterEvadeMode() OVERRIDE { }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(uint32 /*diff*/)
+
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_mrfloppyAI(creature);
     }
@@ -278,21 +279,21 @@ public:
 
     struct npc_outhouse_bunnyAI : public ScriptedAI
     {
-        npc_outhouse_bunnyAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_outhouse_bunnyAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             _counter = 0;
             _gender  = 0;
         }
 
-        void SetData(uint32 Type, uint32 Data)
+        void SetData(uint32 Type, uint32 Data) OVERRIDE
         {
             if (Type == 1)
                 _gender = Data;
         }
 
-        void SpellHit(Unit* Caster, const SpellInfo* Spell)
+        void SpellHit(Unit* Caster, const SpellInfo* Spell) OVERRIDE
         {
              if (Spell->Id == SPELL_OUTHOUSE_GROANS)
              {
@@ -319,7 +320,7 @@ public:
             uint8 _gender;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_outhouse_bunnyAI(creature);
     }
@@ -340,14 +341,14 @@ public:
 
     struct npc_tallhorn_stagAI : public ScriptedAI
     {
-        npc_tallhorn_stagAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_tallhorn_stagAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             _phase = 1;
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
         {
             if (_phase == 1)
             {
@@ -365,7 +366,7 @@ public:
             uint8 _phase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_tallhorn_stagAI(creature);
     }
@@ -392,9 +393,9 @@ public:
 
     struct npc_amberpine_woodsmanAI : public ScriptedAI
     {
-        npc_amberpine_woodsmanAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_amberpine_woodsmanAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             if (me->FindNearestCreature(NPC_TALLHORN_STAG, 0.2f))
             {
@@ -404,7 +405,7 @@ public:
                 _events.ScheduleEvent(EVENT_WOODSMAN_1, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             _events.Update(diff);
 
@@ -430,7 +431,7 @@ public:
             EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_amberpine_woodsmanAI(creature);
     }
@@ -458,21 +459,21 @@ public:
 
     struct npc_wounded_skirmisherAI : public ScriptedAI
     {
-        npc_wounded_skirmisherAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_wounded_skirmisherAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             _despawnTimer = 5000;
             _playerGUID = 0;
         }
 
-        void MovementInform(uint32, uint32 id)
+        void MovementInform(uint32, uint32 id) OVERRIDE
         {
             if (id == 1)
                 me->DespawnOrUnsummon(_despawnTimer);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) OVERRIDE
         {
             if (spell->Id == SPELL_RENEW_SKIRMISHER && caster->GetTypeId() == TYPEID_PLAYER
                 && caster->ToPlayer()->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
@@ -489,7 +490,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -501,90 +502,9 @@ public:
             uint32 _despawnTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_wounded_skirmisherAI(creature);
-    }
-};
-
-/*Lightning Sentry - if you kill it when you have your Minion with you, you will get a quest credit*/
-enum Sentry
-{
-    //Creature
-    NPC_LIGHTNING_SENTRY                   = 26407,
-    NPC_WAR_GOLEM                          = 27017,
-    // Quest
-    QUEST_OR_MAYBE_WE_DONT_A               = 12138,
-    QUEST_OR_MAYBE_WE_DONT_H               = 12198,
-    // Spell
-    SPELL_CHARGED_SENTRY_TOTEM             = 52703,
-    SPELL_WAR_GOLEM_CHARGE_CREDIT          = 47797,
-};
-
-enum SentryEvents
-{
-    EVENT_SENTRY                           = 1
-};
-
-class npc_lightning_sentry : public CreatureScript
-{
-public:
-    npc_lightning_sentry() : CreatureScript("npc_lightning_sentry") { }
-
-    struct npc_lightning_sentryAI : public ScriptedAI
-    {
-        npc_lightning_sentryAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset()
-        {
-            _events.ScheduleEvent(EVENT_SENTRY, urand(10000, 12000));
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_SENTRY:
-                        DoCast(SPELL_CHARGED_SENTRY_TOTEM);
-                        _events.ScheduleEvent(EVENT_SENTRY, urand(10000, 12000));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustDied(Unit* killer)
-        {
-            if (killer->ToPlayer() && killer->ToPlayer()->GetTypeId() == TYPEID_PLAYER)
-            {
-                if (me->FindNearestCreature(NPC_WAR_GOLEM, 10.0f, true))
-                {
-                    if (killer->ToPlayer()->GetQuestStatus(QUEST_OR_MAYBE_WE_DONT_A) == QUEST_STATUS_INCOMPLETE ||
-                        killer->ToPlayer()->GetQuestStatus(QUEST_OR_MAYBE_WE_DONT_H) == QUEST_STATUS_INCOMPLETE)
-                        DoCast(killer, SPELL_WAR_GOLEM_CHARGE_CREDIT);
-                }
-            }
-        }
-        private:
-            EventMap _events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_lightning_sentryAI(creature);
     }
 };
 
@@ -620,7 +540,7 @@ public:
     {
         npc_venture_co_stragglerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             _playerGUID   = 0;
 
@@ -628,7 +548,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             _events.Update(diff);
 
@@ -637,7 +557,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_STRAGGLER_1:
-                        if (Player* player = Unit::GetPlayer(*me, _playerGUID))
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                              DoCast(player, SPELL_VENTURE_STRAGGLER_CREDIT);
                          me->GetMotionMaster()->MovePoint(0, me->GetPositionX()-7, me->GetPositionY()+7, me->GetPositionZ());
                          _events.ScheduleEvent(EVENT_STRAGGLER_2, 2500);
@@ -670,7 +590,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) OVERRIDE
         {
             if (spell->Id == SPELL_SMOKE_BOMB && caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -687,7 +607,7 @@ public:
             uint64 _playerGUID;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_venture_co_stragglerAI(creature);
         }
@@ -735,7 +655,7 @@ public:
         {
             npc_lake_frogAI(Creature* creature) : ScriptedAI(creature) { }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _following = false;
                 _runningScript = false;
@@ -743,7 +663,7 @@ public:
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) OVERRIDE
             {
                 if (_following)
                     if (!me->HasAura(SPELL_FROG_LOVE))
@@ -782,7 +702,7 @@ public:
                 }
             }
 
-            void ReceiveEmote(Player* player, uint32 emote)
+            void ReceiveEmote(Player* player, uint32 emote) OVERRIDE
             {
                 if (_following || _runningScript)
                     return;
@@ -812,7 +732,7 @@ public:
                 }
             }
 
-            void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/)
+            void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) OVERRIDE
             {
                 DoCast(player, SPELL_SUMMON_ASHWOOD_BRAND);
             }
@@ -823,9 +743,46 @@ public:
             bool   _runningScript;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_lake_frogAI(creature);
+        }
+};
+
+enum ShredderDelivery
+{
+    NPC_BROKEN_DOWN_SHREDDER               = 27354
+};
+
+class spell_shredder_delivery : public SpellScriptLoader
+{
+    public:
+        spell_shredder_delivery() : SpellScriptLoader("spell_shredder_delivery") { }
+
+        class spell_shredder_delivery_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_shredder_delivery_SpellScript);
+
+            bool Load() OVERRIDE
+            {
+                return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            }
+
+            void HandleScript(SpellEffIndex /*effIndex*/)
+            {
+                if (GetCaster()->ToCreature()->GetEntry() == NPC_BROKEN_DOWN_SHREDDER)
+                    GetCaster()->ToCreature()->DespawnOrUnsummon();
+            }
+
+            void Register() OVERRIDE
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_shredder_delivery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const OVERRIDE
+        {
+            return new spell_shredder_delivery_SpellScript();
         }
 };
 
@@ -837,7 +794,7 @@ void AddSC_grizzly_hills()
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
     new npc_wounded_skirmisher();
-    new npc_lightning_sentry();
     new npc_venture_co_straggler();
     new npc_lake_frog();
+    new spell_shredder_delivery();
 }

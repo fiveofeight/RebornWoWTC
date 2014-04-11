@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -41,14 +41,14 @@ class boss_boss_ras_frostwhisper : public CreatureScript
 public:
     boss_boss_ras_frostwhisper() : CreatureScript("boss_boss_ras_frostwhisper") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_rasfrostAI (creature);
+        return new boss_rasfrostAI(creature);
     }
 
     struct boss_rasfrostAI : public ScriptedAI
     {
-        boss_rasfrostAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_rasfrostAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 IceArmor_Timer;
         uint32 Frostbolt_Timer;
@@ -57,7 +57,7 @@ public:
         uint32 ChillNova_Timer;
         uint32 FrostVolley_Timer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             IceArmor_Timer = 2000;
             Frostbolt_Timer = 8000;
@@ -69,9 +69,9 @@ public:
             DoCast(me, SPELL_ICEARMOR, true);
         }
 
-        void EnterCombat(Unit* /*who*/){}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;

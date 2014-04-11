@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -47,14 +47,14 @@ class boss_azuregos : public CreatureScript
 public:
     boss_azuregos() : CreatureScript("boss_azuregos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_azuregosAI (creature);
+        return new boss_azuregosAI(creature);
     }
 
     struct boss_azuregosAI : public ScriptedAI
     {
-        boss_azuregosAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_azuregosAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 MarkOfFrostTimer;
         uint32 ManaStormTimer;
@@ -66,7 +66,7 @@ public:
         uint32 EnrageTimer;
         bool Enraged;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             MarkOfFrostTimer = 35000;
             ManaStormTimer = urand(5000, 17000);
@@ -79,9 +79,9 @@ public:
             Enraged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             //Return since we have no target
             if (!UpdateVictim())

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -156,7 +156,7 @@ public:
         uint32 uiDeathBiteTimer;
         uint32 uiMarkedDeathTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             RemoveSummons();
             me->SetDisplayId(me->GetNativeDisplayId());
@@ -243,12 +243,12 @@ public:
             SummonList.clear();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) OVERRIDE
         {
             SummonList.push_back(summon->GetGUID());
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             if (Phase == IDLE)
                 return;
@@ -464,7 +464,9 @@ public:
                                 DoCast(target, SPELL_MARKED_DEATH);
                         }
                         uiMarkedDeathTimer = urand (10000, 12000);
-                    } else uiMarkedDeathTimer -= uiDiff;
+
+                    } 
+                    else uiMarkedDeathTimer -= uiDiff;
                     break;
                 }
             }
@@ -535,7 +537,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             //DoCast(me, SPELL_KILL_CREDIT);
             Talk(SAY_DEATH);
@@ -560,9 +562,9 @@ public:
             EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new boss_black_knightAI (creature);
+        return GetInstanceAI<boss_black_knightAI>(creature);
     }
 
 };
@@ -574,11 +576,11 @@ public:
 
     struct npc_risen_ghoulAI : public ScriptedAI
     {
-        npc_risen_ghoulAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_risen_ghoulAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 uiAttackTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiAttackTimer = 3500;
         }
@@ -602,7 +604,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_risen_ghoulAI(creature);
     }
@@ -679,7 +681,6 @@ public:
         Creature* pHighlord;
         InstanceScript* instance;
 
-
         void Reset()
         {
             pHighlord = NULL;
@@ -726,7 +727,7 @@ public:
               }
         }
 
-        void UpdateAI(uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff) OVERRIDE
         {
             npc_escortAI::UpdateAI(uiDiff);
 
@@ -736,7 +737,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_black_knight_skeletal_gryphonAI(creature);
     }

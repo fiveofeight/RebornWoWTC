@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -110,9 +110,7 @@ class boss_headless_horseman : public CreatureScript
 
         struct boss_headless_horsemanAI : public ScriptedAI
         {
-            boss_headless_horsemanAI(Creature* c) : ScriptedAI(c), _summons(me)
-            {
-            }
+            boss_headless_horsemanAI(Creature* c) : ScriptedAI(c), _summons(me) {            }
 
             void Reset()
             {
@@ -212,7 +210,6 @@ class boss_headless_horseman : public CreatureScript
                 if (damage >= me->GetHealth())
                 {
                     damage = me->GetHealth() - 1;
-
                     DoCast(me, SPELL_IMMUNED, true);
                     DoCast(me, SPELL_BODY_REGEN, true);
                     DoCast(me, SPELL_CONFUSED, true);
@@ -435,17 +432,17 @@ class npc_horseman_head : public CreatureScript
         }
 };
 
-class mob_pulsing_pumpkin : public CreatureScript
+class npc_pulsing_pumpkin : public CreatureScript
 {
 public:
-    mob_pulsing_pumpkin() : CreatureScript("mob_pulsing_pumpkin") { }
+    npc_pulsing_pumpkin() : CreatureScript("npc_pulsing_pumpkin") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
-        return new mob_pulsing_pumpkinAI (creature);
+        return new npc_pulsing_pumpkinAI(creature);
     }
 
-    struct mob_pulsing_pumpkinAI : public ScriptedAI
+    struct npc_pulsing_pumpkinAI : public ScriptedAI
     {
         mob_pulsing_pumpkinAI(Creature* creature) : ScriptedAI(creature) 
         {
@@ -454,7 +451,7 @@ public:
         bool sprouted;
         uint64 debuffGUID;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             sprouted = false;
             DoCast(me, SPELL_PUMPKIN_AURA_GREEN, false);
@@ -463,9 +460,9 @@ public:
             sprouted = false;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) OVERRIDE
         {
             if (spell->Id == SPELL_SPROUTING)
             {
@@ -491,19 +488,20 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) OVERRIDE
         {
             if (!sprouted)
                 Despawn();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
+
         {
             if (!who || !me->IsValidAttackTarget(who) || me->GetVictim())
                 return;
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) OVERRIDE
         {
             if (sprouted && UpdateVictim())
                 DoMeleeAttackIfReady();

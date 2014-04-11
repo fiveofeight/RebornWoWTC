@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -61,8 +61,8 @@ bool RotateMovementGenerator::Update(Unit* owner, uint32 diff)
         angle -= (float)diff * static_cast<float>(M_PI * 2) / m_maxDuration;
         while (angle < 0) angle += static_cast<float>(M_PI * 2);
     }
-    owner->SetOrientation(angle);
-    owner->SendMovementFlagUpdate(); // this is a hack. we do not have anything correct to send in the beginning
+
+    owner->SetFacingTo(angle);
 
     if (m_duration > diff)
         m_duration -= diff;
