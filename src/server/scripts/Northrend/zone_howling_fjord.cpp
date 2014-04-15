@@ -589,10 +589,6 @@ void AddSC_howling_fjord()
     new npc_daegarn;
     new npc_attracted_reef_bull();
     new spell_anuniaqs_net();
-    new npc_apothecary_hanes();
-    new npc_plaguehound_tracker();
-    new npc_razael_and_lyana();
-    new npc_daegarn();
     new npc_mindless_abomination();
     new spell_mindless_abomination_explosion_fx_master();
  }

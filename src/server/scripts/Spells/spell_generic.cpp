@@ -699,170 +699,6 @@ class spell_gen_chaos_blast : public SpellScriptLoader
         }
 };
 
-// 24750 Trick
-enum TrickSpells
-{
-    SPELL_PIRATE_COSTUME_MALE           = 24708,
-    SPELL_PIRATE_COSTUME_FEMALE         = 24709,
-    SPELL_NINJA_COSTUME_MALE            = 24710,
-    SPELL_NINJA_COSTUME_FEMALE          = 24711,
-    SPELL_LEPER_GNOME_COSTUME_MALE      = 24712,
-    SPELL_LEPER_GNOME_COSTUME_FEMALE    = 24713,
-    SPELL_SKELETON_COSTUME              = 24723,
-    SPELL_GHOST_COSTUME_MALE            = 24735,
-    SPELL_GHOST_COSTUME_FEMALE          = 24736,
-    SPELL_TRICK_BUFF                    = 24753,
-};
-
-class spell_gen_trick : public SpellScriptLoader
-{
-    public:
-        spell_gen_trick() : SpellScriptLoader("spell_gen_trick") {}
-
-        class spell_gen_trick_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gen_trick_SpellScript);
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_PIRATE_COSTUME_MALE) || !sSpellMgr->GetSpellInfo(SPELL_PIRATE_COSTUME_FEMALE) || !sSpellMgr->GetSpellInfo(SPELL_NINJA_COSTUME_MALE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_NINJA_COSTUME_FEMALE) || !sSpellMgr->GetSpellInfo(SPELL_LEPER_GNOME_COSTUME_MALE) || !sSpellMgr->GetSpellInfo(SPELL_LEPER_GNOME_COSTUME_FEMALE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_SKELETON_COSTUME) || !sSpellMgr->GetSpellInfo(SPELL_GHOST_COSTUME_MALE) || !sSpellMgr->GetSpellInfo(SPELL_GHOST_COSTUME_FEMALE) || !sSpellMgr->GetSpellInfo(SPELL_TRICK_BUFF))
-                    return false;
-                return true;
-            }
-
-            void HandleScript(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-                if (Player* target = GetHitPlayer())
-                {
-                    uint8 gender = target->getGender();
-                    uint32 spellId = SPELL_TRICK_BUFF;
-                    switch (urand(0, 5))
-                    {
-                        case 1:
-                            spellId = gender ? SPELL_LEPER_GNOME_COSTUME_FEMALE : SPELL_LEPER_GNOME_COSTUME_MALE;
-                            break;
-                        case 2:
-                            spellId = gender ? SPELL_PIRATE_COSTUME_FEMALE : SPELL_PIRATE_COSTUME_MALE;
-                            break;
-                        case 3:
-                            spellId = gender ? SPELL_GHOST_COSTUME_FEMALE : SPELL_GHOST_COSTUME_MALE;
-                            break;
-                        case 4:
-                            spellId = gender ? SPELL_NINJA_COSTUME_FEMALE : SPELL_NINJA_COSTUME_MALE;
-                            break;
-                        case 5:
-                            spellId = SPELL_SKELETON_COSTUME;
-                            break;
-                        default:
-                            break;
-                    }
-
-                    caster->CastSpell(target, spellId, true, NULL);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_gen_trick_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gen_trick_SpellScript();
-        }
-};
-
-// 24751 Trick or Treat
-enum TrickOrTreatSpells
-{
-    SPELL_TRICK                 = 24714,
-    SPELL_TREAT                 = 24715,
-    SPELL_TRICKED_OR_TREATED    = 24755,
-    SPELL_TRICKY_TREAT_SPEED    = 42919,
-    SPELL_TRICKY_TREAT_TRIGGER  = 42965,
-    SPELL_UPSET_TUMMY           = 42966
-};
-
-class spell_gen_trick_or_treat : public SpellScriptLoader
-{
-    public:
-        spell_gen_trick_or_treat() : SpellScriptLoader("spell_gen_trick_or_treat") {}
-
-        class spell_gen_trick_or_treat_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gen_trick_or_treat_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_TRICK) || !sSpellMgr->GetSpellInfo(SPELL_TREAT) || !sSpellMgr->GetSpellInfo(SPELL_TRICKED_OR_TREATED))
-                    return false;
-                return true;
-            }
-
-            void HandleScript(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-                if (Player* target = GetHitPlayer())
-                {
-                    caster->CastSpell(target, roll_chance_i(50) ? SPELL_TRICK : SPELL_TREAT, true, NULL);
-                    caster->CastSpell(target, SPELL_TRICKED_OR_TREATED, true, NULL);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_gen_trick_or_treat_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gen_trick_or_treat_SpellScript();
-        }
-};
-
-class spell_gen_tricky_treat : public SpellScriptLoader
-{
-    public:
-        spell_gen_tricky_treat() : SpellScriptLoader("spell_gen_tricky_treat") {}
-
-        class spell_gen_tricky_treat_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gen_tricky_treat_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_TRICKY_TREAT_SPEED))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_TRICKY_TREAT_TRIGGER))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_UPSET_TUMMY))
-                    return false;
-                return true;
-            }
-
-            void HandleScript(SpellEffIndex /*effIndex*/)
-            {
-                if (Unit* caster = GetCaster())
-                    if (caster->HasAura(SPELL_TRICKY_TREAT_TRIGGER) && caster->GetAuraCount(SPELL_TRICKY_TREAT_SPEED) > 3 && roll_chance_i(33))
-                        caster->CastSpell(caster, SPELL_UPSET_TUMMY, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_gen_tricky_treat_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gen_tricky_treat_SpellScript();
-        }
-};
-
 class spell_gen_clone : public SpellScriptLoader
 {
     public:
@@ -4017,64 +3853,6 @@ class spell_gen_bountiful_feast : public SpellScriptLoader
         }
 };
 
-enum PilgrimsBountyBuffFood
-{
-    // Pilgrims Bounty Buff Food
-    SPELL_WELL_FED_AP_TRIGGER       = 65414,
-    SPELL_WELL_FED_ZM_TRIGGER       = 65412,
-    SPELL_WELL_FED_HIT_TRIGGER      = 65416,
-    SPELL_WELL_FED_HASTE_TRIGGER    = 65410,
-    SPELL_WELL_FED_SPIRIT_TRIGGER   = 65415,
-};
-
-class spell_pilgrims_bounty_buff_food : public SpellScriptLoader
-{
-    private:
-        uint32 _triggeredSpellId;
-    public:
-        spell_pilgrims_bounty_buff_food(const char* name, uint32 triggeredSpellId) : SpellScriptLoader(name), _triggeredSpellId(triggeredSpellId) { }
-
-        class spell_pilgrims_bounty_buff_food_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_pilgrims_bounty_buff_food_AuraScript)
-        private:
-            uint32 _triggeredSpellId;
-
-        public:
-            spell_pilgrims_bounty_buff_food_AuraScript(uint32 triggeredSpellId) : AuraScript(), _triggeredSpellId(triggeredSpellId) { }
-
-            bool Load()
-            {
-                _handled = false;
-                return true;
-            }
-
-            void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
-            {
-                if (_handled)
-                    return;
-
-                Unit* caster = GetCaster();
-                if (!caster)
-                    return;
-
-                _handled = true;
-                caster->CastSpell(caster, _triggeredSpellId, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_pilgrims_bounty_buff_food_AuraScript::HandleTriggerSpell, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            }
-
-            bool _handled;
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_pilgrims_bounty_buff_food_AuraScript(_triggeredSpellId);
-        }
-};
 
 /*###################################
 # spell_gen_ribbon_pole_dancer_check
@@ -4525,24 +4303,8 @@ void AddSC_generic_spell_scripts()
     new spell_gen_break_shield("spell_gen_tournament_counterattack");
     new spell_gen_burn_brutallus();
     new spell_gen_cannibalize();
-    new spell_gen_create_lance();
-    new spell_gen_netherbloom();
-    new spell_gen_nightmare_vine();
-    new spell_gen_obsidian_armor();
-    new spell_gen_parachute();
-    new spell_gen_pet_summoned();
-    new spell_gen_remove_flight_auras();
-    new spell_gen_trick();
-    new spell_gen_trick_or_treat();
-    new spell_gen_tricky_treat();
-    new spell_pvp_trinket_wotf_shared_cd();
-    new spell_gen_animal_blood();
-    new spell_gen_divine_storm_cd_reset();
-    new spell_gen_parachute_ic();
-    new spell_gen_gunship_portal();
-    new spell_gen_dungeon_credit();
-    new spell_gen_profession_research();
     new spell_gen_chaos_blast();
+    new spell_gen_clone();
     new spell_gen_clone_weapon_aura();
     new spell_gen_count_pct_from_max_hp("spell_gen_default_count_pct_from_max_hp");
     new spell_gen_count_pct_from_max_hp("spell_gen_50pct_count_pct_from_max_hp", 50);
@@ -4578,32 +4340,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_mount("spell_blazing_hippogryph", 0, 0, 0, SPELL_BLAZING_HIPPOGRYPH_150, SPELL_BLAZING_HIPPOGRYPH_280);
     new spell_gen_mount("spell_celestial_steed", 0, SPELL_CELESTIAL_STEED_60, SPELL_CELESTIAL_STEED_100, SPELL_CELESTIAL_STEED_150, SPELL_CELESTIAL_STEED_280, SPELL_CELESTIAL_STEED_310);
     new spell_gen_mount("spell_x53_touring_rocket", 0, 0, 0, SPELL_X53_TOURING_ROCKET_150, SPELL_X53_TOURING_ROCKET_280, SPELL_X53_TOURING_ROCKET_310);
-    new spell_gen_upper_deck_create_foam_sword();
-    new spell_gen_bonked();
-    new spell_gen_gift_of_naaru();
-    new spell_gen_turkey_tracker();
-    new spell_gen_feast_on();
-    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_ap", SPELL_A_SERVING_OF_TURKEY, SPELL_WELL_FED_AP);
-    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_zm", SPELL_A_SERVING_OF_CRANBERRIES, SPELL_WELL_FED_ZM);
-    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_hit", SPELL_A_SERVING_OF_STUFFING, SPELL_WELL_FED_HIT);
-    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_haste", SPELL_A_SERVING_OF_SWEET_POTATOES, SPELL_WELL_FED_HASTE);
-    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_spirit", SPELL_A_SERVING_OF_PIE, SPELL_WELL_FED_SPIRIT);
-    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_turkey", SPELL_ON_PLATE_TURKEY, SPELL_PASS_THE_TURKEY);
-    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_cranberries", SPELL_ON_PLATE_CRANBERRIES, SPELL_PASS_THE_CRANBERRIES);
-    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_stuffing", SPELL_ON_PLATE_STUFFING, SPELL_PASS_THE_STUFFING);
-    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_sweet_potatoes", SPELL_ON_PLATE_SWEET_POTATOES, SPELL_PASS_THE_SWEET_POTATOES);
-    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_pie", SPELL_ON_PLATE_PIE, SPELL_PASS_THE_PIE);
-    new spell_gen_bountiful_feast();
-    new spell_pilgrims_bounty_buff_food("spell_gen_slow_roasted_turkey", SPELL_WELL_FED_AP_TRIGGER);
-    new spell_pilgrims_bounty_buff_food("spell_gen_cranberry_chutney", SPELL_WELL_FED_ZM_TRIGGER);
-    new spell_pilgrims_bounty_buff_food("spell_gen_spice_bread_stuffing", SPELL_WELL_FED_HIT_TRIGGER);
-    new spell_pilgrims_bounty_buff_food("spell_gen_pumpkin_pie", SPELL_WELL_FED_SPIRIT_TRIGGER);
-    new spell_pilgrims_bounty_buff_food("spell_gen_candied_sweet_potato", SPELL_WELL_FED_HASTE_TRIGGER);
-    new spell_gen_ribbon_pole_dancer_check();
-    new spell_gen_torch_target_picker();
-    new spell_gen_juggle_torch_catch();
-    new spell_gen_replenishment();
-    new spell_gen_aura_service_uniform();
     new spell_gen_mounted_charge();
     new spell_gen_netherbloom();
     new spell_gen_nightmare_vine();
@@ -4613,7 +4349,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_orc_disguise();
     new spell_gen_parachute();
     new spell_gen_parachute_ic();
-    new spell_gen_pet_summoned();
     new spell_gen_profession_research();
     new spell_gen_remove_flight_auras();
     new spell_gen_replenishment();
@@ -4629,6 +4364,22 @@ void AddSC_generic_spell_scripts()
     new spell_pvp_trinket_wotf_shared_cd();
     new spell_gen_turkey_marker();
     new spell_gen_upper_deck_create_foam_sword();
+    new spell_gen_turkey_tracker();
+    new spell_gen_feast_on();
+    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_ap", SPELL_A_SERVING_OF_TURKEY, SPELL_WELL_FED_AP);
+    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_zm", SPELL_A_SERVING_OF_CRANBERRIES, SPELL_WELL_FED_ZM);
+    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_hit", SPELL_A_SERVING_OF_STUFFING, SPELL_WELL_FED_HIT);
+    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_haste", SPELL_A_SERVING_OF_SWEET_POTATOES, SPELL_WELL_FED_HASTE);
+    new spell_gen_well_fed_pilgrims_bounty("spell_gen_well_fed_pilgrims_bounty_spirit", SPELL_A_SERVING_OF_PIE, SPELL_WELL_FED_SPIRIT);
+    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_turkey", SPELL_ON_PLATE_TURKEY, SPELL_PASS_THE_TURKEY);
+    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_cranberries", SPELL_ON_PLATE_CRANBERRIES, SPELL_PASS_THE_CRANBERRIES);
+    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_stuffing", SPELL_ON_PLATE_STUFFING, SPELL_PASS_THE_STUFFING);
+    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_sweet_potatoes", SPELL_ON_PLATE_SWEET_POTATOES, SPELL_PASS_THE_SWEET_POTATOES);
+    new spell_gen_on_plate_pilgrims_bounty("spell_gen_on_plate_pilgrims_bounty_pie", SPELL_ON_PLATE_PIE, SPELL_PASS_THE_PIE);
+    new spell_gen_bountiful_feast();
+    new spell_gen_ribbon_pole_dancer_check();
+    new spell_gen_torch_target_picker();
+    new spell_gen_juggle_torch_catch();
     new spell_gen_vehicle_scaling();
     new spell_gen_vendor_bark_trigger();
     new spell_gen_wg_water();
