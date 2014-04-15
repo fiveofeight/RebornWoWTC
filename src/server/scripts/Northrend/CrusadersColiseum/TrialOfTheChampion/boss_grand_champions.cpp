@@ -270,7 +270,7 @@ class generic_vehicleAI_toc5 : public CreatureScript
                 DoCast(me, SPELL_DEFEND, true);
         }
 
-        void SpellHit(Unit* source, const SpellInfo* spell)
+        void SpellHit(Unit* source, const SpellInfo* spell) OVERRIDE
         {
 
             uint32 defendAuraStackAmount = 0;
@@ -358,7 +358,7 @@ class generic_vehicleAI_toc5 : public CreatureScript
             return true;
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() OVERRIDE
         {
             // Try to stay in combat, otherwise reset
             if (!StayInCombatAndCleanup(true, false))
@@ -387,30 +387,30 @@ class generic_vehicleAI_toc5 : public CreatureScript
                 DoCast(me,SPELL_SHIELD,true);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 diff) OVERRIDE
         {
             // Try to keep players clean of defend aura
             if (combatEntered)
             {
-                if (combatCheckTimer <= uiDiff)
+                if (combatCheckTimer <= diff)
                 {
                     StayInCombatAndCleanup(false, true);
                     combatCheckTimer = 1000;
-                }else combatCheckTimer -= uiDiff;
+                }else combatCheckTimer -= diff;
             }
 
-            npc_escortAI::UpdateAI(uiDiff);
+            npc_escortAI::UpdateAI(diff);
 
             if (!UpdateVictim())
                 return;
 
-            if (uiDefendTimer <= uiDiff)
+            if (uiDefendTimer <= diff)
             {
                 DoCastSpellDefend();
                 uiDefendTimer = urand(30000, 45000);
-            }else uiDefendTimer -= uiDiff;
+            }else uiDefendTimer -= diff;
 
-            if (uiShieldBreakerTimer <= uiDiff)
+            if (uiShieldBreakerTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 {
@@ -433,9 +433,9 @@ class generic_vehicleAI_toc5 : public CreatureScript
                 }
 
                 uiShieldBreakerTimer = urand(15000, 20000);
-            }else uiShieldBreakerTimer -= uiDiff;
+            }else uiShieldBreakerTimer -= diff;
 
-            if (uiChargeTimer <= uiDiff)
+            if (uiChargeTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 {
@@ -462,15 +462,15 @@ class generic_vehicleAI_toc5 : public CreatureScript
                 }
 
                 uiChargeTimer = urand(10000, 30000);
-            }else uiChargeTimer -= uiDiff;
+            }else uiChargeTimer -= diff;
 
-            if (uiThrustTimer <= uiDiff)
+            if (uiThrustTimer <= diff)
             {
                 if (me->GetVictim() && me->GetDistance(me->GetVictim()) < 5.0f)
                     DoCast(me->GetVictim(), SPELL_THRUST);
 
                 uiThrustTimer = urand(8000, 14000);
-            }else uiThrustTimer -= uiDiff;
+            }else uiThrustTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -542,14 +542,14 @@ class boss_warrior_toc5 : public CreatureScript
             bHome = false;
         }
 
-	    void EnterCombat(Unit* who)
+	    void EnterCombat(Unit* /*who*/) OVERRIDE
         {
 		    _EnterCombat();
 		    hasBeenInCombat = true;
     		
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!bDone && GrandChampionsOutVehicle(me))
             {
@@ -569,19 +569,19 @@ class boss_warrior_toc5 : public CreatureScript
                 bHome = true;
             }
 
-            if (uiPhaseTimer <= uiDiff)
+            if (uiPhaseTimer <= diff)
             {
                 if (uiPhase == 1)
                 {
                     AggroAllPlayers(me);
                     uiPhase = 0;
                 }
-            }else uiPhaseTimer -= uiDiff;
+            }else uiPhaseTimer -= diff;
 
             if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
                 return;
 
-            if (uiInterceptTimer <= uiDiff)
+            if (uiInterceptTimer <= diff)
             {
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (me->GetMap()->IsDungeon() && !players.isEmpty())
@@ -599,24 +599,24 @@ class boss_warrior_toc5 : public CreatureScript
                     }
                 }
                 uiInterceptTimer = 7000;
-            } else uiInterceptTimer -= uiDiff;
+            } else uiInterceptTimer -= diff;
 
-            if (uiBladeStormTimer <= uiDiff)
+            if (uiBladeStormTimer <= diff)
             {
                 DoCastVictim(SPELL_BLADESTORM);
                 uiBladeStormTimer = urand(15000,25000);
-            } else uiBladeStormTimer -= uiDiff;
+            } else uiBladeStormTimer -= diff;
 
-            if (uiMortalStrikeTimer <= uiDiff)
+            if (uiMortalStrikeTimer <= diff)
             {
                 DoCastVictim(DUNGEON_MODE(SPELL_MORTAL_STRIKE, SPELL_MORTAL_STRIKE_H));
                 uiMortalStrikeTimer = urand(8000,12000);
-            } else uiMortalStrikeTimer -= uiDiff;
+            } else uiMortalStrikeTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth())
             {
@@ -718,13 +718,13 @@ class boss_mage_toc5 : public CreatureScript
             bHome = false;
         }
 
-	    void EnterCombat(Unit* who)
+	    void EnterCombat(Unit* /*who*/) OVERRIDE
         {
 		    _EnterCombat();
 		    hasBeenInCombat = true;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!bDone && GrandChampionsOutVehicle(me))
             {
@@ -746,49 +746,49 @@ class boss_mage_toc5 : public CreatureScript
                 bHome = true;
             }
 
-            if (uiPhaseTimer <= uiDiff)
+            if (uiPhaseTimer <= diff)
             {
                 if (uiPhase == 1)
                 {
                     AggroAllPlayers(me);
                     uiPhase = 0;
                 }
-            }else uiPhaseTimer -= uiDiff;
+            }else uiPhaseTimer -= diff;
 
             if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
                 return;
 
-            if (uiFireBallTimer <= uiDiff)
+            if (uiFireBallTimer <= diff)
             {
                 DoCastVictim(DUNGEON_MODE(SPELL_FIREBALL,SPELL_FIREBALL_H));
                 uiFireBallTimer = 17000;
-            } else uiFireBallTimer -= uiDiff;
+            } else uiFireBallTimer -= diff;
 
-            if (uiPolymorphTimer <= uiDiff)
+            if (uiPolymorphTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target, DUNGEON_MODE(SPELL_POLYMORPH,SPELL_POLYMORPH_H));
                 uiPolymorphTimer = 22000;
-            } else uiPolymorphTimer -= uiDiff;
+            } else uiPolymorphTimer -= diff;
 
-            if (uiBlastWaveTimer <= uiDiff)
+            if (uiBlastWaveTimer <= diff)
             {
                 DoCastAOE(DUNGEON_MODE(SPELL_BLAST_WAVE,SPELL_BLAST_WAVE_H),false);
                 uiBlastWaveTimer = 30000;
-            } else uiBlastWaveTimer -= uiDiff;
+            } else uiBlastWaveTimer -= diff;
 
-            if (uiHasteTimer <= uiDiff)
+            if (uiHasteTimer <= diff)
             {
                 me->InterruptNonMeleeSpells(true);
 
                 DoCast(me,SPELL_HASTE);
                 uiHasteTimer = 40000;
-            } else uiHasteTimer -= uiDiff;
+            } else uiHasteTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth())
             {
@@ -890,7 +890,7 @@ class boss_shaman_toc5 : public CreatureScript
             bHome = false;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!bDone && GrandChampionsOutVehicle(me))
             {
@@ -912,27 +912,27 @@ class boss_shaman_toc5 : public CreatureScript
                 bHome = true;
             }
 
-            if (uiPhaseTimer <= uiDiff)
+            if (uiPhaseTimer <= diff)
             {
                 if (uiPhase == 1)
                 {
                     AggroAllPlayers(me);
                     uiPhase = 0;
                 }
-            }else uiPhaseTimer -= uiDiff;
+            }else uiPhaseTimer -= diff;
 
             if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
                 return;
 
-            if (uiChainLightningTimer <= uiDiff)
+            if (uiChainLightningTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,DUNGEON_MODE(SPELL_CHAIN_LIGHTNING,SPELL_CHAIN_LIGHTNING_H));
 
                 uiChainLightningTimer = 23000;
-            } else uiChainLightningTimer -= uiDiff;
+            } else uiChainLightningTimer -= diff;
 
-            if (uiHealingWaveTimer <= uiDiff)
+            if (uiHealingWaveTimer <= diff)
             {
                 bool bChance = urand(0,1);
 
@@ -944,26 +944,26 @@ class boss_shaman_toc5 : public CreatureScript
                     DoCast(me,DUNGEON_MODE(SPELL_HEALING_WAVE,SPELL_HEALING_WAVE_H));
 
                 uiHealingWaveTimer = 19000;
-            } else uiHealingWaveTimer -= uiDiff;
+            } else uiHealingWaveTimer -= diff;
 
-            if (uiEartShieldTimer <= uiDiff)
+            if (uiEartShieldTimer <= diff)
             {
                 DoCast(me,SPELL_EARTH_SHIELD);
 
                 uiEartShieldTimer = urand(40000,45000);
-            } else uiEartShieldTimer -= uiDiff;
+            } else uiEartShieldTimer -= diff;
 
-            if (uiHexMendingTimer <= uiDiff)
+            if (uiHexMendingTimer <= diff)
             {
                 DoCastVictim(SPELL_HEX_OF_MENDING,true);
 
                 uiHexMendingTimer = urand(30000,35000);
-            } else uiHexMendingTimer -= uiDiff;
+            } else uiHexMendingTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth())
             {
@@ -1087,13 +1087,13 @@ class boss_hunter_toc5 : public CreatureScript
             bHome = false;
         }
 
-	    void EnterCombat(Unit* who)
+	    void EnterCombat(Unit* /*who*/) OVERRIDE
         {
 		    _EnterCombat();
 		    hasBeenInCombat = true;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!bDone && GrandChampionsOutVehicle(me))
             {
@@ -1115,19 +1115,19 @@ class boss_hunter_toc5 : public CreatureScript
                 bHome = true;
             }
     				
-            if (uiPhaseTimer <= uiDiff)
+            if (uiPhaseTimer <= diff)
             {
                 if (uiPhase == 1)
                 {
                     AggroAllPlayers(me);
                     uiPhase = 0;
                 }
-            }else uiPhaseTimer -= uiDiff;
+            }else uiPhaseTimer -= diff;
 
             if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
                 return;
 
-            if (uiDisengageCooldown <= uiDiff)
+            if (uiDisengageCooldown <= diff)
             {
                 if (me->IsWithinDistInMap(me->GetVictim(), 5) && uiDisengageCooldown == 0)
                 {
@@ -1135,16 +1135,16 @@ class boss_hunter_toc5 : public CreatureScript
                     uiDisengageCooldown = 35000;
                 }
                 uiDisengageCooldown = 20000;
-            }else uiDisengageCooldown -= uiDiff;
+            }else uiDisengageCooldown -= diff;
     		
-            if (uiLightningArrowsTimer <= uiDiff)
+            if (uiLightningArrowsTimer <= diff)
             {
                  DoCastAOE(SPELL_LIGHTNING_ARROWS, false);
                  uiLightningArrowsTimer = 15000;
 
-            } else uiLightningArrowsTimer -= uiDiff;
+            } else uiLightningArrowsTimer -= diff;
 
-            if (uiShootTimer <= uiDiff)
+            if (uiShootTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST,0,30.0f))
                 {
@@ -1154,9 +1154,9 @@ class boss_hunter_toc5 : public CreatureScript
                 uiShootTimer = 19000;
                 uiMultiShotTimer = 8000;
                 bShoot = true;
-            } else uiShootTimer -= uiDiff;
+            } else uiShootTimer -= diff;
 
-            if (bShoot && uiMultiShotTimer <= uiDiff)
+            if (bShoot && uiMultiShotTimer <= diff)
             {
                 me->InterruptNonMeleeSpells(true);
                 Unit* target = Unit::GetUnit(*me, uiTargetGUID);
@@ -1181,12 +1181,12 @@ class boss_hunter_toc5 : public CreatureScript
                     }
                 }
                 bShoot = false;
-            } else uiMultiShotTimer -= uiDiff;
+            } else uiMultiShotTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth())
             {
@@ -1301,13 +1301,13 @@ class boss_rouge_toc5 : public CreatureScript
             bHome = false;
         }
 
-	    void EnterCombat(Unit* who)
+	    void EnterCombat(Unit* /*who*/) OVERRIDE
         {
 		    _EnterCombat();
 		    hasBeenInCombat = true;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!bDone && GrandChampionsOutVehicle(me))
             {
@@ -1329,41 +1329,41 @@ class boss_rouge_toc5 : public CreatureScript
                 bHome = true;
             }
 
-            if (uiPhaseTimer <= uiDiff)
+            if (uiPhaseTimer <= diff)
             {
                 if (uiPhase == 1)
                 {
                     AggroAllPlayers(me);
                     uiPhase = 0;
                 }
-            } else uiPhaseTimer -= uiDiff;
+            } else uiPhaseTimer -= diff;
 
             if (!UpdateVictim() || me->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) || me->GetVehicle())
                 return;
 
-            if (uiEviscerateTimer <= uiDiff)
+            if (uiEviscerateTimer <= diff)
             {
                 DoCastVictim(DUNGEON_MODE(SPELL_EVISCERATE,SPELL_EVISCERATE_H));
                 uiEviscerateTimer = 12000;
-            } else uiEviscerateTimer -= uiDiff;
+            } else uiEviscerateTimer -= diff;
 
-            if (uiFanKivesTimer <= uiDiff)
+            if (uiFanKivesTimer <= diff)
             {
                 DoCastAOE(SPELL_FAN_OF_KNIVES,false);
                 uiFanKivesTimer = 20000;
-            } else uiFanKivesTimer -= uiDiff;
+            } else uiFanKivesTimer -= diff;
 
-            if (uiPosionBottleTimer <= uiDiff)
+            if (uiPosionBottleTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                 DoCast(target,SPELL_POISON_BOTTLE);
                 uiPosionBottleTimer = 19000;
-            } else uiPosionBottleTimer -= uiDiff;
+            } else uiPosionBottleTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth())
             {
@@ -1405,7 +1405,7 @@ class achievement_toc5_grand_champions : public AchievementCriteriaScript
             creature_entry = original_entry;
         }
 
-        bool OnCheck(Player* source, Unit* target)
+        bool OnCheck(Player* /*source*/, Unit* target)
         {
             if (!target)
                 return false;

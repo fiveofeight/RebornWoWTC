@@ -199,7 +199,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) OVERRIDE
     {
         player->PlayerTalkClass->ClearMenus();
-        if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
             player->CLOSE_GOSSIP_MENU();
             if (creature->GetEntry() == NPC_SQUIRE_DAVID)
@@ -257,7 +257,7 @@ public:
         uint32 uiThrustTimer;
         bool bCharge;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiChargeTimer = 12000;
             uiShieldBreakerTimer = 10000;
@@ -266,13 +266,13 @@ public:
             bCharge = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             for (uint8 i = 0; i < 3; ++i)
                 DoCast(me, SPELL_DEFEND, true);
         }
 
-        void MovementInform(uint32 uiType, uint32 /*uiId*/)
+        void MovementInform(uint32 uiType, uint32 /*uiId*/) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
@@ -292,7 +292,7 @@ public:
                 me->setFaction(14);
         }
 
-        void DamageTaken(Unit* doneby, uint32& uiDamage)
+        void DamageTaken(Unit* doneby, uint32& uiDamage) OVERRIDE
         {
             if (uiDamage >= me->GetHealth() && doneby->GetTypeId() == TYPEID_PLAYER)
             {
@@ -308,18 +308,18 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
-            if (uiShieldTimer <= uiDiff)
+            if (uiShieldTimer <= diff)
             {
                 me->CastSpell(me, SPELL_DEFEND);
                 uiShieldTimer = 4000;
-            } else uiShieldTimer -= uiDiff;
+            } else uiShieldTimer -= diff;
 
-            if (uiChargeTimer <= uiDiff && !bCharge)
+            if (uiChargeTimer <= diff && !bCharge)
             {
                 // directly charge if range is ok
                 if (me->GetDistance(me->GetVictim()) > 5.0f && me->GetDistance(me->GetVictim()) <= 30.0f)
@@ -333,26 +333,26 @@ public:
                     me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
                     bCharge = true;
                 }
-            } else uiChargeTimer -= uiDiff;
+            } else uiChargeTimer -=diff;
 
             // prevent shieldbreaker while moving away, npc is not facing player at that time
             if (bCharge)
                 return;
 
-            if (uiShieldBreakerTimer <= uiDiff)
+            if (uiShieldBreakerTimer <= diff)
             {
                 DoCastVictim(SPELL_SHIELD_BREAKER_COMBAT);
                 uiShieldBreakerTimer = 10000;
-            } else uiShieldBreakerTimer -= uiDiff;
+            } else uiShieldBreakerTimer -= diff;
 
             if (me->IsWithinMeleeRange(me->GetVictim()))
             {
-                if (uiThrustTimer <= uiDiff)
+                if (uiThrustTimer <= diff)
                 {
                     DoCastVictim(SPELL_THRUST);
                     uiThrustTimer = 2000;
                 }
-                else uiThrustTimer -= uiDiff;
+                else uiThrustTimer -= diff;
             }
         }
     };
@@ -422,10 +422,10 @@ enum eArgentFactionRiders
     SPELL_JOUST_MUSIC               = 64780,
     SPELL_NO_MUSIC                  = 64794,
 
-    ITEM_MARK_OF_CHAMPION       = 45500,
-    ITEM_MARK_OF_VALIANT        = 45127,
+    ITEM_MARK_OF_CHAMPION           = 45500,
+    ITEM_MARK_OF_VALIANT            = 45127,
 
-    EVENT_START                 = 1,
+    ARGENT_EVENT_START              = 1,
 
     TYPE_VALIANT_ALLIANCE       = 1,
     TYPE_VALIANT_HORDE          = 2,
@@ -610,7 +610,7 @@ public:
                 return false;
 
             creature->GetAI()->SetData(DATA_PLAYER, player->GetGUID());
-            creature->GetAI()->DoAction(EVENT_START);
+            creature->GetAI()->DoAction(ARGENT_EVENT_START);
         }
         return true;
     }
@@ -630,9 +630,9 @@ public:
 
         uint32 challengeeGUID;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
-            me->m_CombatDistance = 100.0f; // lawl, copied from zuldrak.cpp
+            me->m_CombatDistance = 100.0f; // 
             me->setFaction(35);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             DoCast(me, SPELL_READYJOUST_POSE_EFFECT, true);
@@ -656,7 +656,7 @@ public:
 
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const OVERRIDE
         {
             switch (type)
             {
@@ -671,15 +671,15 @@ public:
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) OVERRIDE
         {
             if (type == DATA_PLAYER)
                 challengeeGUID = data;
         }
 
-        void DoAction(int32 const type)
+        void DoAction(int32 const type) OVERRIDE
         {
-            if (type == EVENT_START)
+            if (type == ARGENT_EVENT_START)
             {
                 // check valid player
                 Player* challengee = ObjectAccessor::GetPlayer(*me, challengeeGUID);
@@ -747,11 +747,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
-        {
-        }
-
-        void MovementInform(uint32 uiType, uint32 /*uiId*/)
+        void MovementInform(uint32 uiType, uint32 /*uiId*/) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
@@ -787,7 +783,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* who, uint32& damage)
+        void DamageTaken(Unit* who, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth() && who->GetTypeId() == TYPEID_PLAYER && !bDefeated)
             {
@@ -911,7 +907,7 @@ public:
 
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -929,13 +925,13 @@ public:
                 }
             }
 
-            if (uiShieldTimer <= uiDiff)
+            if (uiShieldTimer <= diff)
             {
                 me->CastSpell(me, SPELL_DEFEND);
                 uiShieldTimer = GetCustomType() == TYPE_CHAMPION ? 8000 : 6000;
-            } else uiShieldTimer -= uiDiff;
+            } else uiShieldTimer -= diff;
 
-            if (uiMusicTimer <= uiDiff)
+            if (uiMusicTimer <= diff)
             {
                 if (Player* challengee = ObjectAccessor::GetPlayer(*me, challengeeGUID))
                     challengee->CastSpell(challengee, SPELL_JOUST_MUSIC, false);
@@ -943,7 +939,7 @@ public:
                 uiMusicTimer = 60000;
             }
 
-            if (uiChargeTimer <= uiDiff && !bCharge)
+            if (uiChargeTimer <= diff && !bCharge)
             {
                 // directly charge if range is ok
                 if (me->GetDistance(me->GetVictim()) > 10.0f && me->GetDistance(me->GetVictim()) <= 25.0f)
@@ -960,27 +956,27 @@ public:
                     me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
                     bCharge = true;
                 }
-            } else uiChargeTimer -= uiDiff;
+            } else uiChargeTimer -= diff;
 
-            if (uiShieldBreakerTimer <= uiDiff)
+            if (uiShieldBreakerTimer <= diff)
             {
                 DoCastVictim(SPELL_SHIELD_BREAKER_COMBAT);
                 uiShieldBreakerTimer = GetCustomType() == TYPE_CHAMPION ? 9000 : 10000;
-            } else uiShieldBreakerTimer -= uiDiff;
+            } else uiShieldBreakerTimer -= diff;
 
             if (me->IsWithinMeleeRange(me->GetVictim()))
             {
-                if (uiThrustTimer <= uiDiff)
+                if (uiThrustTimer <= diff)
                 {
                     DoCastVictim(SPELL_THRUST);
                     uiThrustTimer = GetCustomType() == TYPE_CHAMPION ? 1800 : 2000;
                 }
-                else uiThrustTimer -= uiDiff;
+                else uiThrustTimer -= diff;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_argent_faction_riderAI(creature);
     }
@@ -1041,22 +1037,22 @@ public:
             }
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
-            if (uiChargeTimer <= uiDiff)
+            if (uiChargeTimer <= diff)
             {
                 DoCastVictim(SPELL_CHARGE);
                 uiChargeTimer = 7000;
-            } else uiChargeTimer -= uiDiff;
+            } else uiChargeTimer -= diff;
 
-            if (uiShieldBreakerTimer <= uiDiff)
+            if (uiShieldBreakerTimer <= diff)
             {
                 DoCastVictim(SPELL_SHIELD_BREAKER);
                 uiShieldBreakerTimer = 10000;
-            } else uiShieldBreakerTimer -= uiDiff;
+            } else uiShieldBreakerTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -1347,7 +1343,7 @@ public:
     {
         npc_black_knights_graveAI(Creature* creature) : ScriptedAI(creature){}
 
-		void MoveInLineOfSight(Unit* who)
+		void MoveInLineOfSight(Unit* who) OVERRIDE
         {
             ScriptedAI::MoveInLineOfSight(who);
 
@@ -1358,12 +1354,10 @@ public:
 	        }
         }
 
-        void Reset(){}
-
-		void UpdateAI(const uint32 /*diff*/){}
+		void UpdateAI(const uint32 /*diff*/) OVERRIDE {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_black_knights_graveAI(creature);
     }
@@ -1400,7 +1394,7 @@ public:
         bool bCharge;
 
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             DoCast(me, SPELL_BANNER_BEARER, false);
 
@@ -1422,7 +1416,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             events.Reset();
             events.ScheduleEvent(EVENT_BONEGUARD_SHIELD, 7000);
@@ -1430,7 +1424,7 @@ public:
             events.ScheduleEvent(EVENT_BONEGUARD_SHIELD_BREAKER, 10000);
         }
         
-        void MovementInform(uint32 uiType, uint32 /*uiId*/)
+        void MovementInform(uint32 uiType, uint32 /*uiId*/) OVERRIDE
         {
             if (uiType != POINT_MOTION_TYPE)
                 return;
@@ -1448,7 +1442,7 @@ public:
             }
         }
         
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff) OVERRIDE
        {
             events.Update(diff);
 
@@ -1505,7 +1499,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_boneguard_mountedAI(creature);
     }

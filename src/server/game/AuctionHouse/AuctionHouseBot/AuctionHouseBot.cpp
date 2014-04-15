@@ -121,7 +121,7 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
 {
     if (!AHBSeller)
     {
-        if (debug_Out) sLog->outInfo(LOG_FILTER_GENERAL, "AHSeller: Disabled");
+        if (debug_Out) TC_LOG_INFO("server.general", "AHSeller: Disabled");
         return;
     }
 
@@ -130,7 +130,7 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
 
     if (maxItems == 0)
     {
-        //if (debug_Out) sLog->outInfo(LOG_FILTER_GENERAL, "AHSeller: Auctions disabled");
+        //if (debug_Out) TC_LOG_INFO("server.general", "AHSeller: Auctions disabled");
         return;
     }
 
@@ -151,13 +151,13 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
 
     if (auctions >= minItems)
     {
-        //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: Auctions above minimum");
+        //if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: Auctions above minimum");
         return;
     }
 
     if (auctions >= maxItems)
     {
-        //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: Auctions at or above maximum");
+        //if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: Auctions at or above maximum");
         return;
     }
 
@@ -166,7 +166,7 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
     else
         items = (maxItems - auctions);
 
-    if (debug_Out) sLog->outInfo(LOG_FILTER_GENERAL, "AHSeller: Adding %u Auctions", items);
+    if (debug_Out) TC_LOG_INFO("server.general", "AHSeller: Adding %u Auctions", items);
 
     uint32 AuctioneerGUID = 0;
 
@@ -182,12 +182,12 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
         AuctioneerGUID = 23442; //goblin in GZ
         break;
     default:
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: GetAHID() - Default switch reached");
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: GetAHID() - Default switch reached");
         AuctioneerGUID = 23442; //default to neutral 7
         break;
     }
 
-    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: Current Auctineer GUID is %u", AuctioneerGUID);
+    if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: Current Auctineer GUID is %u", AuctioneerGUID);
 
     uint32 greyTGcount = config->GetPercents(AHB_GREY_TG);
     uint32 whiteTGcount = config->GetPercents(AHB_WHITE_TG);
@@ -223,12 +223,12 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
     uint32 purpleItems = config->GetItemCounts(AHB_PURPLE_I);
     uint32 orangeItems = config->GetItemCounts(AHB_ORANGE_I);
     uint32 yellowItems = config->GetItemCounts(AHB_YELLOW_I);
-    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: %u items", items);
+    if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: %u items", items);
 
     // only insert a few at a time, so as not to peg the processor
     for (uint32 cnt = 1; cnt <= items; cnt++)
     {
-    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: %u count", cnt);
+    if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: %u count", cnt);
         uint32 itemID = 0;
         uint32 itemColor = 99;
         uint32 loopbreaker = 0;
@@ -339,28 +339,28 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
                 }
             default:
                 {
-                    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: itemID Switch - Default Reached");
+                    if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: itemID Switch - Default Reached");
                     break;
                 }
             }
 
             if (itemID == 0)
             {
-                if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: Item::CreateItem() - ItemID is 0");
+                if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: Item::CreateItem() - ItemID is 0");
                 continue;
             }
 
             ItemTemplate const* prototype = sObjectMgr->GetItemTemplate(itemID);
             if (prototype == NULL)
             {
-                if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: Huh?!?! prototype == NULL");
+                if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: Huh?!?! prototype == NULL");
                 continue;
             }
 
             Item* item = Item::CreateItem(itemID, 1, AHBplayer);
             if (item == NULL)
             {
-                if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHSeller: Item::CreateItem() returned NULL");
+                if (debug_Out) TC_LOG_ERROR("server.general", "AHSeller: Item::CreateItem() returned NULL");
                 break;
             }
             item->AddToUpdateQueueOf(AHBplayer);
@@ -399,7 +399,7 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
             else
             {
                 // quality is something it shouldn't be, let's get out of here
-                if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Quality %u not Supported", prototype->Quality);
+                if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Quality %u not Supported", prototype->Quality);
                 item->RemoveFromUpdateQueueOf(AHBplayer);
                 continue;
             }
@@ -499,7 +499,7 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
 {
     if (!AHBBuyer)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Disabled");
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Disabled");
         return;
     }
 
@@ -526,7 +526,7 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
         // Do we have anything to bid? If not, stop here.
         if (possibleBids.empty())
         {
-            //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: I have no items to bid on.");
+            //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: I have no items to bid on.");
             count = config->GetBidsPerInterval();
             continue;
         }
@@ -549,7 +549,7 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
         Item *pItem =  sAuctionMgr->GetAItem(auction->itemGUIDLow);
         if (!pItem)
         {
-            if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Item %u doesn't exist, perhaps bought already?", auction->itemGUIDLow);
+            if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Item %u doesn't exist, perhaps bought already?", auction->itemGUIDLow);
             continue;
         }
 
@@ -580,7 +580,7 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
                 else
                 {
                     // quality is something it shouldn't be, let's get out of here
-                    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Quality %u not Supported", prototype->Quality);
+                    if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Quality %u not Supported", prototype->Quality);
                     continue;
                 }
                 break;
@@ -595,7 +595,7 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
                 else
                 {
                     // quality is something it shouldn't be, let's get out of here
-                    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Quality %u not Supported", prototype->Quality);
+                    if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Quality %u not Supported", prototype->Quality);
                     continue;
                 }
                 break;
@@ -630,32 +630,32 @@ void AuctionHouseBot::addNewAuctionBuyerBotBid(Player *AHBplayer, AHBConfig *con
 
         if (debug_Out)
         {
-            sLog->outInfo(LOG_FILTER_GENERAL, "-------------------------------------------------");
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Info for Auction #%u:", auction->Id);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: AuctionHouse: %u", auction->GetHouseId());
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Auctioneer: %u", auction->auctioneer);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Owner: %u", auction->owner);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Bidder: %u", auction->bidder);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Starting Bid: %u", auction->startbid);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Current Bid: %u", currentprice);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Buyout: %u", auction->buyout);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Deposit: %u", auction->deposit);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Expire Time: %u", uint32(auction->expire_time));
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Bid Rate: %f", bidrate);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Bid Max: %Lf", bidMax);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Bid Value: %Lf", bidvalue);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Bid Price: %u", bidprice);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Item GUID: %u", auction->itemGUIDLow);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Item Template: %u", auction->itemEntry);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Item Info:");
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Item ID: %u", prototype->ItemId);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Buy Price: %u", prototype->BuyPrice);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Sell Price: %u", prototype->SellPrice);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Bonding: %u", prototype->Bonding);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Quality: %u", prototype->Quality);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Item Level: %u", prototype->ItemLevel);
-            sLog->outInfo(LOG_FILTER_GENERAL, "AHBuyer: Ammo Type: %u", prototype->AmmoType);
-            sLog->outInfo(LOG_FILTER_GENERAL, "-------------------------------------------------");
+            TC_LOG_INFO("server.general", "-------------------------------------------------");
+            TC_LOG_INFO("server.general", "AHBuyer: Info for Auction #%u:", auction->Id);
+            TC_LOG_INFO("server.general", "AHBuyer: AuctionHouse: %u", auction->GetHouseId());
+            TC_LOG_INFO("server.general", "AHBuyer: Auctioneer: %u", auction->auctioneer);
+            TC_LOG_INFO("server.general", "AHBuyer: Owner: %u", auction->owner);
+            TC_LOG_INFO("server.general", "AHBuyer: Bidder: %u", auction->bidder);
+            TC_LOG_INFO("server.general", "AHBuyer: Starting Bid: %u", auction->startbid);
+            TC_LOG_INFO("server.general", "AHBuyer: Current Bid: %u", currentprice);
+            TC_LOG_INFO("server.general", "AHBuyer: Buyout: %u", auction->buyout);
+            TC_LOG_INFO("server.general", "AHBuyer: Deposit: %u", auction->deposit);
+            TC_LOG_INFO("server.general", "AHBuyer: Expire Time: %u", uint32(auction->expire_time));
+            TC_LOG_INFO("server.general", "AHBuyer: Bid Rate: %f", bidrate);
+            TC_LOG_INFO("server.general", "AHBuyer: Bid Max: %Lf", bidMax);
+            TC_LOG_INFO("server.general", "AHBuyer: Bid Value: %Lf", bidvalue);
+            TC_LOG_INFO("server.general", "AHBuyer: Bid Price: %u", bidprice);
+            TC_LOG_INFO("server.general", "AHBuyer: Item GUID: %u", auction->itemGUIDLow);
+            TC_LOG_INFO("server.general", "AHBuyer: Item Template: %u", auction->itemEntry);
+            TC_LOG_INFO("server.general", "AHBuyer: Item Info:");
+            TC_LOG_INFO("server.general", "AHBuyer: Item ID: %u", prototype->ItemId);
+            TC_LOG_INFO("server.general", "AHBuyer: Buy Price: %u", prototype->BuyPrice);
+            TC_LOG_INFO("server.general", "AHBuyer: Sell Price: %u", prototype->SellPrice);
+            TC_LOG_INFO("server.general", "AHBuyer: Bonding: %u", prototype->Bonding);
+            TC_LOG_INFO("server.general", "AHBuyer: Quality: %u", prototype->Quality);
+            TC_LOG_INFO("server.general", "AHBuyer: Item Level: %u", prototype->ItemLevel);
+            TC_LOG_INFO("server.general", "AHBuyer: Ammo Type: %u", prototype->AmmoType);
+            TC_LOG_INFO("server.general", "-------------------------------------------------");
         }
 
         // Check whether we do normal bid, or buyout
@@ -725,8 +725,8 @@ void AuctionHouseBot::Update()
         addNewAuctions(&_AHBplayer, &AllianceConfig);
         if (((_newrun - _lastrun_a) >= (AllianceConfig.GetBiddingInterval() * MINUTE)) && (AllianceConfig.GetBidsPerInterval() > 0))
         {
-            //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: %u seconds have passed since last bid", (_newrun - _lastrun_a));
-            //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Bidding on Alliance Auctions");
+            //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: %u seconds have passed since last bid", (_newrun - _lastrun_a));
+            //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Bidding on Alliance Auctions");
             addNewAuctionBuyerBotBid(&_AHBplayer, &AllianceConfig, &_session);
             _lastrun_a = _newrun;
         }
@@ -734,8 +734,8 @@ void AuctionHouseBot::Update()
         addNewAuctions(&_AHBplayer, &HordeConfig);
         if (((_newrun - _lastrun_h) >= (HordeConfig.GetBiddingInterval() * MINUTE)) && (HordeConfig.GetBidsPerInterval() > 0))
         {
-            //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: %u seconds have passed since last bid", (_newrun - _lastrun_h));
-            //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Bidding on Horde Auctions");
+            //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: %u seconds have passed since last bid", (_newrun - _lastrun_h));
+            //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Bidding on Horde Auctions");
             addNewAuctionBuyerBotBid(&_AHBplayer, &HordeConfig, &_session);
             _lastrun_h = _newrun;
         }
@@ -744,8 +744,8 @@ void AuctionHouseBot::Update()
     addNewAuctions(&_AHBplayer, &NeutralConfig);
     if (((_newrun - _lastrun_n) >= (NeutralConfig.GetBiddingInterval() * MINUTE)) && (NeutralConfig.GetBidsPerInterval() > 0))
     {
-        //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: %u seconds have passed since last bid", (_newrun - _lastrun_n));
-        //if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBuyer: Bidding on Neutral Auctions");
+        //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: %u seconds have passed since last bid", (_newrun - _lastrun_n));
+        //if (debug_Out) TC_LOG_ERROR("server.general", "AHBuyer: Bidding on Neutral Auctions");
         addNewAuctionBuyerBotBid(&_AHBplayer, &NeutralConfig, &_session);
         _lastrun_n = _newrun;
     }
@@ -754,34 +754,34 @@ void AuctionHouseBot::Update()
 
 void AuctionHouseBot::Initialize()
 {
-    debug_Out = ConfigMgr::GetBoolDefault("AuctionHouseBot.DEBUG", false);
-    debug_Out_Filters = ConfigMgr::GetBoolDefault("AuctionHouseBot.DEBUG_FILTERS", false);
+    debug_Out = sConfigMgr->GetBoolDefault("AuctionHouseBot.DEBUG", false);
+    debug_Out_Filters = sConfigMgr->GetBoolDefault("AuctionHouseBot.DEBUG_FILTERS", false);
 
-    AHBSeller = ConfigMgr::GetBoolDefault("AuctionHouseBot.EnableSeller", false);
-    AHBBuyer = ConfigMgr::GetBoolDefault("AuctionHouseBot.EnableBuyer", false);
-    SellMethod = ConfigMgr::GetBoolDefault("AuctionHouseBot.UseBuyPriceForSeller", false);
-    BuyMethod = ConfigMgr::GetBoolDefault("AuctionHouseBot.UseBuyPriceForBuyer", false);
+    AHBSeller = sConfigMgr->GetBoolDefault("AuctionHouseBot.EnableSeller", false);
+    AHBBuyer = sConfigMgr->GetBoolDefault("AuctionHouseBot.EnableBuyer", false);
+    SellMethod = sConfigMgr->GetBoolDefault("AuctionHouseBot.UseBuyPriceForSeller", false);
+    BuyMethod = sConfigMgr->GetBoolDefault("AuctionHouseBot.UseBuyPriceForBuyer", false);
 
-    AHBplayerAccount = ConfigMgr::GetIntDefault("AuctionHouseBot.Account", 0);
-    AHBplayerGUID = ConfigMgr::GetIntDefault("AuctionHouseBot.GUID", 0);
-    ItemsPerCycle = ConfigMgr::GetIntDefault("AuctionHouseBot.ItemsPerCycle", 200);
+    AHBplayerAccount = sConfigMgr->GetIntDefault("AuctionHouseBot.Account", 0);
+    AHBplayerGUID = sConfigMgr->GetIntDefault("AuctionHouseBot.GUID", 0);
+    ItemsPerCycle = sConfigMgr->GetIntDefault("AuctionHouseBot.ItemsPerCycle", 200);
 
     //Begin Filters
 
-    Vendor_Items = ConfigMgr::GetBoolDefault("AuctionHouseBot.VendorItems", false);
-    Loot_Items = ConfigMgr::GetBoolDefault("AuctionHouseBot.LootItems", true);
-    Other_Items = ConfigMgr::GetBoolDefault("AuctionHouseBot.OtherItems", false);
-    Vendor_TGs = ConfigMgr::GetBoolDefault("AuctionHouseBot.VendorTradeGoods", false);
-    Loot_TGs = ConfigMgr::GetBoolDefault("AuctionHouseBot.LootTradeGoods", true);
-    Other_TGs = ConfigMgr::GetBoolDefault("AuctionHouseBot.OtherTradeGoods", false);
+    Vendor_Items = sConfigMgr->GetBoolDefault("AuctionHouseBot.VendorItems", false);
+    Loot_Items = sConfigMgr->GetBoolDefault("AuctionHouseBot.LootItems", true);
+    Other_Items = sConfigMgr->GetBoolDefault("AuctionHouseBot.OtherItems", false);
+    Vendor_TGs = sConfigMgr->GetBoolDefault("AuctionHouseBot.VendorTradeGoods", false);
+    Loot_TGs = sConfigMgr->GetBoolDefault("AuctionHouseBot.LootTradeGoods", true);
+    Other_TGs = sConfigMgr->GetBoolDefault("AuctionHouseBot.OtherTradeGoods", false);
 
-    No_Bind = ConfigMgr::GetBoolDefault("AuctionHouseBot.No_Bind", true);
-    Bind_When_Picked_Up = ConfigMgr::GetBoolDefault("AuctionHouseBot.Bind_When_Picked_Up", false);
-    Bind_When_Equipped = ConfigMgr::GetBoolDefault("AuctionHouseBot.Bind_When_Equipped", true);
-    Bind_When_Use = ConfigMgr::GetBoolDefault("AuctionHouseBot.Bind_When_Use", true);
-    Bind_Quest_Item = ConfigMgr::GetBoolDefault("AuctionHouseBot.Bind_Quest_Item", false);
+    No_Bind = sConfigMgr->GetBoolDefault("AuctionHouseBot.No_Bind", true);
+    Bind_When_Picked_Up = sConfigMgr->GetBoolDefault("AuctionHouseBot.Bind_When_Picked_Up", false);
+    Bind_When_Equipped = sConfigMgr->GetBoolDefault("AuctionHouseBot.Bind_When_Equipped", true);
+    Bind_When_Use = sConfigMgr->GetBoolDefault("AuctionHouseBot.Bind_When_Use", true);
+    Bind_Quest_Item = sConfigMgr->GetBoolDefault("AuctionHouseBot.Bind_Quest_Item", false);
 
-    std::string disabledItems = ConfigMgr::GetStringDefault("AuctionHouseBot.DisabledItems", "");
+    std::string disabledItems = sConfigMgr->GetStringDefault("AuctionHouseBot.DisabledItems", "");
     DisableItemStore.clear();
     Tokenizer tokens(disabledItems, ' ');
     for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
@@ -790,44 +790,44 @@ void AuctionHouseBot::Initialize()
         DisableItemStore.insert(id);
     }
 
-    DisablePermEnchant = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisablePermEnchant", false);
-    DisableConjured = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableConjured", false);
-    DisableGems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableGems", false);
-    DisableMoney = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableMoney", false);
-    DisableMoneyLoot = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableMoneyLoot", false);
-    DisableLootable = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableLootable", false);
-    DisableKeys = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableKeys", false);
-    DisableDuration = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableDuration", false);
-    DisableBOP_Or_Quest_NoReqLevel = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableBOP_Or_Quest_NoReqLevel", false);
+    DisablePermEnchant = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisablePermEnchant", false);
+    DisableConjured = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableConjured", false);
+    DisableGems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableGems", false);
+    DisableMoney = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableMoney", false);
+    DisableMoneyLoot = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableMoneyLoot", false);
+    DisableLootable = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableLootable", false);
+    DisableKeys = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableKeys", false);
+    DisableDuration = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableDuration", false);
+    DisableBOP_Or_Quest_NoReqLevel = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableBOP_Or_Quest_NoReqLevel", false);
 
-    DisableWarriorItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableWarriorItems", false);
-    DisablePaladinItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisablePaladinItems", false);
-    DisableHunterItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableHunterItems", false);
-    DisableRogueItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableRogueItems", false);
-    DisablePriestItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisablePriestItems", false);
-    DisableDKItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableDKItems", false);
-    DisableShamanItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableShamanItems", false);
-    DisableMageItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableMageItems", false);
-    DisableWarlockItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableWarlockItems", false);
-    DisableUnusedClassItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableUnusedClassItems", false);
-    DisableDruidItems = ConfigMgr::GetBoolDefault("AuctionHouseBot.DisableDruidItems", false);
+    DisableWarriorItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableWarriorItems", false);
+    DisablePaladinItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisablePaladinItems", false);
+    DisableHunterItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableHunterItems", false);
+    DisableRogueItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableRogueItems", false);
+    DisablePriestItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisablePriestItems", false);
+    DisableDKItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableDKItems", false);
+    DisableShamanItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableShamanItems", false);
+    DisableMageItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableMageItems", false);
+    DisableWarlockItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableWarlockItems", false);
+    DisableUnusedClassItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableUnusedClassItems", false);
+    DisableDruidItems = sConfigMgr->GetBoolDefault("AuctionHouseBot.DisableDruidItems", false);
 
-    DisableItemsBelowLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsBelowLevel", 0);
-    DisableItemsAboveLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsAboveLevel", 0);
-    DisableTGsBelowLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsBelowLevel", 0);
-    DisableTGsAboveLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsAboveLevel", 0);
-    DisableItemsBelowGUID = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsBelowGUID", 0);
-    DisableItemsAboveGUID = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsAboveGUID", 0);
-    DisableTGsBelowGUID = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsBelowGUID", 0);
-    DisableTGsAboveGUID = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsAboveGUID", 0);
-    DisableItemsBelowReqLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsBelowReqLevel", 0);
-    DisableItemsAboveReqLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsAboveReqLevel", 0);
-    DisableTGsBelowReqLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsBelowReqLevel", 0);
-    DisableTGsAboveReqLevel = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsAboveReqLevel", 0);
-    DisableItemsBelowReqSkillRank = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsBelowReqSkillRank", 0);
-    DisableItemsAboveReqSkillRank = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableItemsAboveReqSkillRank", 0);
-    DisableTGsBelowReqSkillRank = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsBelowReqSkillRank", 0);
-    DisableTGsAboveReqSkillRank = ConfigMgr::GetIntDefault("AuctionHouseBot.DisableTGsAboveReqSkillRank", 0);
+    DisableItemsBelowLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsBelowLevel", 0);
+    DisableItemsAboveLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsAboveLevel", 0);
+    DisableTGsBelowLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsBelowLevel", 0);
+    DisableTGsAboveLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsAboveLevel", 0);
+    DisableItemsBelowGUID = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsBelowGUID", 0);
+    DisableItemsAboveGUID = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsAboveGUID", 0);
+    DisableTGsBelowGUID = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsBelowGUID", 0);
+    DisableTGsAboveGUID = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsAboveGUID", 0);
+    DisableItemsBelowReqLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsBelowReqLevel", 0);
+    DisableItemsAboveReqLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsAboveReqLevel", 0);
+    DisableTGsBelowReqLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsBelowReqLevel", 0);
+    DisableTGsAboveReqLevel = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsAboveReqLevel", 0);
+    DisableItemsBelowReqSkillRank = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsBelowReqSkillRank", 0);
+    DisableItemsAboveReqSkillRank = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableItemsAboveReqSkillRank", 0);
+    DisableTGsBelowReqSkillRank = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsBelowReqSkillRank", 0);
+    DisableTGsAboveReqSkillRank = sConfigMgr->GetIntDefault("AuctionHouseBot.DisableTGsAboveReqSkillRank", 0);
 
     //End Filters
     if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
@@ -846,7 +846,7 @@ void AuctionHouseBot::Initialize()
         QueryResult result = CharacterDatabase.PQuery("SELECT 1 FROM characters WHERE account = %u AND guid = %u", AHBplayerAccount, AHBplayerGUID);
         if (!result)
        {
-           sLog->outError(LOG_FILTER_SERVER_LOADING, "AuctionHouseBot: The account/GUID-information set for your AHBot is incorrect (account: %u guid: %u)", AHBplayerAccount, AHBplayerGUID);
+           TC_LOG_ERROR("server.loading", "AuctionHouseBot: The account/GUID-information set for your AHBot is incorrect (account: %u guid: %u)", AHBplayerAccount, AHBplayerGUID);
            return;
         }
     }
@@ -867,7 +867,7 @@ void AuctionHouseBot::Initialize()
         }
         else
         {
-            if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: \"%s\" failed", npcQuery);
+            if (debug_Out) TC_LOG_ERROR("server.general", "AuctionHouseBot: \"%s\" failed", npcQuery);
         }
 
         char lootQuery[] = "SELECT item FROM creature_loot_template UNION "
@@ -893,7 +893,7 @@ void AuctionHouseBot::Initialize()
         }
         else
         {
-            if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: \"%s\" failed", lootQuery);
+            if (debug_Out) TC_LOG_ERROR("server.general", "AuctionHouseBot: \"%s\" failed", lootQuery);
         }
 
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1041,259 +1041,259 @@ void AuctionHouseBot::Initialize()
             // Disable items by Id
             if (DisableItemStore.find(itr->second.ItemId) != DisableItemStore.end())
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (PTR/Beta/Unused Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (PTR/Beta/Unused Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable permanent enchants items
             if ((DisablePermEnchant) && (itr->second.Class == ITEM_CLASS_PERMANENT))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Permanent Enchant Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Permanent Enchant Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable conjured items
             if ((DisableConjured) && (itr->second.IsConjuredConsumable()))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Conjured Consumable)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Conjured Consumable)", itr->second.ItemId);
                 continue;
             }
 
             // Disable gems
             if ((DisableGems) && (itr->second.Class == ITEM_CLASS_GEM))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Gem)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Gem)", itr->second.ItemId);
                 continue;
             }
 
             // Disable money
             if ((DisableMoney) && (itr->second.Class == ITEM_CLASS_MONEY))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Money)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Money)", itr->second.ItemId);
                 continue;
             }
 
             // Disable moneyloot
             if ((DisableMoneyLoot) && (itr->second.MinMoneyLoot > 0))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (MoneyLoot)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (MoneyLoot)", itr->second.ItemId);
                 continue;
             }
 
             // Disable lootable items
             if ((DisableLootable) && (itr->second.Flags & 4))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Lootable Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Lootable Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable Keys
             if ((DisableKeys) && (itr->second.Class == ITEM_CLASS_KEY))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Quest Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Quest Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items with duration
             if ((DisableDuration) && (itr->second.Duration > 0))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Has a Duration)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Has a Duration)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items which are BOP or Quest Items and have a required level lower than the item level
             if ((DisableBOP_Or_Quest_NoReqLevel) && ((itr->second.Bonding == BIND_WHEN_PICKED_UP || itr->second.Bonding == BIND_QUEST_ITEM) && (itr->second.RequiredLevel < itr->second.ItemLevel)))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (BOP or BQI and Required Level is less than Item Level)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (BOP or BQI and Required Level is less than Item Level)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Warrior
             if ((DisableWarriorItems) && (itr->second.AllowableClass == 1))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Warrior Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Warrior Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Paladin
             if ((DisablePaladinItems) && (itr->second.AllowableClass == 2))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Paladin Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Paladin Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Hunter
             if ((DisableHunterItems) && (itr->second.AllowableClass == 4))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Hunter Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Hunter Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Rogue
             if ((DisableRogueItems) && (itr->second.AllowableClass == 8))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Rogue Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Rogue Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Priest
             if ((DisablePriestItems) && (itr->second.AllowableClass == 16))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Priest Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Priest Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for DK
             if ((DisableDKItems) && (itr->second.AllowableClass == 32))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (DK Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (DK Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Shaman
             if ((DisableShamanItems) && (itr->second.AllowableClass == 64))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Shaman Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Shaman Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Mage
             if ((DisableMageItems) && (itr->second.AllowableClass == 128))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Mage Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Mage Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Warlock
             if ((DisableWarlockItems) && (itr->second.AllowableClass == 256))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Warlock Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Warlock Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Unused Class
             if ((DisableUnusedClassItems) && (itr->second.AllowableClass == 512))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Unused Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Unused Item)", itr->second.ItemId);
                 continue;
             }
 
             // Disable items specifically for Druid
             if ((DisableDruidItems) && (itr->second.AllowableClass == 1024))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Druid Item)", itr->second.ItemId);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Druid Item)", itr->second.ItemId);
                 continue;
             }
 
              // Disable Items below level X
             if ((DisableItemsBelowLevel) && (itr->second.Class != ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemLevel < DisableItemsBelowLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
             // Disable Items above level X
             if ((DisableItemsAboveLevel) && (itr->second.Class != ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemLevel > DisableItemsAboveLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
            // Disable Trade Goods below level X
             if ((DisableTGsBelowLevel) && (itr->second.Class == ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemLevel < DisableTGsBelowLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Trade Good %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Trade Good %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
            // Disable Trade Goods above level X
             if ((DisableTGsAboveLevel) && (itr->second.Class == ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemLevel > DisableTGsAboveLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Trade Good %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Trade Good %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
             // Disable Items below GUID X
             if ((DisableItemsBelowGUID) && (itr->second.Class != ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemId < DisableItemsBelowGUID))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
             // Disable Items above GUID X
             if ((DisableItemsAboveGUID) && (itr->second.Class != ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemId > DisableItemsAboveGUID))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Item Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
             // Disable Trade Goods below GUID X
             if ((DisableTGsBelowGUID) && (itr->second.Class == ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemId < DisableTGsBelowGUID))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
             // Disable Trade Goods above GUID X
             if ((DisableTGsAboveGUID) && (itr->second.Class == ITEM_CLASS_TRADE_GOODS) && (itr->second.ItemId > DisableTGsAboveGUID))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (Trade Good Level = %u)", itr->second.ItemId, itr->second.ItemLevel);
                 continue;
             }
 
             // Disable Items for level lower than X
             if ((DisableItemsBelowReqLevel) && (itr->second.RequiredLevel < DisableItemsBelowReqLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
                 continue;
             }
 
             // Disable Items for level higher than X
             if ((DisableItemsAboveReqLevel) && (itr->second.RequiredLevel > DisableItemsAboveReqLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
                 continue;
             }
 
             // Disable Trade Goods for level lower than X
             if ((DisableTGsBelowReqLevel) && (itr->second.RequiredLevel < DisableTGsBelowReqLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Trade Good %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Trade Good %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
                 continue;
             }
 
             // Disable Trade Goods for level higher than X
             if ((DisableTGsAboveReqLevel) && (itr->second.RequiredLevel > DisableTGsAboveReqLevel))
             {
-                if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Trade Good %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
+                if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Trade Good %u disabled (RequiredLevel = %u)", itr->second.ItemId, itr->second.RequiredLevel);
                 continue;
             }
 
             // Disable Items that require skill lower than X
             // if ((DisableItemsBelowReqSkillRank) && (itr->second.RequiredSkillRank < DisableItemsBelowReqSkillRank))
             // {
-            //    if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
+            //    if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
             //    continue;
             // }
 
             // Disable Items that require skill higher than X
             // if ((DisableItemsAboveReqSkillRank) && (itr->second.RequiredSkillRank > DisableItemsAboveReqSkillRank))
             // {
-            //    if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
+            //    if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
             //    continue;
             // }
 
             // Disable Trade Goods that require skill lower than X
             // if ((DisableTGsBelowReqSkillRank) && (itr->second.RequiredSkillRank < DisableTGsBelowReqSkillRank))
             // {
-            //    if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
+            //    if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
             //    continue;
             // }
 
             // Disable Trade Goods that require skill higher than X
             // if ((DisableTGsAboveReqSkillRank) && (itr->second.?RequiredSkillRank > DisableTGsAboveReqSkillRank))
             // {
-            //    if (debug_Out_Filters) sLog->outError(LOG_FILTER_GENERAL, "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
+            //    if (debug_Out_Filters) TC_LOG_ERROR("server.general", "AuctionHouseBot: Item %u disabled (RequiredSkillRank = %u)", itr->second.ItemId, itr->second.RequiredSkillRank);
             //    continue;
             // }
 
@@ -1365,27 +1365,27 @@ void AuctionHouseBot::Initialize()
             (orangeItemsBin.size() == 0) &&
             (yellowItemsBin.size() == 0))
         {
-            sLog->outError(LOG_FILTER_SERVER_LOADING, "AuctionHouseBot: No items");
+            TC_LOG_ERROR("server.loading", "AuctionHouseBot: No items");
             AHBSeller = 0;
         }
 
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "AuctionHouseBot:");
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u grey trade goods", uint32(greyTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u white trade goods", uint32(whiteTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u green trade goods", uint32(greenTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u blue trade goods", uint32(blueTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u purple trade goods", uint32(purpleTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u orange trade goods", uint32(orangeTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u yellow trade goods", uint32(yellowTradeGoodsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u grey items", uint32(greyItemsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u white items", uint32(whiteItemsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u green items", uint32(greenItemsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u blue items", uint32(blueItemsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u purple items", uint32(purpleItemsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u orange items", uint32(orangeItemsBin.size()));
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "loaded %u yellow items", uint32(yellowItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "AuctionHouseBot:");
+        TC_LOG_ERROR("server.loading", "loaded %u grey trade goods", uint32(greyTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u white trade goods", uint32(whiteTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u green trade goods", uint32(greenTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u blue trade goods", uint32(blueTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u purple trade goods", uint32(purpleTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u orange trade goods", uint32(orangeTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u yellow trade goods", uint32(yellowTradeGoodsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u grey items", uint32(greyItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u white items", uint32(whiteItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u green items", uint32(greenItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u blue items", uint32(blueItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u purple items", uint32(purpleItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u orange items", uint32(orangeItemsBin.size()));
+        TC_LOG_ERROR("server.loading", "loaded %u yellow items", uint32(yellowItemsBin.size()));
     }
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "AuctionHouseBot and AuctionHouseBuyer have been loaded.");
+    TC_LOG_ERROR("server.loading", "AuctionHouseBot and AuctionHouseBuyer have been loaded.");
 }
 
 void AuctionHouseBot::IncrementItemCounts(AuctionEntry* ah)
@@ -1396,7 +1396,7 @@ void AuctionHouseBot::IncrementItemCounts(AuctionEntry* ah)
     Item *pItem =  sAuctionMgr->GetAItem(ah->itemGUIDLow);
     if (!pItem)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: Item %u doesn't exist, perhaps bought already?", ah->itemGUIDLow);
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: Item %u doesn't exist, perhaps bought already?", ah->itemGUIDLow);
         return;
     }
 
@@ -1408,22 +1408,22 @@ void AuctionHouseBot::IncrementItemCounts(AuctionEntry* ah)
     FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(ah->GetHouseFaction());
     if (!u_entry)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
         config = &NeutralConfig;
     }
     else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Alliance", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Alliance", ah->GetHouseFaction());
         config = &AllianceConfig;
     }
     else if (u_entry->ourMask & FACTION_MASK_HORDE)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Horde", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Horde", ah->GetHouseFaction());
         config = &HordeConfig;
     }
     else
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
         config = &NeutralConfig;
     }
 
@@ -1440,22 +1440,22 @@ void AuctionHouseBot::DecrementItemCounts(AuctionEntry* ah, uint32 itemEntry)
     FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(ah->GetHouseFaction());
     if (!u_entry)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
         config = &NeutralConfig;
     }
     else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Alliance", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Alliance", ah->GetHouseFaction());
         config = &AllianceConfig;
     }
     else if (u_entry->ourMask & FACTION_MASK_HORDE)
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Horde", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Horde", ah->GetHouseFaction());
         config = &HordeConfig;
     }
     else
     {
-        if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
+        if (debug_Out) TC_LOG_ERROR("server.general", "AHBot: %u returned as House Faction. Neutral", ah->GetHouseFaction());
         config = &NeutralConfig;
     }
 
@@ -1669,7 +1669,7 @@ void AuctionHouseBot::Commands(uint32 command, uint32 ahMapID, uint32 col, char*
 void AuctionHouseBot::LoadValues(AHBConfig *config)
 {
     if (debug_Out)
-        sLog->outError(LOG_FILTER_GENERAL, "Start Settings for %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u", config->GetAHID())->Fetch()->GetCString());
+        TC_LOG_ERROR("server.general", "Start Settings for %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u", config->GetAHID())->Fetch()->GetCString());
     if (AHBSeller)
     {
         //load min and max items
@@ -1731,57 +1731,57 @@ void AuctionHouseBot::LoadValues(AHBConfig *config)
         config->SetMaxStack(AHB_YELLOW, CharacterDatabase.PQuery("SELECT maxstackyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
         if (debug_Out)
         {
-            sLog->outError(LOG_FILTER_GENERAL, "minItems                = %u", config->GetMinItems());
-            sLog->outError(LOG_FILTER_GENERAL, "maxItems                = %u", config->GetMaxItems());
-            sLog->outError(LOG_FILTER_GENERAL, "percentGreyTradeGoods   = %u", config->GetPercentages(AHB_GREY_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentWhiteTradeGoods  = %u", config->GetPercentages(AHB_WHITE_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentGreenTradeGoods  = %u", config->GetPercentages(AHB_GREEN_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentBlueTradeGoods   = %u", config->GetPercentages(AHB_BLUE_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentPurpleTradeGoods = %u", config->GetPercentages(AHB_PURPLE_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentOrangeTradeGoods = %u", config->GetPercentages(AHB_ORANGE_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentYellowTradeGoods = %u", config->GetPercentages(AHB_YELLOW_TG));
-            sLog->outError(LOG_FILTER_GENERAL, "percentGreyItems        = %u", config->GetPercentages(AHB_GREY_I));
-            sLog->outError(LOG_FILTER_GENERAL, "percentWhiteItems       = %u", config->GetPercentages(AHB_WHITE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "percentGreenItems       = %u", config->GetPercentages(AHB_GREEN_I));
-            sLog->outError(LOG_FILTER_GENERAL, "percentBlueItems        = %u", config->GetPercentages(AHB_BLUE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "percentPurpleItems      = %u", config->GetPercentages(AHB_PURPLE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "percentOrangeItems      = %u", config->GetPercentages(AHB_ORANGE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "percentYellowItems      = %u", config->GetPercentages(AHB_YELLOW_I));
-            sLog->outError(LOG_FILTER_GENERAL, "minPriceGrey            = %u", config->GetMinPrice(AHB_GREY));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPriceGrey            = %u", config->GetMaxPrice(AHB_GREY));
-            sLog->outError(LOG_FILTER_GENERAL, "minPriceWhite           = %u", config->GetMinPrice(AHB_WHITE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPriceWhite           = %u", config->GetMaxPrice(AHB_WHITE));
-            sLog->outError(LOG_FILTER_GENERAL, "minPriceGreen           = %u", config->GetMinPrice(AHB_GREEN));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPriceGreen           = %u", config->GetMaxPrice(AHB_GREEN));
-            sLog->outError(LOG_FILTER_GENERAL, "minPriceBlue            = %u", config->GetMinPrice(AHB_BLUE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPriceBlue            = %u", config->GetMaxPrice(AHB_BLUE));
-            sLog->outError(LOG_FILTER_GENERAL, "minPricePurple          = %u", config->GetMinPrice(AHB_PURPLE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPricePurple          = %u", config->GetMaxPrice(AHB_PURPLE));
-            sLog->outError(LOG_FILTER_GENERAL, "minPriceOrange          = %u", config->GetMinPrice(AHB_ORANGE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPriceOrange          = %u", config->GetMaxPrice(AHB_ORANGE));
-            sLog->outError(LOG_FILTER_GENERAL, "minPriceYellow          = %u", config->GetMinPrice(AHB_YELLOW));
-            sLog->outError(LOG_FILTER_GENERAL, "maxPriceYellow          = %u", config->GetMaxPrice(AHB_YELLOW));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPriceGrey         = %u", config->GetMinBidPrice(AHB_GREY));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPriceGrey         = %u", config->GetMaxBidPrice(AHB_GREY));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPriceWhite        = %u", config->GetMinBidPrice(AHB_WHITE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPriceWhite        = %u", config->GetMaxBidPrice(AHB_WHITE));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPriceGreen        = %u", config->GetMinBidPrice(AHB_GREEN));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPriceGreen        = %u", config->GetMaxBidPrice(AHB_GREEN));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPriceBlue         = %u", config->GetMinBidPrice(AHB_BLUE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPriceBlue         = %u", config->GetMinBidPrice(AHB_BLUE));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPricePurple       = %u", config->GetMinBidPrice(AHB_PURPLE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPricePurple       = %u", config->GetMaxBidPrice(AHB_PURPLE));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPriceOrange       = %u", config->GetMinBidPrice(AHB_ORANGE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPriceOrange       = %u", config->GetMaxBidPrice(AHB_ORANGE));
-            sLog->outError(LOG_FILTER_GENERAL, "minBidPriceYellow       = %u", config->GetMinBidPrice(AHB_YELLOW));
-            sLog->outError(LOG_FILTER_GENERAL, "maxBidPriceYellow       = %u", config->GetMaxBidPrice(AHB_YELLOW));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackGrey            = %u", config->GetMaxStack(AHB_GREY));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackWhite           = %u", config->GetMaxStack(AHB_WHITE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackGreen           = %u", config->GetMaxStack(AHB_GREEN));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackBlue            = %u", config->GetMaxStack(AHB_BLUE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackPurple          = %u", config->GetMaxStack(AHB_PURPLE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackOrange          = %u", config->GetMaxStack(AHB_ORANGE));
-            sLog->outError(LOG_FILTER_GENERAL, "maxStackYellow          = %u", config->GetMaxStack(AHB_YELLOW));
+            TC_LOG_ERROR("server.general", "minItems                = %u", config->GetMinItems());
+            TC_LOG_ERROR("server.general", "maxItems                = %u", config->GetMaxItems());
+            TC_LOG_ERROR("server.general", "percentGreyTradeGoods   = %u", config->GetPercentages(AHB_GREY_TG));
+            TC_LOG_ERROR("server.general", "percentWhiteTradeGoods  = %u", config->GetPercentages(AHB_WHITE_TG));
+            TC_LOG_ERROR("server.general", "percentGreenTradeGoods  = %u", config->GetPercentages(AHB_GREEN_TG));
+            TC_LOG_ERROR("server.general", "percentBlueTradeGoods   = %u", config->GetPercentages(AHB_BLUE_TG));
+            TC_LOG_ERROR("server.general", "percentPurpleTradeGoods = %u", config->GetPercentages(AHB_PURPLE_TG));
+            TC_LOG_ERROR("server.general", "percentOrangeTradeGoods = %u", config->GetPercentages(AHB_ORANGE_TG));
+            TC_LOG_ERROR("server.general", "percentYellowTradeGoods = %u", config->GetPercentages(AHB_YELLOW_TG));
+            TC_LOG_ERROR("server.general", "percentGreyItems        = %u", config->GetPercentages(AHB_GREY_I));
+            TC_LOG_ERROR("server.general", "percentWhiteItems       = %u", config->GetPercentages(AHB_WHITE_I));
+            TC_LOG_ERROR("server.general", "percentGreenItems       = %u", config->GetPercentages(AHB_GREEN_I));
+            TC_LOG_ERROR("server.general", "percentBlueItems        = %u", config->GetPercentages(AHB_BLUE_I));
+            TC_LOG_ERROR("server.general", "percentPurpleItems      = %u", config->GetPercentages(AHB_PURPLE_I));
+            TC_LOG_ERROR("server.general", "percentOrangeItems      = %u", config->GetPercentages(AHB_ORANGE_I));
+            TC_LOG_ERROR("server.general", "percentYellowItems      = %u", config->GetPercentages(AHB_YELLOW_I));
+            TC_LOG_ERROR("server.general", "minPriceGrey            = %u", config->GetMinPrice(AHB_GREY));
+            TC_LOG_ERROR("server.general", "maxPriceGrey            = %u", config->GetMaxPrice(AHB_GREY));
+            TC_LOG_ERROR("server.general", "minPriceWhite           = %u", config->GetMinPrice(AHB_WHITE));
+            TC_LOG_ERROR("server.general", "maxPriceWhite           = %u", config->GetMaxPrice(AHB_WHITE));
+            TC_LOG_ERROR("server.general", "minPriceGreen           = %u", config->GetMinPrice(AHB_GREEN));
+            TC_LOG_ERROR("server.general", "maxPriceGreen           = %u", config->GetMaxPrice(AHB_GREEN));
+            TC_LOG_ERROR("server.general", "minPriceBlue            = %u", config->GetMinPrice(AHB_BLUE));
+            TC_LOG_ERROR("server.general", "maxPriceBlue            = %u", config->GetMaxPrice(AHB_BLUE));
+            TC_LOG_ERROR("server.general", "minPricePurple          = %u", config->GetMinPrice(AHB_PURPLE));
+            TC_LOG_ERROR("server.general", "maxPricePurple          = %u", config->GetMaxPrice(AHB_PURPLE));
+            TC_LOG_ERROR("server.general", "minPriceOrange          = %u", config->GetMinPrice(AHB_ORANGE));
+            TC_LOG_ERROR("server.general", "maxPriceOrange          = %u", config->GetMaxPrice(AHB_ORANGE));
+            TC_LOG_ERROR("server.general", "minPriceYellow          = %u", config->GetMinPrice(AHB_YELLOW));
+            TC_LOG_ERROR("server.general", "maxPriceYellow          = %u", config->GetMaxPrice(AHB_YELLOW));
+            TC_LOG_ERROR("server.general", "minBidPriceGrey         = %u", config->GetMinBidPrice(AHB_GREY));
+            TC_LOG_ERROR("server.general", "maxBidPriceGrey         = %u", config->GetMaxBidPrice(AHB_GREY));
+            TC_LOG_ERROR("server.general", "minBidPriceWhite        = %u", config->GetMinBidPrice(AHB_WHITE));
+            TC_LOG_ERROR("server.general", "maxBidPriceWhite        = %u", config->GetMaxBidPrice(AHB_WHITE));
+            TC_LOG_ERROR("server.general", "minBidPriceGreen        = %u", config->GetMinBidPrice(AHB_GREEN));
+            TC_LOG_ERROR("server.general", "maxBidPriceGreen        = %u", config->GetMaxBidPrice(AHB_GREEN));
+            TC_LOG_ERROR("server.general", "minBidPriceBlue         = %u", config->GetMinBidPrice(AHB_BLUE));
+            TC_LOG_ERROR("server.general", "maxBidPriceBlue         = %u", config->GetMinBidPrice(AHB_BLUE));
+            TC_LOG_ERROR("server.general", "minBidPricePurple       = %u", config->GetMinBidPrice(AHB_PURPLE));
+            TC_LOG_ERROR("server.general", "maxBidPricePurple       = %u", config->GetMaxBidPrice(AHB_PURPLE));
+            TC_LOG_ERROR("server.general", "minBidPriceOrange       = %u", config->GetMinBidPrice(AHB_ORANGE));
+            TC_LOG_ERROR("server.general", "maxBidPriceOrange       = %u", config->GetMaxBidPrice(AHB_ORANGE));
+            TC_LOG_ERROR("server.general", "minBidPriceYellow       = %u", config->GetMinBidPrice(AHB_YELLOW));
+            TC_LOG_ERROR("server.general", "maxBidPriceYellow       = %u", config->GetMaxBidPrice(AHB_YELLOW));
+            TC_LOG_ERROR("server.general", "maxStackGrey            = %u", config->GetMaxStack(AHB_GREY));
+            TC_LOG_ERROR("server.general", "maxStackWhite           = %u", config->GetMaxStack(AHB_WHITE));
+            TC_LOG_ERROR("server.general", "maxStackGreen           = %u", config->GetMaxStack(AHB_GREEN));
+            TC_LOG_ERROR("server.general", "maxStackBlue            = %u", config->GetMaxStack(AHB_BLUE));
+            TC_LOG_ERROR("server.general", "maxStackPurple          = %u", config->GetMaxStack(AHB_PURPLE));
+            TC_LOG_ERROR("server.general", "maxStackOrange          = %u", config->GetMaxStack(AHB_ORANGE));
+            TC_LOG_ERROR("server.general", "maxStackYellow          = %u", config->GetMaxStack(AHB_YELLOW));
         }
         //AuctionHouseEntry const* ahEntry =  sAuctionMgr->GetAuctionHouseEntry(config->GetAHFID());
         AuctionHouseObject* auctionHouse =  sAuctionMgr->GetAuctionsMap(config->GetAHFID());
@@ -1851,14 +1851,14 @@ void AuctionHouseBot::LoadValues(AHBConfig *config)
         }
         if (debug_Out)
         {
-            sLog->outError(LOG_FILTER_GENERAL, "Current Settings for %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetCString());
-            sLog->outError(LOG_FILTER_GENERAL, "Grey Trade Goods\t%u\tGrey Items\t%u", config->GetItemCounts(AHB_GREY_TG), config->GetItemCounts(AHB_GREY_I));
-            sLog->outError(LOG_FILTER_GENERAL, "White Trade Goods\t%u\tWhite Items\t%u", config->GetItemCounts(AHB_WHITE_TG), config->GetItemCounts(AHB_WHITE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "Green Trade Goods\t%u\tGreen Items\t%u", config->GetItemCounts(AHB_GREEN_TG), config->GetItemCounts(AHB_GREEN_I));
-            sLog->outError(LOG_FILTER_GENERAL, "Blue Trade Goods\t%u\tBlue Items\t%u", config->GetItemCounts(AHB_BLUE_TG), config->GetItemCounts(AHB_BLUE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "Purple Trade Goods\t%u\tPurple Items\t%u", config->GetItemCounts(AHB_PURPLE_TG), config->GetItemCounts(AHB_PURPLE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "Orange Trade Goods\t%u\tOrange Items\t%u", config->GetItemCounts(AHB_ORANGE_TG), config->GetItemCounts(AHB_ORANGE_I));
-            sLog->outError(LOG_FILTER_GENERAL, "Yellow Trade Goods\t%u\tYellow Items\t%u", config->GetItemCounts(AHB_YELLOW_TG), config->GetItemCounts(AHB_YELLOW_I));
+            TC_LOG_ERROR("server.general", "Current Settings for %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetCString());
+            TC_LOG_ERROR("server.general", "Grey Trade Goods\t%u\tGrey Items\t%u", config->GetItemCounts(AHB_GREY_TG), config->GetItemCounts(AHB_GREY_I));
+            TC_LOG_ERROR("server.general", "White Trade Goods\t%u\tWhite Items\t%u", config->GetItemCounts(AHB_WHITE_TG), config->GetItemCounts(AHB_WHITE_I));
+            TC_LOG_ERROR("server.general", "Green Trade Goods\t%u\tGreen Items\t%u", config->GetItemCounts(AHB_GREEN_TG), config->GetItemCounts(AHB_GREEN_I));
+            TC_LOG_ERROR("server.general", "Blue Trade Goods\t%u\tBlue Items\t%u", config->GetItemCounts(AHB_BLUE_TG), config->GetItemCounts(AHB_BLUE_I));
+            TC_LOG_ERROR("server.general", "Purple Trade Goods\t%u\tPurple Items\t%u", config->GetItemCounts(AHB_PURPLE_TG), config->GetItemCounts(AHB_PURPLE_I));
+            TC_LOG_ERROR("server.general", "Orange Trade Goods\t%u\tOrange Items\t%u", config->GetItemCounts(AHB_ORANGE_TG), config->GetItemCounts(AHB_ORANGE_I));
+            TC_LOG_ERROR("server.general", "Yellow Trade Goods\t%u\tYellow Items\t%u", config->GetItemCounts(AHB_YELLOW_TG), config->GetItemCounts(AHB_YELLOW_I));
         }
     }
     if (AHBBuyer)
@@ -1877,16 +1877,16 @@ void AuctionHouseBot::LoadValues(AHBConfig *config)
         config->SetBidsPerInterval(CharacterDatabase.PQuery("SELECT buyerbidsperinterval FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
         if (debug_Out)
         {
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPriceGrey          = %u", config->GetBuyerPrice(AHB_GREY));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPriceWhite         = %u", config->GetBuyerPrice(AHB_WHITE));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPriceGreen         = %u", config->GetBuyerPrice(AHB_GREEN));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPriceBlue          = %u", config->GetBuyerPrice(AHB_BLUE));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPricePurple        = %u", config->GetBuyerPrice(AHB_PURPLE));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPriceOrange        = %u", config->GetBuyerPrice(AHB_ORANGE));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerPriceYellow        = %u", config->GetBuyerPrice(AHB_YELLOW));
-            sLog->outError(LOG_FILTER_GENERAL, "buyerBiddingInterval    = %u", config->GetBiddingInterval());
-            sLog->outError(LOG_FILTER_GENERAL, "buyerBidsPerInterval    = %u", config->GetBidsPerInterval());
+            TC_LOG_ERROR("server.general", "buyerPriceGrey          = %u", config->GetBuyerPrice(AHB_GREY));
+            TC_LOG_ERROR("server.general", "buyerPriceWhite         = %u", config->GetBuyerPrice(AHB_WHITE));
+            TC_LOG_ERROR("server.general", "buyerPriceGreen         = %u", config->GetBuyerPrice(AHB_GREEN));
+            TC_LOG_ERROR("server.general", "buyerPriceBlue          = %u", config->GetBuyerPrice(AHB_BLUE));
+            TC_LOG_ERROR("server.general", "buyerPricePurple        = %u", config->GetBuyerPrice(AHB_PURPLE));
+            TC_LOG_ERROR("server.general", "buyerPriceOrange        = %u", config->GetBuyerPrice(AHB_ORANGE));
+            TC_LOG_ERROR("server.general", "buyerPriceYellow        = %u", config->GetBuyerPrice(AHB_YELLOW));
+            TC_LOG_ERROR("server.general", "buyerBiddingInterval    = %u", config->GetBiddingInterval());
+            TC_LOG_ERROR("server.general", "buyerBidsPerInterval    = %u", config->GetBidsPerInterval());
         }
     }
-    if (debug_Out) sLog->outError(LOG_FILTER_GENERAL, "End Settings for %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetCString());
+    if (debug_Out) TC_LOG_ERROR("server.general", "End Settings for %s Auctionhouses:", CharacterDatabase.PQuery("SELECT name FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetCString());
 }

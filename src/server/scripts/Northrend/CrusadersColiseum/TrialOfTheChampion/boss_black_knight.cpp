@@ -206,7 +206,7 @@ public:
             uiIntroPhase = 0;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) OVERRIDE
         {
             if (!who)
                 return;
@@ -248,14 +248,14 @@ public:
             SummonList.push_back(summon->GetGUID());
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (Phase == IDLE)
                 return;
 
             if (Phase == INTRO)
             {
-                if (uiIntroTimer <= uiDiff)
+                if (uiIntroTimer <= diff)
                 {
             	    switch (uiIntroPhase)
                     {
@@ -303,7 +303,7 @@ public:
                 		}
         	        } 
                     else
-                        uiIntroTimer -= uiDiff;
+                        uiIntroTimer -= diff;
                    return;
                 }
 
@@ -311,7 +311,8 @@ public:
                   return;
 
                 if (bEventInProgress)
-                    if (uiResurrectTimer <= uiDiff)
+                {
+                    if (uiResurrectTimer <= diff)
                     {
                         me->SetFullHealth();
                         me->AttackStop();
@@ -332,30 +333,32 @@ public:
                     uiResurrectTimer = 3000;
                     bEventInProgress = false;
                     me->ClearUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED);
-                } else uiResurrectTimer -= uiDiff;
+                    } 
+                }
+                else uiResurrectTimer -= diff;
 
 
             switch (uiPhase)
             {
                 case PHASE_UNDEAD:
                 {
-                    if (uiPlagueStrikeTimer <= uiDiff)
+                    if (uiPlagueStrikeTimer <= diff)
                     {
                         DoCastVictim(SPELL_PLAGUE_STRIKE);
                         uiPlagueStrikeTimer = urand(12000, 15000);
-                    } else uiPlagueStrikeTimer -= uiDiff;
+                    } else uiPlagueStrikeTimer -= diff;
                     
-                    if (uiObliterateTimer <= uiDiff)
+                    if (uiObliterateTimer <= diff)
                     {
                         DoCastVictim(DUNGEON_MODE(SPELL_OBLITERATE, SPELL_OBLITERATE_H));
                         uiObliterateTimer = urand(17000, 19000);
-                    } else uiObliterateTimer -= uiDiff;
+                    } else uiObliterateTimer -= diff;
                     
-                    if (uiIcyTouchTimer <= uiDiff)
+                    if (uiIcyTouchTimer <= diff)
                     {
                         DoCastVictim(DUNGEON_MODE(SPELL_ICY_TOUCH, SPELL_ICY_TOUCH_H));
                         uiIcyTouchTimer = urand(5000, 7000);
-                    } else uiIcyTouchTimer -= uiDiff;
+                    } else uiIcyTouchTimer -= diff;
                     break;
                 }
                 case PHASE_SKELETON:
@@ -369,15 +372,17 @@ public:
                     }
 
                     if (!bDeathArmyDone)
-                        if (uiDeathArmyCheckTimer <= uiDiff)
+                    {
+                        if (uiDeathArmyCheckTimer <= diff)
                         {
                             me->ClearUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             uiDeathArmyCheckTimer = 0;
                             bDeathArmyDone = true;
-                        } else uiDeathArmyCheckTimer -= uiDiff;
+                        } else uiDeathArmyCheckTimer -= diff;
+                    }
                     
-                    if (uiDesecrationTimer <= uiDiff)
+                    if (uiDesecrationTimer <= diff)
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
@@ -386,9 +391,9 @@ public:
 
                         }
                         uiDesecrationTimer = urand(15000,16000);
-                    } else uiDesecrationTimer -= uiDiff;
+                    } else uiDesecrationTimer -= diff;
                         
-                    if (uiGhoulExplodeTimer <= uiDiff)
+                    if (uiGhoulExplodeTimer <= diff)
                     {
                         if (!SummonList.empty())
                         {
@@ -415,27 +420,27 @@ public:
                         }
 
                         uiGhoulExplodeTimer = 8000;
-                    } else uiGhoulExplodeTimer -= uiDiff;
+                    } else uiGhoulExplodeTimer -= diff;
                     
-                    if (uiPlagueStrike1Timer <= uiDiff)
+                    if (uiPlagueStrike1Timer <= diff)
                     {
                         DoCastVictim(SPELL_PLAGUE_STRIKE);
                         uiPlagueStrike1Timer = urand(12000, 15000);
-                    } else uiPlagueStrike1Timer -= uiDiff;
+                    } else uiPlagueStrike1Timer -= diff;
                     
-                    if (uiObliterate1Timer <= uiDiff)
+                    if (uiObliterate1Timer <= diff)
                     {
                         DoCastVictim(SPELL_OBLITERATE);
                         uiObliterate1Timer = urand(17000, 19000);
-                    } else uiObliterate1Timer -= uiDiff;
+                    } else uiObliterate1Timer -= diff;
                     
-                    if (uiIcyTouch1Timer <= uiDiff)
+                    if (uiIcyTouch1Timer <= diff)
                     {
                         DoCastVictim(SPELL_ICY_TOUCH);
                         uiIcyTouch1Timer = urand(5000, 7000);
-                    } else uiIcyTouch1Timer -= uiDiff;
+                    } else uiIcyTouch1Timer -= diff;
                     
-                    if (uiDeathRespiteTimer <= uiDiff)
+                    if (uiDeathRespiteTimer <= diff)
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
@@ -443,20 +448,20 @@ public:
                             DoCast(target, SPELL_DEATH_RESPITE);
                         }
                         uiDeathRespiteTimer = urand(15000, 16000);
-                    } else uiDeathRespiteTimer -= uiDiff;
+                    } else uiDeathRespiteTimer -= diff;
                     break;
                 }
 
                 case PHASE_GHOST:
                 {
-                    if (uiDeathBiteTimer <= uiDiff)
+                    if (uiDeathBiteTimer <= diff)
                     {
                         SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                         DoCast(me, DUNGEON_MODE(SPELL_DEATH_BITE, SPELL_DEATH_BITE_H));
                         uiDeathBiteTimer = urand (2000, 4000);
-                    } else uiDeathBiteTimer -= uiDiff;
+                    } else uiDeathBiteTimer -= diff;
                 
-                    if (uiMarkedDeathTimer <= uiDiff)
+                    if (uiMarkedDeathTimer <= diff)
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
@@ -466,7 +471,7 @@ public:
                         uiMarkedDeathTimer = urand (10000, 12000);
 
                     } 
-                    else uiMarkedDeathTimer -= uiDiff;
+                    else uiMarkedDeathTimer -= diff;
                     break;
                 }
             }
@@ -475,7 +480,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             bEventInBattle = true;
             Talk(SAY_AGGRO);
@@ -502,7 +507,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) OVERRIDE
         {
             Talk(SAY_KILLED_PLAYER);
             if (instance)
@@ -585,7 +590,7 @@ public:
             uiAttackTimer = 3500;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -624,13 +629,13 @@ public:
         uint32 uiLeapTimer;
         uint32 uiClawTimer;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             uiLeapTimer = 10000;
             uiClawTimer = 1000;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
@@ -657,7 +662,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const OVERRIDE
     {
         return new npc_risen_announcerAI(creature);
     }
@@ -681,11 +686,12 @@ public:
         Creature* pHighlord;
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() OVERRIDE
         {
             pHighlord = NULL;
         }
-        void WaypointReached(uint32 uiPointId)
+
+        void WaypointReached(uint32 uiPointId) OVERRIDE
         {
             switch(uiPointId)
             {
@@ -727,9 +733,9 @@ public:
               }
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
-            npc_escortAI::UpdateAI(uiDiff);
+            npc_escortAI::UpdateAI(diff);
 
             if (!UpdateVictim())
                 return;

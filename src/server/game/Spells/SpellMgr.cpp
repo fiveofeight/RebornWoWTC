@@ -3647,7 +3647,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
                break;
             case 62012: // Turkey Caller
-                spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_0_YARDS;    // 0yd
+                spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_0_YARDS);    // 0yd
                 break;
             case 24314: // Threatening Gaze
                 spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_JUMP;

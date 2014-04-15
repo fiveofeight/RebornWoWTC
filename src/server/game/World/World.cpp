@@ -1221,7 +1221,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
 	/** World of Warcraft Armory **/
-    m_bool_configs[CONFIG_ARMORY_ENABLE] = ConfigMgr::GetBoolDefault("Armory.Enable", true);
+    m_bool_configs[CONFIG_ARMORY_ENABLE] = sConfigMgr->GetBoolDefault("Armory.Enable", true);
     /** World of Warcraft Armory **/
 
     // MySQL ping time interval
@@ -1820,7 +1820,7 @@ void World::SetInitialWorldSettings()
 
     LoadCharacterNameData();
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Initialize AuctionHouseBot...");
+    TC_LOG_INFO("server.loading", "Initialize AuctionHouseBot...");
     auctionbot.Initialize();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);

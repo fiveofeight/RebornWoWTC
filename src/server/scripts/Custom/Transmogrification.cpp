@@ -191,7 +191,7 @@ public:
                                 oldItem->SetFakeEntry(newItem->GetEntry());
                                 newItem->SetNotRefundable(player);
                                 newItem->SetBinding(true);
-                                player->PlayDirectSound(3337);
+                                player->PlayDirectSound(3337, player);
                                 session->SendAreaTriggerMessage(session->GetTrinityString(LANG_ITEM_TRANSMOGRIFIED), GetSlotName(sender, session));
                             }
                             else

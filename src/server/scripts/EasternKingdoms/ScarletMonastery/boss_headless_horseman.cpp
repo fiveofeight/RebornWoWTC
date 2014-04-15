@@ -112,7 +112,7 @@ class boss_headless_horseman : public CreatureScript
         {
             boss_headless_horsemanAI(Creature* c) : ScriptedAI(c), _summons(me) {            }
 
-            void Reset()
+            void Reset() OVERRIDE
             {
                 _summons.DespawnAll();
 
@@ -162,12 +162,12 @@ class boss_headless_horseman : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) OVERRIDE
             {
                 DoZoneInCombat(me, 100.0f);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* victim) OVERRIDE
             {
                 if (!victim->ToPlayer())
                     return;
@@ -180,7 +180,7 @@ class boss_headless_horseman : public CreatureScript
                 _summons.Summon(summon);                    
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) OVERRIDE
             {
                 Talk(SAY_DEATH);
                 _summons.DespawnAll();
@@ -251,7 +251,7 @@ class boss_headless_horseman : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(uint32 const diff) OVERRIDE
             {
                 if (!UpdateVictim())
                     return;
@@ -426,7 +426,7 @@ class npc_horseman_head : public CreatureScript
             bool _despawn;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const OVERRIDE
         {
             return new npc_horseman_headAI(creature);
         }
@@ -444,9 +444,7 @@ public:
 
     struct npc_pulsing_pumpkinAI : public ScriptedAI
     {
-        mob_pulsing_pumpkinAI(Creature* creature) : ScriptedAI(creature) 
-        {
-        }
+        npc_pulsing_pumpkinAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool sprouted;
         uint64 debuffGUID;
@@ -459,8 +457,6 @@ public:
             DoCast(me, SPELL_SPROUTING, false);
             sprouted = false;
         }
-
-        void EnterCombat(Unit* /*who*/) OVERRIDE { }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell) OVERRIDE
         {
@@ -546,6 +542,6 @@ void AddSC_boss_headless_horseman()
 {
     new boss_headless_horseman();
     new npc_horseman_head();
-    new mob_pulsing_pumpkin();
+    new npc_pulsing_pumpkin();
     new go_pumpkin_shrine();
 }

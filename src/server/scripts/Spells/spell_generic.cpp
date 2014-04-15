@@ -4535,7 +4535,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_trick();
     new spell_gen_trick_or_treat();
     new spell_gen_tricky_treat();
-    new spell_creature_permanent_feign_death();
     new spell_pvp_trinket_wotf_shared_cd();
     new spell_gen_animal_blood();
     new spell_gen_divine_storm_cd_reset();
@@ -4543,8 +4542,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_gunship_portal();
     new spell_gen_dungeon_credit();
     new spell_gen_profession_research();
-    new spell_generic_clone();
-    new spell_generic_clone_weapon();
     new spell_gen_chaos_blast();
     new spell_gen_clone_weapon_aura();
     new spell_gen_count_pct_from_max_hp("spell_gen_default_count_pct_from_max_hp");

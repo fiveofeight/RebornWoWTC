@@ -254,7 +254,7 @@ class boss_eadric : public CreatureScript
                 return;
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
             _EnterCombat();
@@ -263,7 +263,7 @@ class boss_eadric : public CreatureScript
             hasBeenInCombat = true;
         }
     	
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) OVERRIDE
         {
             if (IsHeroic() && !bDone)
                 if (caster->GetTypeId() == TYPEID_PLAYER)
@@ -271,20 +271,20 @@ class boss_eadric : public CreatureScript
                         DoCast(caster, SPELL_EADRIC_ACHIEVEMENT);
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
-            if (bDone && uiResetTimer <= uiDiff)
+            if (bDone && uiResetTimer <= diff)
             {
                 me->GetMotionMaster()->MovePoint(0,746.843f, 695.68f, 412.339f);
                 bDone = false;
                 if (GameObject* pGO = GameObject::GetGameObject(*me, instance->GetData64(DATA_MAIN_GATE)))
                     instance->HandleGameObject(pGO->GetGUID(),false);
-            } else uiResetTimer -= uiDiff;
+            } else uiResetTimer -= diff;
 
             if (!UpdateVictim())
                 return;
 
-            if (uiHammerJusticeTimer <= uiDiff)
+            if (uiHammerJusticeTimer <= diff)
             {
                 me->InterruptNonMeleeSpells(true);
 
@@ -298,21 +298,21 @@ class boss_eadric : public CreatureScript
                     }
                 }
                 uiHammerJusticeTimer = 25000;
-            } else uiHammerJusticeTimer -= uiDiff;
+            } else uiHammerJusticeTimer -= diff;
 
-            if (uiVenganceTimer <= uiDiff)
+            if (uiVenganceTimer <= diff)
             {
                 DoCast(me,SPELL_VENGEANCE);
 
                 uiVenganceTimer = 10000;
-            } else uiVenganceTimer -= uiDiff;
+            } else uiVenganceTimer -= diff;
 
-            if (uiRadianceTimer <= uiDiff)
+            if (uiRadianceTimer <= diff)
             {
                 DoCastAOE(SPELL_RADIANCE);
 
                 uiRadianceTimer = 16000;
-            } else uiRadianceTimer -= uiDiff;
+            } else uiRadianceTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -400,7 +400,7 @@ class boss_paletress : public CreatureScript
             }
 
         }
-	    void EnterCombat(Unit* pWho)
+	    void EnterCombat(Unit* /*who*/) OVERRIDE
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
             _EnterCombat();
@@ -439,26 +439,26 @@ class boss_paletress : public CreatureScript
             }
         }
 
-        void MovementInform(uint32 MovementType, uint32 Data) OVERRIDE
+        void MovementInform(uint32 MovementType, uint32 /*Data*/) OVERRIDE
         {
             if (MovementType != POINT_MOTION_TYPE)
                 return;	
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
-            if (bDone && uiResetTimer <= uiDiff)
+            if (bDone && uiResetTimer <= diff)
             {
                 me->GetMotionMaster()->MovePoint(0, 746.843f, 695.68f, 412.339f);
                 bDone = false;
                 if (GameObject* pGO = GameObject::GetGameObject(*me, pInstance->GetData64(DATA_MAIN_GATE)))
                     pInstance->HandleGameObject(pGO->GetGUID(),false);	
-            } else uiResetTimer -= uiDiff;
+            } else uiResetTimer -= diff;
 
             if (!UpdateVictim())
                 return;
 
-            if (uiHolyFireTimer <= uiDiff)
+            if (uiHolyFireTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
@@ -469,9 +469,9 @@ class boss_paletress : public CreatureScript
                     uiHolyFireTimer = 13000;
                 else
                     uiHolyFireTimer = urand(9000,12000);
-            } else uiHolyFireTimer -= uiDiff;
+            } else uiHolyFireTimer -= diff;
 
-            if (uiHolySmiteTimer <= uiDiff)
+            if (uiHolySmiteTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
@@ -482,11 +482,11 @@ class boss_paletress : public CreatureScript
                     uiHolySmiteTimer = 9000;
                 else
                     uiHolySmiteTimer = urand(5000,7000);
-            } else uiHolySmiteTimer -= uiDiff;
+            } else uiHolySmiteTimer -= diff;
 
             if (me->HasAura(SPELL_SHIELD))
             {
-                if (uiRenewTimer <= uiDiff)
+                if (uiRenewTimer <= diff)
                 {
                     me->InterruptNonMeleeSpells(true);
                     uint8 uiTarget = urand(0,1);
@@ -502,7 +502,7 @@ class boss_paletress : public CreatureScript
                             break;
                     }
                     uiRenewTimer = urand(15000,17000);
-                } else uiRenewTimer -= uiDiff;
+                } else uiRenewTimer -= diff;
             }
 
             if (!bHealth && me->GetHealth()*100 / me->GetMaxHealth() <= 35)
@@ -604,12 +604,12 @@ class npc_memory : public CreatureScript
             uiWakingNightmare = 7000;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
             if (!UpdateVictim())
                 return;
 
-            if (uiOldWoundsTimer <= uiDiff)
+            if (uiOldWoundsTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                 {
@@ -617,15 +617,15 @@ class npc_memory : public CreatureScript
                         DoCast(target, DUNGEON_MODE(SPELL_OLD_WOUNDS,SPELL_OLD_WOUNDS_H));
                 }
                 uiOldWoundsTimer = 23000;
-            }else uiOldWoundsTimer -= uiDiff;
+            }else uiOldWoundsTimer -= diff;
 
-            if (uiWakingNightmare <= uiDiff)
+            if (uiWakingNightmare <= diff)
             {
                 DoCast(me, DUNGEON_MODE(SPELL_WAKING_NIGHTMARE,SPELL_WAKING_NIGHTMARE_H));
                 uiWakingNightmare = 15000;
-            }else uiWakingNightmare -= uiDiff;
+            }else uiWakingNightmare -= diff;
 
-            if (uiShadowPastTimer <= uiDiff)
+            if (uiShadowPastTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,1))
                 {
@@ -633,7 +633,7 @@ class npc_memory : public CreatureScript
                         DoCast(target,DUNGEON_MODE(SPELL_SHADOWS_PAST,SPELL_SHADOWS_PAST_H));
                 }
                 uiShadowPastTimer = 20000;
-            }else uiShadowPastTimer -= uiDiff;
+            }else uiShadowPastTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -757,7 +757,7 @@ class npc_argent_soldier : public CreatureScript
             }  
         }
 
-        void SetData(uint32 uiType, uint32 uiData) OVERRIDE
+        void SetData(uint32 uiType, uint32 /*data*/) OVERRIDE
         {
             switch(me->GetEntry())
             {
@@ -815,83 +815,83 @@ class npc_argent_soldier : public CreatureScript
             uiWaypoint = uiType;
         }
 
-        void UpdateAI(uint32 uiDiff) OVERRIDE
+        void UpdateAI(uint32 diff) OVERRIDE
         {
-            npc_escortAI::UpdateAI(uiDiff);
+            npc_escortAI::UpdateAI(diff);
 
             if (!UpdateVictim())
                 return;
     			
-            if (uiCleaveTimer <= uiDiff)
+            if (uiCleaveTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,SPELL_STRIKE);				
                 uiCleaveTimer = 20000;
-            } else uiCleaveTimer -= uiDiff;	
+            } else uiCleaveTimer -= diff;	
     		
-            if (uiStrikeTimer <= uiDiff)
+            if (uiStrikeTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,SPELL_CLEAVE);				
                 uiStrikeTimer = 25000;
-            } else uiStrikeTimer -= uiDiff;	
+            } else uiStrikeTimer -= diff;	
     		
-            if (uiPummelTimer <= uiDiff)
+            if (uiPummelTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,SPELL_PUMMEL);				
                 uiPummelTimer = 35000;
-            } else uiPummelTimer -= uiDiff;	
+            } else uiPummelTimer -= diff;	
     		
-            if (uiPainTimer <= uiDiff)
+            if (uiPainTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,SPELL_PAIN);				
                 uiPainTimer = 30000;
-            } else uiPainTimer -= uiDiff;	
+            } else uiPainTimer -= diff;	
     		
-            if (uiMindTimer <= uiDiff)
+            if (uiMindTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,SPELL_MIND);				
                 uiMindTimer = 90000;
-            } else uiMindTimer -= uiDiff;
+            } else uiMindTimer -= diff;
     		
-            if (uiSsmiteTimer <= uiDiff)
+            if (uiSsmiteTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM,0))
                     DoCast(target,SPELL_SSMITE);				
                 uiSsmiteTimer = 25000;
-            } else uiSsmiteTimer -= uiDiff;
+            } else uiSsmiteTimer -= diff;
     		
-                    if (uiLightTimer <= uiDiff)
+                    if (uiLightTimer <= diff)
                     {
                         DoCast(me,DUNGEON_MODE(SPELL_LIGHT,SPELL_LIGHT_H));
                         uiLightTimer = urand (15000, 17000);
-                    } else uiLightTimer -= uiDiff;
+                    } else uiLightTimer -= diff;
     				
-                    if (uiFlurryTimer <= uiDiff)
+                    if (uiFlurryTimer <= diff)
                     {
                         DoCast(me,SPELL_FLURRY);
                         uiFlurryTimer = 22000;
-                    } else uiFlurryTimer -= uiDiff;
+                    } else uiFlurryTimer -= diff;
     				
-                    if (uiFinalTimer <= uiDiff)
+                    if (uiFinalTimer <= diff)
                     {
                         DoCast(me,SPELL_FINAL);
                         uiFinalTimer = 70000;
-                    } else uiFinalTimer -= uiDiff;
+                    } else uiFinalTimer -= diff;
     				
-                    if (uiDivineTimer <= uiDiff)
+                    if (uiDivineTimer <= diff)
                     {
                         DoCast(me,SPELL_DIVINE);
                         uiDivineTimer = 85000;
-                    } else uiDivineTimer -= uiDiff;
+                    } else uiDivineTimer -= diff;
     			
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             if (pInstance)
                 pInstance->SetData(DATA_ARGENT_SOLDIER_DEFEATED,pInstance->GetData(DATA_ARGENT_SOLDIER_DEFEATED) + 1);
@@ -960,7 +960,7 @@ class achievement_toc5_argent_challenge : public AchievementCriteriaScript
             creature_entry = original_entry;
         }
 
-        bool OnCheck(Player* source, Unit* target)
+        bool OnCheck(Player* /*source*/, Unit* target)
         {
             if (!target)
                 return false;

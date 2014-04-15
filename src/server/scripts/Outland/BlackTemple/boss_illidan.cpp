@@ -157,7 +157,8 @@ enum CreatureEntry
     SPIRIT_OF_UDALO                 =   23410,
     ILLIDARI_ELITE                  =   23226,
     PARASITIC_SHADOWFIEND           =   23498,
-    CAGE_TRAP_TRIGGER               =   23292               // the eye blast target - has aura 40017
+    CAGE_TRAP_TRIGGER               =   23292,
+    NPC_ILLIDAN_TARGET              =   23070               // the eye blast target - has aura 40017
 };
 
 /*** Phase Names ***/
@@ -493,26 +494,7 @@ public:
             AkamaGUID = 0;
         }
 
-        InstanceScript* instance;
-
-        PhaseIllidan Phase;
-        EventIllidan Event;
-        uint32 Timer[EVENT_ENRAGE + 1];
-
         float m_fTargetMoveX, m_fTargetMoveY, m_fTargetMoveZ;
-
-        uint32 TalkCount;
-        uint32 TransformCount;
-        uint32 FlightCount;
-
-        uint32 HoverPoint;
-
-        uint64 AkamaGUID;
-        uint64 MaievGUID;
-        uint64 FlameGUID[2];
-        uint64 GlaiveGUID[2];
-
-        SummonList Summons;
 
         void Reset() OVERRIDE;
 
