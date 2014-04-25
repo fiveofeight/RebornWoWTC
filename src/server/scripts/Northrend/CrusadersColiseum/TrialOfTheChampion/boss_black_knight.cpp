@@ -514,7 +514,7 @@ public:
                 instance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
+        void DamageTaken(Unit* /*who*/, uint32& damage) OVERRIDE
         {
             if (damage >= me->GetHealth() && uiPhase <= PHASE_SKELETON)
             {

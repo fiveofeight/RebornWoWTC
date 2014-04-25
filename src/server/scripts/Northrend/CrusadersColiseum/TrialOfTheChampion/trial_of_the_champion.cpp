@@ -362,7 +362,7 @@ class npc_herald_toc5 : public CreatureScript
                 me->SetFacingTo(ORIENTATION);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) OVERRIDE
         {
             if (instance && instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
             {
@@ -371,7 +371,7 @@ class npc_herald_toc5 : public CreatureScript
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) OVERRIDE
         {
             switch(summon->GetEntry())
             {
@@ -547,7 +547,7 @@ class npc_herald_toc5 : public CreatureScript
             }
         }
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) OVERRIDE
         {
 		    me->SetReactState(REACT_PASSIVE);
             if (Creature* pGhoul = me->SummonCreature(NPC_RISEN_JAEREN,742.835f, 639.134f, 411.571f, 1.05731f))
@@ -644,7 +644,7 @@ class npc_herald_toc5 : public CreatureScript
             }
         }
 
-        void DoAction(int32 const action)
+        void DoAction(int32 const action) OVERRIDE
         {
             switch (action)
             {
@@ -654,11 +654,8 @@ class npc_herald_toc5 : public CreatureScript
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) OVERRIDE
         {
-            if(!(thrallGUID || garroshGUID || varianGUID || proudmooreGUID || tirionGUID))
-                return;
-                
             events.Update(diff);
                 
             while (uint32 eventId = events.ExecuteEvent())

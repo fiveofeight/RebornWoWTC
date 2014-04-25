@@ -17476,7 +17476,8 @@ bool Unit::SetCanFly(bool enable)
         if (!IsLevitating())
         {
             m_movementInfo.SetFallTime(0);
-            AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+            // Causes you the error "Cannot do that while moving" if you dismount from a flying mount while on the ground by casting a spell (herbalism, another mount, etc).
+            // AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
         }
     }
 
